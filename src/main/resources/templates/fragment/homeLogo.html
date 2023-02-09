@@ -1,3 +1,9 @@
+<!--
+'*  파 일 명 : src\main\resources\templates\fragment\homeLogo.html
+'*  기    능 : 홈 -> 홈 로고
+'*  작 성 자 : 김영빈
+'*  비    고 : 2023.02.08 작성
+  -->
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org">
@@ -11,14 +17,13 @@
 <body>
 <header th:fragment="logo" th:remove="tag">
 
-
-    <div class="util-box">
-  <div class="logo-box">
-    <div class="logo">
-      <img src="/img/logo/logo-white.png" alt="" onclick="location.href='http://localhost:9080/'">
+  <div class="util-box">
+    <div class="logo-box">
+      <div class="logo">
+        <img src="/img/logo/logo-white.png" alt="" onclick="location.href='http://localhost:9080/'">
+      </div>
     </div>
   </div>
-    </div>
 
 </header>
 </body>

@@ -8,13 +8,32 @@ import lombok.ToString;
 @Getter
 @ToString
 public class MyHomePriceFilterCondition {
-  private int startRec;         //시작레코드
-  private int endRec;           //종료레코드
-  private String searchType;    //검색유형
-  private String keyword;       //검색어
 
-  public MyHomePriceFilterCondition(String searchType, String keyword) {
-    this.searchType = searchType;
-    this.keyword = keyword;
+  private String contractDate;       //시작 계약일자
+  private String contractDateTo;     //종료 계약일자
+  private String searchSidoCd;       //시도
+  private String searchGugunCd;      //시군구
+  private String searchDongCd;       //읍면동
+  private String searchArea;         //면적
+  private String searchAreaValue;   //시작 면적
+  private String searchAreaValueTo;  //종료 면적
+  private String searchFromAmount;   //시작 금액
+  private String searchToAmnount;    //종료 금액
+
+  private int startRec;           //시작레코드
+  private int endRec;              //종료레코드
+
+  public MyHomePriceFilterCondition(String contractDate, String contractDateTo, String searchSidoCd
+      , String searchGugunCd, String searchDongCd, String searchArea, String searchAreaValue, String searchAreaValueTo, String searchFromAmount, String searchToAmnount) {
+    this.contractDate = contractDate;
+    this.contractDateTo = contractDateTo;
+    this.searchSidoCd = searchSidoCd;
+    this.searchGugunCd = searchGugunCd;
+    this.searchDongCd = searchDongCd;
+    this.searchArea = searchArea;
+    this.searchAreaValue = searchAreaValue;
+    this.searchAreaValueTo = searchAreaValueTo;
+    this.searchFromAmount = searchFromAmount;
+    this.searchToAmnount = searchToAmnount;
   }
 }

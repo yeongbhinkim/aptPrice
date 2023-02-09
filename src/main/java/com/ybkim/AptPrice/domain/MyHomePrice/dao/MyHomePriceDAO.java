@@ -17,7 +17,11 @@ public interface MyHomePriceDAO {
   //개별 조회
   MyHomePrice selectOne(Long cityId);
 
-  //전체건수
+  /**
+   * 전체건수
+   * @param myHomePriceFilterCondition
+   * @return
+   */
   int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
 }

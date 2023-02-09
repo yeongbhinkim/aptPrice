@@ -7,7 +7,6 @@ import com.ybkim.AptPrice.domain.MyHomePrice.svc.MyHomePriceSVC;
 import com.ybkim.AptPrice.domain.common.paging.FindCriteria;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceListForm;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -35,57 +34,68 @@ public class MyHomePriceController {
   private FindCriteria fc;
 
 
-  @GetMapping({"/list",
-      "/list/{reqPage}",
-      "/list/{reqPage}//",
-      "/list/{reqPage}/{searchType}/{keyword}"})
+  @GetMapping({
+      "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/////",
+      "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}////",
+      "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}///{searchFromAmount}/{searchToAmnount}",
+      "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}//",
+      "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}/{searchFromAmount}/{searchToAmnount}"})
   public String listAndReqPage(
-      @PathVariable(required = false) Optional<Integer> reqPage,
-      @PathVariable(required = false) Optional<String> searchType,
-      @PathVariable(required = false) Optional<String> keyword,
+      @PathVariable(required = false) Optional<Integer> reqPage,            //요청페이지, 요청없으면 1
+      @PathVariable(required = false) Optional<String> contractDate,        //시작 계약일자
+      @PathVariable(required = false) Optional<String> contractDateTo,      //종료 계약일자
+      @PathVariable(required = false) Optional<String> searchSidoCd,        //시도
+      @PathVariable(required = false) Optional<String> searchGugunCd,       //시군구
+      @PathVariable(required = false) Optional<String> searchDongCd,        //읍면동
+      @PathVariable(required = false) Optional<String> searchArea,          //면적
+      @PathVariable(required = false) Optional<String> searchAreaValue,          //면적
+      @PathVariable(required = false) Optional<String> searchAreaValueTo,          //면적
+      @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
+      @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
       HttpServletRequest request, Model model) {
-    log.info("/list 요청됨{},{},{}", reqPage, searchType, keyword);
+    log.info("/list 요청됨 {},{},{},{},{},{},{},{},{}", reqPage, contractDate, contractDateTo
+        , searchSidoCd, searchGugunCd, searchDongCd, searchArea, searchFromAmount, searchToAmnount);
 
     //FindCriteria 값 설정
-    fc.getRc().setReqPage(reqPage.orElse(1)); //요청페이지, 요청없으면 1
-    fc.setSearchType(searchType.orElse(""));  //검색유형
-    fc.setKeyword(keyword.orElse(""));        //검색어
-
-
-    List<MyHomePrice> list = null;
+    fc.getRc().setReqPage(reqPage.orElse(1));               //요청페이지, 요청없으면 1
+    fc.setContractDate(contractDate.orElse(""));            //시작 계약일자
+    fc.setContractDateTo(contractDateTo.orElse(""));        //종료 계약일자
+    fc.setSearchSidoCd(searchSidoCd.orElse(""));            //시도
+    fc.setSearchGugunCd(searchGugunCd.orElse(""));          //시군구
+    fc.setSearchDongCd(searchDongCd.orElse(""));            //읍면동
+    fc.setSearchArea(searchArea.orElse(""));                //면적
+    fc.setSearchArea(searchAreaValue.orElse("0"));           //시작 면적
+    fc.setSearchArea(searchAreaValueTo.orElse("10000"));         //종료 면적
+    fc.setSearchFromAmount(searchFromAmount.orElse("0"));    //시작 금액
+    fc.setSearchToAmnount(searchToAmnount.orElse("100000000"));      //종료 금액
 
     MyHomePriceFilterCondition myHomePriceFilterCondition = new MyHomePriceFilterCondition(
-            fc.getRc().getStartRec(), fc.getRc().getEndRec(),
-            "searchType.get()", "keyword.get()");
 
-    log.info("myHomePriceFilterCondition = ", myHomePriceFilterCondition);
-    log.info("fc = ", fc);
+        contractDate.orElse(""), contractDateTo.orElse(""), searchSidoCd.orElse(""), searchGugunCd.orElse(""), searchDongCd.orElse(""),
+        searchArea.orElse(""), searchAreaValue.orElse("0"), searchAreaValueTo.orElse("10000"), searchFromAmount.orElse("0"), searchToAmnount.orElse("100000000"), fc.getRc().getStartRec(), fc.getRc().getEndRec());
+
+
 
     fc.setTotalRec(MyHomePriceSVC.totalCount(myHomePriceFilterCondition));
-    fc.setSearchType(searchType.get());
-    fc.setKeyword(keyword.get());
-//    list = MyHomePriceSVC.MyHomePriceList(myHomePriceFilterCondition);
+
+    List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceList(myHomePriceFilterCondition);
 
     List<MyHomePriceListForm> partOfList = new ArrayList<>();
 
     for (MyHomePrice MyHomePrice : list) {
       MyHomePriceListForm myHomePriceListForm = new MyHomePriceListForm();
       BeanUtils.copyProperties(MyHomePrice, myHomePriceListForm);
-      partOfList.add(myHomePriceListForm);    }
-    log.info("partOfList = ", partOfList);
-    log.info("fc = ", fc);
+      partOfList.add(myHomePriceListForm);
+    }
+
+    log.info("myHomePriceFilterCondition = {}", myHomePriceFilterCondition);
+    log.info("partOfList = {} ", partOfList);
+    log.info("fc = {} ", fc);
 
     model.addAttribute("list", partOfList);
     model.addAttribute("fc", fc);
 
-    log.info("list={}", list);
-
-
-    HttpSession session = request.getSession(false);
-    if (session != null) {
-      return "mainAfterLogin";
-    }
-    return "mainBeforeLogin";
+    return "mainView";
   }
 
 
@@ -100,12 +110,9 @@ public class MyHomePriceController {
 
 //    BeanUtils.copyProperties(MyHomePrice, MyHomePriceDetailForm);
 
-    HttpSession session = request.getSession(false);
 
-    String view = null;
-    view = (session == null) ? "contentBeforeLogin" : "contentAfterLogin";
 
-    return view;
+    return "contentView";
   }
 
 

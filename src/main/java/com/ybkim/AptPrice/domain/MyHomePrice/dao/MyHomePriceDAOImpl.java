@@ -20,6 +20,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
 
   /**
    * APT 조건조회
+   *
    * @param myHomePriceFilterCondition
    * @return
    */
@@ -27,29 +28,44 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   public List<MyHomePrice> selectMyHomePriceList(MyHomePriceFilterCondition myHomePriceFilterCondition) {
     StringBuffer sql = new StringBuffer();
 
-    sql.append(" SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO, a.* FROM APT A ");
-    sql.append(" WHERE 1 = 1");
-//    sql.append(" AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN '?' AND '?' ");
-//    sql.append(" AND CITY  LIKE '%?%'||'%?%'||'%?%' ");
-//    sql.append(" AND DAN_GI_MYEONG LIKE '%?%'");
-//    sql.append(" AND ROAD_NAME LIKE '%?%'");
-//    sql.append(" AND SQUARE_METER LIKE '%?%'");
-//    sql.append(" AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE('?', ','))  AND  TO_NUMBER(REPLACE('?', ','))");
-//    sql.append(" ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC ");
+
+    sql.append(" SELECT A.* FROM( ");
+    sql.append("   SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO, a.* FROM APT A ");
+    sql.append("   WHERE 1 = 1");
+    sql.append("   AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(?,'-','') AND REPLACE(?,'-','') ");
+    sql.append("   AND CITY  LIKE '%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%' ");
+//    sql.append("   AND DAN_GI_MYEONG LIKE '%'||?||'%'");
+//    sql.append("   AND ROAD_NAME LIKE '%'||?||'%'");
+    sql.append("   AND TO_NUMBER(REPLACE(SQUARE_METER, '.')) BETWEEN  TO_NUMBER(?)  AND  TO_NUMBER(?)");
+    sql.append("   AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(?, ','))  AND  TO_NUMBER(REPLACE(?, ','))");
+    sql.append("   ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC ");
+    sql.append(" ) A ");
+    sql.append(" WHERE A.NO BETWEEN ? AND ? ");
 
     List<MyHomePrice> list = jdbcTemplate.query(sql.toString(),
         new BeanPropertyRowMapper<>(MyHomePrice.class),
+        myHomePriceFilterCondition.getContractDate(),
+        myHomePriceFilterCondition.getContractDateTo(),
+        myHomePriceFilterCondition.getSearchSidoCd(),
+        myHomePriceFilterCondition.getSearchGugunCd(),
+        myHomePriceFilterCondition.getSearchDongCd(),
+//        myHomePriceFilterCondition.getSearchArea(),
+        myHomePriceFilterCondition.getSearchAreaValue(),
+        myHomePriceFilterCondition.getSearchAreaValueTo(),
+        myHomePriceFilterCondition.getSearchFromAmount(),
+        myHomePriceFilterCondition.getSearchToAmnount(),
         myHomePriceFilterCondition.getStartRec(),
         myHomePriceFilterCondition.getEndRec()
     );
 
-
+    log.info("list123 = {}", list);
 
     return list;
   }
 
   /**
    * 전체건수
+   *
    * @return
    */
   @Override
@@ -57,12 +73,29 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
 
     StringBuffer sql = new StringBuffer();
 
-    sql.append(" select count(*) from APT ");
+    sql.append("   SELECT count(*) FROM APT ");
+    sql.append("   WHERE 1 = 1");
+    sql.append("   AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(?,'-','') AND REPLACE(?,'-','') ");
+    sql.append("   AND CITY  LIKE '%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%' ");
+//    sql.append("   AND DAN_GI_MYEONG LIKE '%'||?||'%'");
+//    sql.append("   AND ROAD_NAME LIKE '%'||?||'%'");
+    sql.append("   AND TO_NUMBER(REPLACE(SQUARE_METER, '.')) BETWEEN  TO_NUMBER(?)  AND  TO_NUMBER(?)");
+    sql.append("   AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(?, ','))  AND  TO_NUMBER(REPLACE(?, ','))");
 
     Integer cnt = 0;
     cnt = jdbcTemplate.queryForObject(
-        sql.toString(), Integer.class
+        sql.toString(), Integer.class,
+        myHomePriceFilterCondition.getContractDate(),
+        myHomePriceFilterCondition.getContractDateTo(),
+        myHomePriceFilterCondition.getSearchSidoCd(),
+        myHomePriceFilterCondition.getSearchGugunCd(),
+        myHomePriceFilterCondition.getSearchDongCd(),
+        myHomePriceFilterCondition.getSearchAreaValue(),
+        myHomePriceFilterCondition.getSearchAreaValueTo(),
+        myHomePriceFilterCondition.getSearchFromAmount(),
+        myHomePriceFilterCondition.getSearchToAmnount()
     );
+    log.info("cnt = {}", cnt);
 
     return cnt;
   }
