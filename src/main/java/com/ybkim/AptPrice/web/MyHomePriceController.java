@@ -33,7 +33,23 @@ public class MyHomePriceController {
   @Qualifier("fc5") //동일한 타입의 객체가 여러개있을때 빈이름을 명시적으로 지정해서 주입받을때
   private FindCriteria fc;
 
-
+  /**
+   * 조건 조회 리스트
+   * @param reqPage
+   * @param contractDate
+   * @param contractDateTo
+   * @param searchSidoCd
+   * @param searchGugunCd
+   * @param searchDongCd
+   * @param searchArea
+   * @param searchAreaValue
+   * @param searchAreaValueTo
+   * @param searchFromAmount
+   * @param searchToAmnount
+   * @param request
+   * @param model
+   * @return
+   */
   @GetMapping({
       "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/////",
       "/list/{reqPage}/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}////",
@@ -48,38 +64,39 @@ public class MyHomePriceController {
       @PathVariable(required = false) Optional<String> searchGugunCd,       //시군구
       @PathVariable(required = false) Optional<String> searchDongCd,        //읍면동
       @PathVariable(required = false) Optional<String> searchArea,          //면적
-      @PathVariable(required = false) Optional<String> searchAreaValue,          //면적
-      @PathVariable(required = false) Optional<String> searchAreaValueTo,          //면적
+      @PathVariable(required = false) Optional<String> searchAreaValue,     //면적
+      @PathVariable(required = false) Optional<String> searchAreaValueTo,   //면적
       @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
       @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
       HttpServletRequest request, Model model) {
-    log.info("/list 요청됨 {},{},{},{},{},{},{},{},{}", reqPage, contractDate, contractDateTo
-        , searchSidoCd, searchGugunCd, searchDongCd, searchArea, searchFromAmount, searchToAmnount);
+
+//    log.info("/list 요청됨 {},{},{},{},{},{},{},{},{}", reqPage, contractDate, contractDateTo
+//        , searchSidoCd, searchGugunCd, searchDongCd, searchArea, searchFromAmount, searchToAmnount);
 
     //FindCriteria 값 설정
-    fc.getRc().setReqPage(reqPage.orElse(1));               //요청페이지, 요청없으면 1
-    fc.setContractDate(contractDate.orElse(""));            //시작 계약일자
-    fc.setContractDateTo(contractDateTo.orElse(""));        //종료 계약일자
-    fc.setSearchSidoCd(searchSidoCd.orElse(""));            //시도
-    fc.setSearchGugunCd(searchGugunCd.orElse(""));          //시군구
-    fc.setSearchDongCd(searchDongCd.orElse(""));            //읍면동
-    fc.setSearchArea(searchArea.orElse(""));                //면적
-    fc.setSearchArea(searchAreaValue.orElse("0"));           //시작 면적
-    fc.setSearchArea(searchAreaValueTo.orElse("10000"));         //종료 면적
-    fc.setSearchFromAmount(searchFromAmount.orElse("0"));    //시작 금액
-    fc.setSearchToAmnount(searchToAmnount.orElse("100000000"));      //종료 금액
+    fc.getRc().setReqPage(reqPage.orElse(1));                     //요청페이지, 요청없으면 1
+    fc.setContractDate(contractDate.orElse(""));                  //시작 계약일자
+    fc.setContractDateTo(contractDateTo.orElse(""));              //종료 계약일자
+    fc.setSearchSidoCd(searchSidoCd.orElse(""));                  //시도
+    fc.setSearchGugunCd(searchGugunCd.orElse(""));                //시군구
+    fc.setSearchDongCd(searchDongCd.orElse(""));                  //읍면동
+    fc.setSearchArea(searchArea.orElse(""));                      //면적
+    fc.setSearchArea(searchAreaValue.orElse("0"));                //시작 면적
+    fc.setSearchArea(searchAreaValueTo.orElse("10000"));          //종료 면적
+    fc.setSearchFromAmount(searchFromAmount.orElse("0"));         //시작 금액
+    fc.setSearchToAmnount(searchToAmnount.orElse("100000000"));   //종료 금액
 
+    //myHomePriceFilterCondition 값 설정
     MyHomePriceFilterCondition myHomePriceFilterCondition = new MyHomePriceFilterCondition(
-
         contractDate.orElse(""), contractDateTo.orElse(""), searchSidoCd.orElse(""), searchGugunCd.orElse(""), searchDongCd.orElse(""),
-        searchArea.orElse(""), searchAreaValue.orElse("0"), searchAreaValueTo.orElse("10000"), searchFromAmount.orElse("0"), searchToAmnount.orElse("100000000"), fc.getRc().getStartRec(), fc.getRc().getEndRec());
+        searchArea.orElse(""), searchAreaValue.orElse("0"), searchAreaValueTo.orElse("10000"), searchFromAmount.orElse("0"),
+        searchToAmnount.orElse("100000000"), fc.getRc().getStartRec(), fc.getRc().getEndRec());
 
-
-
+    //FindCriteria 전체건수 값 설정
     fc.setTotalRec(MyHomePriceSVC.totalCount(myHomePriceFilterCondition));
 
+    //전체조회
     List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceList(myHomePriceFilterCondition);
-
     List<MyHomePriceListForm> partOfList = new ArrayList<>();
 
     for (MyHomePrice MyHomePrice : list) {
@@ -88,28 +105,43 @@ public class MyHomePriceController {
       partOfList.add(myHomePriceListForm);
     }
 
-    log.info("myHomePriceFilterCondition = {}", myHomePriceFilterCondition);
-    log.info("partOfList = {} ", partOfList);
-    log.info("fc = {} ", fc);
-
+//    log.info("myHomePriceFilterCondition = {}", myHomePriceFilterCondition);
+//    log.info("partOfList = {} ", partOfList);
+//    log.info("fc = {} ", fc);
+    //조회 리스트
     model.addAttribute("list", partOfList);
+    //페이징
     model.addAttribute("fc", fc);
 
     return "mainView";
   }
 
 
-  //조회
-  @GetMapping("/detail/{cityId}")
-  public String detail(@PathVariable Long cityId,
-                       HttpServletRequest request,
-                       Model model) {
+  //상세 조회
 
-    MyHomePrice MyHomePrice = MyHomePriceSVC.findByCityId(cityId);
+  @GetMapping({
+      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/////",
+      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}////",
+      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}///{searchFromAmount}/{searchToAmnount}",
+      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}//",
+      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}/{searchFromAmount}/{searchToAmnount}"})
+  public String detail(
+      @PathVariable(required = false) Optional<String> contractDate,        //시작 계약일자
+      @PathVariable(required = false) Optional<String> contractDateTo,      //종료 계약일자
+      @PathVariable(required = false) Optional<String> searchSidoCd,        //시도
+      @PathVariable(required = false) Optional<String> searchGugunCd,       //시군구
+      @PathVariable(required = false) Optional<String> searchDongCd,        //읍면동
+      @PathVariable(required = false) Optional<String> searchArea,          //면적
+      @PathVariable(required = false) Optional<String> searchAreaValue,     //면적
+      @PathVariable(required = false) Optional<String> searchAreaValueTo,   //면적
+      @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
+      @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
+      HttpServletRequest request, Model model) {
+//상세차트, 위치, 상세정보 리스트
+//    MyHomePrice MyHomePrice = MyHomePriceSVC.findByCityId(cityId);
 //    MyHomePriceDetailForm MyHomePriceDetailForm = new MyHomePriceDetailForm();
 
 //    BeanUtils.copyProperties(MyHomePrice, MyHomePriceDetailForm);
-
 
 
     return "contentView";

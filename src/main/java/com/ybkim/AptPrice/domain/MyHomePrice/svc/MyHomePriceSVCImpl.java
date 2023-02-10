@@ -32,19 +32,26 @@ public class MyHomePriceSVCImpl implements MyHomePriceSVC {
     return MyHomePriceDAO.selectMyHomePriceList(myHomePriceFilterCondition);
   }
 
-
-  //상세조회
-  @Override
-  public MyHomePrice findByCityId(Long cityId) {
-    MyHomePrice findedItem = MyHomePriceDAO.selectOne(cityId);
-    return findedItem;
-  }
-
   /**
    * 전체 건수
+   *
    * @return
    */
   @Override
-  public int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition) {return MyHomePriceDAO.totalCount(myHomePriceFilterCondition);}
+  public int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition) {
+    return MyHomePriceDAO.totalCount(myHomePriceFilterCondition);
+  }
+
+  /**
+   * APT 상세조회
+   *
+   * @param myHomePriceFilterCondition
+   * @return
+   */
+  @Override
+  public MyHomePrice MyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition) {
+    return MyHomePriceDAO.selectMyHomePriceDetail(myHomePriceFilterCondition);
+  }
+
 
 }

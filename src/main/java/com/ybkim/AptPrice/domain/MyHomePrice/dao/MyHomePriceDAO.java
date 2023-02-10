@@ -9,19 +9,27 @@ public interface MyHomePriceDAO {
 
   /**
    * APT 조건 조회
+   *
    * @param myHomePriceFilterCondition
    * @return
    */
   List<MyHomePrice> selectMyHomePriceList(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
-  //개별 조회
-  MyHomePrice selectOne(Long cityId);
-
   /**
    * 전체건수
+   *
    * @param myHomePriceFilterCondition
    * @return
    */
   int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition);
+
+
+  /**
+   * APT 상세조회
+   *
+   * @param myHomePriceFilterCondition
+   * @return
+   */
+  MyHomePrice selectMyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
 }

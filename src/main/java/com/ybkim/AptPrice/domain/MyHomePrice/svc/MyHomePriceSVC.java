@@ -8,16 +8,29 @@ import java.util.List;
 
 public interface MyHomePriceSVC {
 
-    /**
-     * APT 조건 조회
-     * @param myHomePriceFilterCondition
-     * @return
-     */
-    List<MyHomePrice> MyHomePriceList(MyHomePriceFilterCondition myHomePriceFilterCondition);
+  /**
+   * APT 조건 조회
+   *
+   * @param myHomePriceFilterCondition
+   * @return
+   */
+  List<MyHomePrice> MyHomePriceList(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
-    //커피숍 개별 조회
-    MyHomePrice findByCityId(Long cityId);
+  /**
+   * 전체건수
+   *
+   * @param myHomePriceFilterCondition
+   * @return
+   */
+  int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
-    int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition);
 
-  }
+  /**
+   * APT 상세조회
+   *
+   * @param myHomePriceFilterCondition
+   * @return
+   */
+  MyHomePrice MyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition);
+
+}

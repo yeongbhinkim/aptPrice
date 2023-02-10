@@ -117,6 +117,9 @@ if($searchArea.value == 1){
 }else if ($searchArea.value == 5){
      $searchAreaValue = 135;
      $searchAreaValueTo = 10000;
+}else if ($searchArea.value == 0){
+    $searchAreaValue = 0;
+    $searchAreaValueTo = 10000;
 }
     //조건 검색
     // const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.value}/${$searchGugunCd.value}/${$searchDongCd.value}/${$searchArea.value}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
