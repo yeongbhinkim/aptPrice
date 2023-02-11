@@ -5,8 +5,8 @@ import com.ybkim.AptPrice.domain.MyHomePrice.MyHomePrice;
 import com.ybkim.AptPrice.domain.MyHomePrice.dao.MyHomePriceFilterCondition;
 import com.ybkim.AptPrice.domain.MyHomePrice.svc.MyHomePriceSVC;
 import com.ybkim.AptPrice.domain.common.paging.FindCriteria;
+import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceForm;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceListForm;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -35,6 +35,7 @@ public class MyHomePriceController {
 
   /**
    * 조건 조회 리스트
+   *
    * @param reqPage
    * @param contractDate
    * @param contractDateTo
@@ -46,7 +47,6 @@ public class MyHomePriceController {
    * @param searchAreaValueTo
    * @param searchFromAmount
    * @param searchToAmnount
-   * @param request
    * @param model
    * @return
    */
@@ -68,7 +68,7 @@ public class MyHomePriceController {
       @PathVariable(required = false) Optional<String> searchAreaValueTo,   //면적
       @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
       @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
-      HttpServletRequest request, Model model) {
+      Model model) {
 
 //    log.info("/list 요청됨 {},{},{},{},{},{},{},{},{}", reqPage, contractDate, contractDateTo
 //        , searchSidoCd, searchGugunCd, searchDongCd, searchArea, searchFromAmount, searchToAmnount);
@@ -106,7 +106,7 @@ public class MyHomePriceController {
     }
 
 //    log.info("myHomePriceFilterCondition = {}", myHomePriceFilterCondition);
-//    log.info("partOfList = {} ", partOfList);
+    log.info("partOfList = {} ", partOfList);
 //    log.info("fc = {} ", fc);
     //조회 리스트
     model.addAttribute("list", partOfList);
@@ -117,32 +117,40 @@ public class MyHomePriceController {
   }
 
 
-  //상세 조회
-
-  @GetMapping({
-      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/////",
-      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}////",
-      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}///{searchFromAmount}/{searchToAmnount}",
-      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}//",
-      "/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}/{searchFromAmount}/{searchToAmnount}"})
+  /**
+   * 상세조회
+   *
+   * @param apt_id
+   * @param model
+   * @return
+   */
+  @GetMapping({"/detail/{apt_id}"})
   public String detail(
-      @PathVariable(required = false) Optional<String> contractDate,        //시작 계약일자
-      @PathVariable(required = false) Optional<String> contractDateTo,      //종료 계약일자
-      @PathVariable(required = false) Optional<String> searchSidoCd,        //시도
-      @PathVariable(required = false) Optional<String> searchGugunCd,       //시군구
-      @PathVariable(required = false) Optional<String> searchDongCd,        //읍면동
-      @PathVariable(required = false) Optional<String> searchArea,          //면적
-      @PathVariable(required = false) Optional<String> searchAreaValue,     //면적
-      @PathVariable(required = false) Optional<String> searchAreaValueTo,   //면적
-      @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
-      @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
-      HttpServletRequest request, Model model) {
-//상세차트, 위치, 상세정보 리스트
-//    MyHomePrice MyHomePrice = MyHomePriceSVC.findByCityId(cityId);
-//    MyHomePriceDetailForm MyHomePriceDetailForm = new MyHomePriceDetailForm();
+      @PathVariable(required = false) Long apt_id,             //PK_시퀀스
+      Model model) {
+    //
 
-//    BeanUtils.copyProperties(MyHomePrice, MyHomePriceDetailForm);
+    //상세정보 Form
+    MyHomePrice myHomePrice = MyHomePriceSVC.MyHomePriceDetailForm(apt_id);
 
+    MyHomePriceListForm myHomePriceListForm = new MyHomePriceListForm();
+
+    BeanUtils.copyProperties(myHomePrice, myHomePriceListForm);
+    log.info("myHomePriceListForm = {} ", myHomePriceListForm);
+    model.addAttribute("myHomePriceListForm", myHomePriceListForm);
+    //상세차트 (수정중) (점차트?)
+
+    //상세정보 리스트 <li class="shop-each" th:each="item : ${list}"> 로 만든다
+    List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceDetail(apt_id);
+    List<MyHomePriceForm> partOfList = new ArrayList<>();
+
+    for (MyHomePrice MyHomePrice : list) {
+      MyHomePriceForm MyHomePriceForm = new MyHomePriceForm();
+      BeanUtils.copyProperties(MyHomePrice, MyHomePriceForm);
+      partOfList.add(MyHomePriceForm);
+    }
+    log.info("partOfList = {} ", partOfList);
+    model.addAttribute("list", partOfList);
 
     return "contentView";
   }

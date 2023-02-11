@@ -27,9 +27,16 @@ public interface MyHomePriceDAO {
   /**
    * APT 상세조회
    *
-   * @param myHomePriceFilterCondition
+   * @param apt_id
    * @return
    */
-  MyHomePrice selectMyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition);
+  MyHomePrice selectMyHomePriceDetailForm(Long apt_id);
 
+  /**
+   * APT 상세조회 폼
+   *
+   * @param apt_id
+   * @return
+   */
+  List<MyHomePrice> selectMyHomePriceDetail(Long apt_id);
 }

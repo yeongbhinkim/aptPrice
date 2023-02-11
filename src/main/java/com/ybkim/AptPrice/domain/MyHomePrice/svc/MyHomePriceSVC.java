@@ -28,9 +28,16 @@ public interface MyHomePriceSVC {
   /**
    * APT 상세조회
    *
-   * @param myHomePriceFilterCondition
+   * @param apt_id
    * @return
    */
-  MyHomePrice MyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition);
+  MyHomePrice MyHomePriceDetailForm(Long apt_id);
 
+  /**
+   * APT 상세조회 폼
+   *
+   * @param apt_id
+   * @return
+   */
+  List<MyHomePrice> MyHomePriceDetail(Long apt_id);
 }

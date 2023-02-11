@@ -29,8 +29,9 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
     StringBuffer sql = new StringBuffer();
 
     sql.append(" SELECT A.* ");
-    sql.append("  ,GET_AMOUNT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS AMOUNTLIST ");
+//    sql.append("  ,GET_AMOUNT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS AMOUNTLIST ");
     sql.append("  ,GET_CONTRACT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS CONTRACT ");
+    sql.append("  ,GET_TRANSACTIONCOUNT_LIST(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS TRANSACTIONCOUNTLIST ");
     sql.append("  FROM( ");
 //    sql.append("   SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO, a.* FROM APT A ");
     sql.append("   SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO ");
@@ -110,28 +111,73 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   }
 
   /**
-   * APT 상세조회
+   * APT 상세조회 리스트
    *
-   * @param myHomePriceFilterCondition
+   * @param apt_id
    * @return
    */
   @Override
-  public MyHomePrice selectMyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition) {
+  public MyHomePrice selectMyHomePriceDetailForm(Long apt_id) {
 
     StringBuffer sql = new StringBuffer();
-    sql.append("  ");
 
-    MyHomePrice MyHomePriceItem = null;
-    try {
-      MyHomePriceItem = jdbcTemplate.queryForObject(
-          sql.toString(),
-          new BeanPropertyRowMapper<>(MyHomePrice.class)
-      );
-    } catch (Exception e) { //1건을 못찾으면
-      MyHomePriceItem = null;
-    }
+    sql.append(" SELECT * FROM APT ");
+    sql.append(" WHERE APT_ID = ? ");
+
+//    MyHomePrice MyHomePriceItem = null;
+//    try {
+//      MyHomePriceItem = jdbcTemplate.queryForObject(
+//          sql.toString(),
+//          new BeanPropertyRowMapper<>(MyHomePrice.class),
+//          myHomePriceFilterCondition.getApt_id()
+//      );
+//    } catch (Exception e) { //1건을 못찾으면
+//      MyHomePriceItem = null;
+//    }
+
+    MyHomePrice MyHomePriceItem = jdbcTemplate.queryForObject(
+        sql.toString(),
+        new BeanPropertyRowMapper<>(MyHomePrice.class),
+        apt_id
+    );
+
+    log.info("MyHomePriceItem = {}", MyHomePriceItem);
 
     return MyHomePriceItem;
+  }
+
+  /**
+   * APT 상세조회 폼
+   *
+   * @param apt_id
+   * @return
+   */
+  @Override
+  public List<MyHomePrice> selectMyHomePriceDetail(Long apt_id) {
+    StringBuffer sql = new StringBuffer();
+
+    sql.append(" SELECT A.*  ");
+    sql.append(" FROM APT A, (SELECT * ");
+    sql.append("              FROM APT B ");
+    sql.append("              WHERE APT_ID = ? ) B ");
+    sql.append(" WHERE 1 = 1 ");
+    sql.append(" AND A.CITY LIKE '%'||B.CITY||'%' ");
+    sql.append(" AND A.STREET LIKE '%'||B.STREET||'%' ");
+    sql.append(" AND A.BON_BUN LIKE '%'||B.BON_BUN||'%' ");
+    sql.append(" AND A.BU_BUN LIKE '%'||B.BU_BUN||'%' ");
+    sql.append(" AND A.DAN_GI_MYEONG LIKE '%'||B.DAN_GI_MYEONG||'%' ");
+    sql.append(" AND A.SQUARE_METER LIKE '%'||B.SQUARE_METER||'%' ");
+    sql.append(" AND A.LAYER LIKE '%'||B.LAYER||'%' ");
+    sql.append(" AND A.CONSTRUCTION_DATE LIKE '%'||B.CONSTRUCTION_DATE||'%' ");
+
+    List<MyHomePrice> detaillist = jdbcTemplate.query(sql.toString(),
+        new BeanPropertyRowMapper<>(MyHomePrice.class),
+        apt_id
+    );
+
+    log.info("detaillist = {}", detaillist);
+
+    return detaillist;
   }
 
 }

@@ -45,13 +45,23 @@ public class MyHomePriceSVCImpl implements MyHomePriceSVC {
   /**
    * APT 상세조회
    *
-   * @param myHomePriceFilterCondition
+   * @param apt_id
    * @return
    */
   @Override
-  public MyHomePrice MyHomePriceDetail(MyHomePriceFilterCondition myHomePriceFilterCondition) {
-    return MyHomePriceDAO.selectMyHomePriceDetail(myHomePriceFilterCondition);
+  public MyHomePrice MyHomePriceDetailForm(Long apt_id) {
+    return MyHomePriceDAO.selectMyHomePriceDetailForm(apt_id);
   }
 
+  /**
+   * APT 상세조회 폼
+   *
+   * @param apt_id
+   * @return
+   */
+  @Override
+  public List<MyHomePrice> MyHomePriceDetail(Long apt_id) {
+    return MyHomePriceDAO.selectMyHomePriceDetail(apt_id);
+  }
 
 }

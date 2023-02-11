@@ -3,7 +3,7 @@ package com.ybkim.AptPrice.web.form.MyHomePrice;
 import lombok.Data;
 
 @Data
-public class MyHomePriceListForm {
+public class MyHomePriceForm {
 
   private Long apt_id;                       // ID                         NUMBER               PK_시퀀스
   private String city;                       // CITY	                     VARCHAR2(100 BYTE)   시군구

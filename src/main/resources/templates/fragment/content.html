@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko" id="root"
       xmlns:th="http://www.thymeleaf.org"
-      th:fragment="content(title,styles,scripts,style,script,upm,header,nav,main,footer)"
-      th:with="s_id=${session?.loginMemberShip?.memberId},
-               s_email=${session?.loginMemberShip?.memberEmail},
-               s_name=${session?.loginMemberShip?.memberName}"
-      th:data-member-id="${s_id}"
-      th:data-member-email="${s_email}"
-      th:data-member-name="${s_name}">
+      th:fragment="content(title,styles,scripts,style,script,upm,header,nav,main,footer)">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title th:replace=${title}>콘텐트 레이아웃</title>
+  <title th:replace="${title}">콘텐트 레이아웃</title>
+
+  <!--차트-->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 
   <!--common style-->
   <link rel="stylesheet" href="" th:href="@{/css/parts/upperSearchBar.css}" />
@@ -20,8 +17,8 @@
   <link rel="stylesheet" href="" th:href="@{/css/page/content-page-style.css}">
 
 
-  <script defer src="" th:src="@{/js/carousel.js}"></script>
-  <script defer src="" th:src="@{/js/showhide.js}"></script>
+<!--  <script defer src="" th:src="@{/js/carousel.js}"></script>-->
+<!--  <script defer src="" th:src="@{/js/showhide.js}"></script>-->
   <!--common script-->
 <!--  <script defer src="xxx.js"></script>-->
 

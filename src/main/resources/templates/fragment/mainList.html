@@ -27,10 +27,12 @@
             </div>
             <div class="shop-container-util shop-each_title">
               <span>
-                <a href="" th:href="@{/MyHomePrice/detail/{apt_id}(APT_ID=${item.apt_id})}"
-                   th:text="${item.dan_gi_myeong}">아파트이름</a>
-                <!--                <a href="" th:href="@{/MyHomePrice/detail/{contractDate}/{contractDateTo}/{searchSidoCd}/{searchGugunCd}/{searchDongCd}/{searchArea}/{searchAreaValue}/{searchAreaValueTo}/{searchFromAmount}/{searchToAmnount}-->
-                <!--                (contractDate=${item.contractDate}, contractDateTo=${item.contractDateTo}, searchSidoCd=${item.searchSidoCd}, searchGugunCd=${item.searchGugunCd}, searchDongCd=${item.searchDongCd}, searchArea=${item.searchArea}, searchArea=${item.searchArea}, searchAreaValue=${item.searchAreaValue}, searchAreaValueTo=${item.searchAreaValueTo}, searchFromAmount=${item.searchFromAmount}, searchToAmnount=${item.searchToAmnount})}"-->
+                <a href="" th:href="@{/MyHomePrice/detail/{apt_id}(apt_id=${item.apt_id})}"
+                                   th:text="${item.dan_gi_myeong}">아파트이름</a>
+
+<!--                  <a href="" th:href="@{/MyHomePrice/detail/{city}/{street}/{bon_bun}/{bu_bun}/{dan_gi_myeong}/{square_meter}/{layer}/{construction_date}-->
+<!--                  (city=${item.city}, street=${item.street}, bon_bun=${item.bon_bun}, bu_bun=${item.bu_bun}, dan_gi_myeong=${item.dan_gi_myeong}, square_meter=${item.square_meter}, layer=${item.layer}, construction_date=${item.construction_date})}"-->
+<!--                     th:text="${item.dan_gi_myeong}">아파트이름</a>-->
               </span>
             </div>
             <div class="shop-container-util shop-each_hashtag">
@@ -114,8 +116,8 @@
       /* Function to create the chart */
 
       function createChart(item) {
-          const amountlist = item.amountlist;
-          const amountListArr = amountlist.split(',');
+          const transactioncountlist = item.transactioncountlist;
+          const transactioncountlistArr = transactioncountlist.split(',');
 
           const contract = item.contract;
           const contractArr = contract.split(',');
@@ -125,7 +127,7 @@
               labels: contractArr,
               datasets: [{
                   label: '거래금액',
-                  data: amountListArr,
+                  data: transactioncountlistArr,
                   backgroundColor: 'rgba(255, 99, 132, 0.2)',
                   borderColor: 'rgba(255, 99, 132, 1)',
                   borderWidth: 1
