@@ -111,7 +111,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   }
 
   /**
-   * APT 상세조회 리스트
+   * APT 상세조회 폼
    *
    * @param apt_id
    * @return
@@ -147,7 +147,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   }
 
   /**
-   * APT 상세조회 폼
+   * APT 상세조회 리스트
    *
    * @param apt_id
    * @return
@@ -157,6 +157,42 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
     StringBuffer sql = new StringBuffer();
 
     sql.append(" SELECT A.*  ");
+//    sql.append(" , '{x:'||CONCAT(A.CONTRACT_DATE||LPAD(A.CONTRACT_DAY, 2, '0'), ',y:'||TRIM(REPLACE(A.AMOUNT, ',', '')))||'}' AS DATAS  ");
+    sql.append(" FROM APT A, (SELECT * ");
+    sql.append("              FROM APT B ");
+    sql.append("              WHERE APT_ID = ? ) B ");
+    sql.append(" WHERE 1 = 1 ");
+    sql.append(" AND A.CITY LIKE '%'||B.CITY||'%' ");
+    sql.append(" AND A.STREET LIKE '%'||B.STREET||'%' ");
+    sql.append(" AND A.BON_BUN LIKE '%'||B.BON_BUN||'%' ");
+    sql.append(" AND A.BU_BUN LIKE '%'||B.BU_BUN||'%' ");
+    sql.append(" AND A.DAN_GI_MYEONG LIKE '%'||B.DAN_GI_MYEONG||'%' ");
+    sql.append(" AND A.SQUARE_METER LIKE '%'||B.SQUARE_METER||'%' ");
+    sql.append(" AND A.LAYER LIKE '%'||B.LAYER||'%' ");
+    sql.append(" AND A.CONSTRUCTION_DATE LIKE '%'||B.CONSTRUCTION_DATE||'%' ");
+    sql.append(" ORDER BY A.CONTRACT_DATE||LPAD(A.CONTRACT_DAY, 2, '0') DESC ");
+
+    List<MyHomePrice> detaillist = jdbcTemplate.query(sql.toString(),
+        new BeanPropertyRowMapper<>(MyHomePrice.class),
+        apt_id
+    );
+
+    log.info("detaillist = {}", detaillist);
+
+    return detaillist;
+  }
+
+  /**
+   * APT 상세조회 ScatterChart
+   *
+   * @param apt_id
+   * @return
+   */
+  @Override
+  public List<MyHomePrice> selectMyHomePriceScatterChart(Long apt_id) {
+    StringBuffer sql = new StringBuffer();
+
+    sql.append(" SELECT A.CONTRACT_DATE||LPAD(A.CONTRACT_DAY, 2, '0') as x , TRIM(REPLACE(A.AMOUNT, ',', '')) as y  ");
     sql.append(" FROM APT A, (SELECT * ");
     sql.append("              FROM APT B ");
     sql.append("              WHERE APT_ID = ? ) B ");
@@ -170,14 +206,15 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
     sql.append(" AND A.LAYER LIKE '%'||B.LAYER||'%' ");
     sql.append(" AND A.CONSTRUCTION_DATE LIKE '%'||B.CONSTRUCTION_DATE||'%' ");
 
-    List<MyHomePrice> detaillist = jdbcTemplate.query(sql.toString(),
+    List<MyHomePrice> ScatterChart = jdbcTemplate.query(sql.toString(),
         new BeanPropertyRowMapper<>(MyHomePrice.class),
         apt_id
     );
 
-    log.info("detaillist = {}", detaillist);
+    log.info("ScatterChart = {}", ScatterChart);
 
-    return detaillist;
+    return ScatterChart;
   }
+
 
 }

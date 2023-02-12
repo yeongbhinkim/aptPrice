@@ -14,17 +14,17 @@ function currentSlide(n) {
 
 function showSlides(n) {
   let i;
-  const $shopImg = document.getElementsByClassName("shop-img");
+  const $AptImg = document.getElementsByClassName("Apt-img");
 
-  if (n > $shopImg.length) {
+  if (n > $AptImg.length) {
     slideIndex = 1;
   }
   if (n < 1) {
-    slideIndex = $shopImg.length;
+    slideIndex = $AptImg.length;
   }
-  for (i = 0; i < $shopImg.length; i++) {
-    $shopImg[i].style.display = "none";
+  for (i = 0; i < $AptImg.length; i++) {
+    $AptImg[i].style.display = "none";
   }
 
-  $shopImg[slideIndex - 1].style.display = "block";
+  $AptImg[slideIndex - 1].style.display = "block";
 }

@@ -135,21 +135,21 @@ body {
     height: 150px;
     margin-bottom: 30px;
   }
-  .review-shop-content-box {
+  .review-Apt-content-box {
     width: 100%;
     display: flex;
     flex-direction: column;
   }
-  .review-shop-img-box {
+  .review-Apt-img-box {
     text-align: center;
     border-right: 1px solid #ddd;
   }
-  .review-shop-img-box > img {
+  .review-Apt-img-box > img {
     width: 170px;
     height: 100px;
     margin: 10px;
   }
-  .shop-title {
+  .Apt-title {
     margin-bottom: 7px;
     font-size: 13px;
   }

@@ -23,7 +23,8 @@ public class ApiHomeController {
   private final homeSVC homeSVC;
 
   @ResponseBody
-  @GetMapping("/regionCounty/{CITY_CODE}")
+  @GetMapping({"/regionCounty/",
+               "/regionCounty/{CITY_CODE}"})
   public ApiResult<List<home>> regionCounty(@PathVariable Optional<String> CITY_CODE) {
     List<home> HomeForm = homeSVC.regionCounty(CITY_CODE.orElse(""));
     ApiResult<List<home>> result = new ApiResult<>("00", "success", HomeForm);
@@ -32,7 +33,8 @@ public class ApiHomeController {
   }
 
   @ResponseBody
-  @GetMapping("/regionDistricts/{COUNTY_CODE}")
+  @GetMapping({"/regionDistricts/",
+               "/regionDistricts/{COUNTY_CODE}"})
   public ApiResult<List<home>> regionDistricts(@PathVariable Optional<String> COUNTY_CODE) {
     List<home> HomeForm = homeSVC.regionDistricts(COUNTY_CODE.orElse(""));
     ApiResult<List<home>> result = new ApiResult<>("00", "success", HomeForm);

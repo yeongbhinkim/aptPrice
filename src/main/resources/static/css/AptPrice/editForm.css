@@ -1,0 +1,46 @@
+@charset "utf-8";
+
+
+/* ckeditor style 지정 */
+#bcontent {display:none;}
+.AptPrice-wrap .ck-editor__editable{min-height:20rem;}
+
+  main {display:flex; justify-content: center;}
+    .AptPrice-wrap * {
+      /* outline:1px solid red; */
+      box-sizing: border-box;
+    }
+    .AptPrice-wrap {width:80%}
+    .AptPrice-wrap .AptPrice-hit{
+      display: flex;
+      justify-content: end;
+    }
+    .AptPrice-wrap .AptPrice-hit .AptPrice-hit-content {
+      width:50px;
+      font-weight: bold;
+    }
+    .AptPrice-wrap .AptPrice-hit .AptPrice-hit-content.AptPrice-hit-cnt {
+      text-align: right;
+    }
+    .AptPrice-wrap .AptPrice-title {
+      text-align: center; padding:20px 0;
+    }
+    .AptPrice-wrap .AptPrice-content,
+    .AptPrice-wrap .AptPrice-attach{
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 5px;
+    }
+    .AptPrice-wrap .AptPrice-content .w100 {
+      width:100%; padding:3px;
+    }
+    .AptPrice-wrap .AptPrice-btngrp {
+      display:flex;
+      justify-content: flex-end;
+    }
+    .AptPrice-wrap .AptPrice-attach .fa-solid.fa-trash-can {
+       cursor:pointer;
+    }
+    .AptPrice-wrap .AptPrice-attach .fa-solid.fa-trash-can:hover {
+      color: red;
+    }

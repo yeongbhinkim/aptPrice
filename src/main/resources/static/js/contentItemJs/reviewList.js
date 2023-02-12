@@ -7,7 +7,7 @@ list_r();
 function confirmBtn_f(evt) {
   const data = {
     reviewContent: document.querySelector('.write-review').value,
-    shopId: shopId.value,
+    AptId: AptId.value,
     memberId: memberId.value
   };
 
@@ -30,7 +30,7 @@ function confirmBtn_f(evt) {
 //등록된 리뷰 목록
 function list_r(evt) {
 
-  fetch(`http://localhost:9080/review/shop?shopId=${shopId.value}`, {
+  fetch(`http://localhost:9080/review/Apt?AptId=${AptId.value}`, {
     method: 'GET',
   })
     .then((res) => res.json())
@@ -92,7 +92,7 @@ function delBtn_f(reviewId) {
   console.log('삭제 처리 시작');
   const data = {
       reviewId: reviewId,
-      shopId: shopId.value
+      AptId: AptId.value
     };
   const url = `http://localhost:9080/review/${reviewId}`;
   fetch(url, {

@@ -26,29 +26,40 @@
               <tr>
                 <td>
                   <label>계약일자</label>
-                  <input id="contractDate" name="contractDate" class="input_search" type="date">
-                  ~ <input id="contractDateTo" name="contractDateTo" class="input_search" type="date">
+                  <input id="contractDate" name="contractDate" class="input_search" type="date"
+                         style="text-align: right">
+                  ~ <input id="contractDateTo" name="contractDateTo" class="input_search" type="date"
+                           style="text-align: right">
                 </td>
+                <td class="search_tit011">면적</td>
+                <td><select id="searchArea" name="searchArea" class="select_search">
+                  <option value="0">전체</option>
+                  <option value="1">60㎡이하</option>
+                  <option value="2">60㎡초과~85㎡이하</option>
+                  <option value="3">85㎡초과~102㎡이하</option>
+                  <option value="4">102㎡초과~135㎡이하</option>
+                  <option value="5">135㎡초과</option>
+                </select></td>
               </tr>
               </tbody>
             </table>
-            <table>
-              <tbody>
-              <tr>
-                <td>
-                  <div id="gubunR1">
-                    <label>주소구분</label>
-                    <input id="gubunRadio21" name="gubunRadio2" onclick="fn_select_check(this.value)" class="radio"
-                           type="radio" value="1" checked="checked">
-                    <label for="gubunRadio21">지번주소</label>
-                    <input id="gubunRadio22" name="gubunRadio2" onclick="fn_select_check(this.value)" class="radio"
-                           type="radio" value="2">
-                    <label for="gubunRadio22">도로명주소</label>
-                  </div>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+            <!--            <table>-->
+            <!--              <tbody>-->
+            <!--              <tr>-->
+            <!--                <td>-->
+            <!--                  <div id="gubunR1">-->
+            <!--                    <label>주소구분</label>-->
+            <!--                    <input id="gubunRadio21" name="gubunRadio2" onclick="fn_select_check(this.value)" class="radio"-->
+            <!--                           type="radio" value="1" checked="checked">-->
+            <!--                    <label for="gubunRadio21">지번주소</label>-->
+            <!--                    <input id="gubunRadio22" name="gubunRadio2" onclick="fn_select_check(this.value)" class="radio"-->
+            <!--                           type="radio" value="2">-->
+            <!--                    <label for="gubunRadio22">도로명주소</label>-->
+            <!--                  </div>-->
+            <!--                </td>-->
+            <!--              </tr>-->
+            <!--              </tbody>-->
+            <!--            </table>-->
             <table>
               <tbody>
               <tr>
@@ -72,7 +83,7 @@
                 </td>
                 <td class="search_tit011">
                   <label id="dongList1" style="display: block;">읍면동</label>
-                  <label id="loadList1" style="display: none;">도로명</label>
+                  <!--                  <label id="loadList1" style="display: none;">도로명</label>-->
                 </td>
                 <td>
                   <div id="dongList" style="display: block;">
@@ -80,51 +91,46 @@
                       <option value="" selected="selected">전체</option>
                     </select>
                   </div>
-                  <div id="chosungList" style="display: block;">
-                    <select id="searchChosung" name="searchChosung" class="select_search" onchange="fn_load_search()">
-                      <option value="ALL" selected="selected">초성</option>
-                    </select>
-                  </div>
+                  <!--                  <div id="chosungList" style="display: block;">-->
+                  <!--                    <select id="searchChosung" name="searchChosung" class="select_search" onchange="fn_load_search()">-->
+                  <!--                      <option value="ALL" selected="selected">초성</option>-->
+                  <!--                    </select>-->
+                  <!--                  </div>-->
                 </td>
-                <td>
-                  <div id="loadList" style="display: block;">
-                    <select id="searchLoad" name="searchLoad" class="select_search" onchange="fn_dong_search()">
-                      <option value="ALL" selected="selected">도로명</option>
-                    </select>
-                  </div>
-                </td>
+                <!--                <td>-->
+                <!--                  <div id="loadList" style="display: block;">-->
+                <!--                    <select id="searchLoad" name="searchLoad" class="select_search" onchange="fn_dong_search()">-->
+                <!--                      <option value="ALL" selected="selected">도로명</option>-->
+                <!--                    </select>-->
+                <!--                  </div>-->
+                <!--                </td>-->
                 </td>
               </tr>
               </tbody>
             </table>
+
             <table>
               <tbody>
               <tr>
-                <td class="search_tit011">면적</td>
-                <td><select id="searchArea" name="searchArea" class="select_search">
-                  <option value="0">전체</option>
-                  <option value="1">60㎡이하</option>
-                  <option value="2">60㎡초과~85㎡이하</option>
-                  <option value="3">85㎡초과~102㎡이하</option>
-                  <option value="4">102㎡초과~135㎡이하</option>
-                  <option value="5">135㎡초과</option>
-                </select></td>
-                <td class="search_tit011">금액선택</td>
                 <td>
+                  <label class="search_tit011">금액선택(만원)</label>
                   <input id="searchFromAmount" name="searchFromAmount" class="input_search" type="text" value=""
+                         maxlength="15"> ~
+                  <input id="searchToAmnount" name="searchToAmount" class="input_search" type="text" value=""
                          maxlength="15">
-                  (만원) ~ <input id="searchToAmnount" name="searchToAmount" class="input_search" type="text" value=""
-                                maxlength="15">
-                  (만원)
                 </td>
               </tr>
               </tbody>
             </table>
+
+            <div class="search-box" style="height: 34px;">
+              <button id="searchBtn" style="width: 29px;height: 31px;">검색</button>
+            </div>
+
           </td>
+
         </div>
-        <div class="search-box">
-          <button id="searchBtn">검색</button>
-        </div>
+
       </div>
 
     </div>

@@ -26,7 +26,7 @@ public interface MyHomePriceSVC {
 
 
   /**
-   * APT 상세조회
+   * APT 상세조회 폼
    *
    * @param apt_id
    * @return
@@ -34,10 +34,18 @@ public interface MyHomePriceSVC {
   MyHomePrice MyHomePriceDetailForm(Long apt_id);
 
   /**
-   * APT 상세조회 폼
+   * APT 상세조회 리스트
    *
    * @param apt_id
    * @return
    */
   List<MyHomePrice> MyHomePriceDetail(Long apt_id);
+
+  /**
+   * APT 상세조회 ScatterChart
+   *
+   * @param apt_id
+   * @return
+   */
+  List<MyHomePrice> MyHomePriceScatterChart(Long apt_id);
 }

@@ -4,7 +4,7 @@
 #bcontent {
   display: none;
 }
-.coffeeShop-wrap .ck-editor__editable {
+.AptPrice-wrap .ck-editor__editable {
   min-height: 20rem;
 }
 
@@ -12,39 +12,39 @@ main {
   display: flex;
   justify-content: center;
 }
-.coffeeShop-wrap * {
+.AptPrice-wrap * {
   /* outline:1px solid red; */
   box-sizing: border-box;
 }
-.coffeeShop-wrap {
+.AptPrice-wrap {
   width: 80%;
 }
-.coffeeShop-wrap .coffeeShop-hit {
+.AptPrice-wrap .AptPrice-hit {
   display: flex;
   justify-content: end;
 }
-.coffeeShop-wrap .coffeeShop-hit .coffeeShop-hit-content {
+.AptPrice-wrap .AptPrice-hit .AptPrice-hit-content {
   width: 50px;
   font-weight: bold;
 }
-.coffeeShop-wrap .coffeeShop-hit .coffeeShop-hit-content.coffeeShop-hit-cnt {
+.AptPrice-wrap .AptPrice-hit .AptPrice-hit-content.AptPrice-hit-cnt {
   text-align: right;
 }
-.coffeeShop-wrap .coffeeShop-title {
+.AptPrice-wrap .AptPrice-title {
   text-align: center;
   padding: 20px 0;
 }
-.coffeeShop-wrap .coffeeShop-content,
-.coffeeShop-wrap .coffeeShop-attach {
+.AptPrice-wrap .AptPrice-content,
+.AptPrice-wrap .AptPrice-attach {
   display: grid;
   grid-template-columns: 100px 1fr;
   gap: 5px;
 }
-.coffeeShop-wrap .coffeeShop-content .w100 {
+.AptPrice-wrap .AptPrice-content .w100 {
   width: 100%;
   padding: 3px;
 }
-.coffeeShop-wrap .coffeeShopbtngrp {
+.AptPrice-wrap .AptPricebtngrp {
   display: flex;
   justify-content: flex-end;
 }

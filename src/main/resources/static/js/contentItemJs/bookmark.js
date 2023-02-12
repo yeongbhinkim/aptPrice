@@ -17,7 +17,7 @@ heartBtn.addEventListener('click', (evt) => {
 //북마크 등록
 function create_f(e) {
   const data = {
-    shopId: shopId.value,
+    AptId: AptId.value,
     memberId: memberId.value
   };
   fetch(`/bookmark`, {
@@ -38,7 +38,7 @@ function create_f(e) {
 //북마크 삭제
 function del_f(e) {
   const data = {
-    shopId: shopId.value,
+    AptId: AptId.value,
     memberId: memberId.value
   };
   fetch(`/bookmark`, {

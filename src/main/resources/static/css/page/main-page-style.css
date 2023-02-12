@@ -53,7 +53,7 @@
   }
 
   /* 상세검색 내용 */
-  .shop-list-wrap {
+  .Apt-list-wrap {
     margin: 170px auto 0;
     width: 100%;
     max-width: 1200px;
@@ -61,17 +61,17 @@
     height: auto;
     display: block;
   }
-  .shops-box {
+  .Apts-box {
     width: 100%;
     position: relative;
     margin-right: auto;
   }
-  .shops-box::after {
+  .Apts-box::after {
     content: '';
     display: block;
     clear: both;
   }
-  .shop-each {
+  .Apt-each {
     float: left;
     width: 260px;
     height: 300px;
@@ -80,31 +80,31 @@
     margin: 0 20px 40px;
     box-shadow: 0px 2px 14px -2px rgba(153, 162, 180, 0.8);
   }
-  .shop-container {
+  .Apt-container {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
   }
-  .shop-container-util {
+  .Apt-container-util {
     width: 80%;
     margin: 0 auto;
   }
-  .shop-each_img {
+  .Apt-each_img {
     height: 170px;
     margin-top: 20px;
   }
-  .shop-each_img > img {
+  .Apt-each_img > img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  .shop-each_title {
+  .Apt-each_title {
     font-size: 1.1rem;
     margin: 12px auto;
     text-align: center;
     word-break: keep-all;
   }
-  .shop-each_hashtag {
+  .Apt-each_hashtag {
     font-size: 0.8rem;
   }
   .page {
@@ -125,7 +125,7 @@
 }
 
 @media screen and (min-width: 961px) and (max-width: 1199px) {
-  .shop-each {
+  .Apt-each {
     width: 23%;
     margin: 1%;
   }

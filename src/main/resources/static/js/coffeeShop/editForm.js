@@ -18,13 +18,13 @@ saveBtn?.addEventListener('click', (e) => {
 
 // 취소
 cancelBtn?.addEventListener('click', (e) => {
-  const url = `/admin/coffeeShop/list`;
+  const url = `/admin/AptPrice/list`;
   location.href = url;
 });
 
 // 목록
 listBtn?.addEventListener('click', (e) => {
-  const url = `/coffeeShop/list`;
+  const url = `/AptPrice/list`;
   location.href = url;
 });
 
@@ -62,7 +62,7 @@ document.querySelector('.files').addEventListener('click', (evt) => {
 const $delBtn = document.getElementById('delBtn');
 $delBtn?.addEventListener('click', (e) => {
   if (confirm('삭제하시겠습니까?')) {
-    const url = `/coffeeShop/${shopId.value}/del`;
+    const url = `/AptPrice/${AptId.value}/del`;
     location.href = url;
   }
 });

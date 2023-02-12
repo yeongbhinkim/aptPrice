@@ -25,7 +25,7 @@ public interface MyHomePriceDAO {
 
 
   /**
-   * APT 상세조회
+   * APT 상세조회 폼
    *
    * @param apt_id
    * @return
@@ -33,10 +33,18 @@ public interface MyHomePriceDAO {
   MyHomePrice selectMyHomePriceDetailForm(Long apt_id);
 
   /**
-   * APT 상세조회 폼
+   * APT 상세조회 리스트
    *
    * @param apt_id
    * @return
    */
   List<MyHomePrice> selectMyHomePriceDetail(Long apt_id);
+
+  /**
+   * APT 상세조회 ScatterChart
+   *
+   * @param apt_id
+   * @return
+   */
+  List<MyHomePrice> selectMyHomePriceScatterChart(Long apt_id);
 }

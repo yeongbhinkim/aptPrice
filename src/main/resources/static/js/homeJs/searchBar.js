@@ -1,28 +1,30 @@
 'use strict';
+var now = new Date();
+
 
 //계약일자 오늘날짜
-document.getElementById('contractDate').value = new Date().toISOString().substring(0, 10);
+document.getElementById('contractDate').value = new Date(now.setMonth(now.getMonth() - 1)).toISOString().substring(0, 10);
 document.getElementById('contractDateTo').value = new Date().toISOString().substring(0, 10);
 
 // 주소구분 라디오 이벤트
-const $gubunR1 = document.getElementById('gubunR1');
-$gubunR1.addEventListener('click', fn_select_check)
+// const $gubunR1 = document.getElementById('gubunR1');
+// $gubunR1.addEventListener('click', fn_select_check)
 const $searchDongCd = document.getElementById("searchDongCd");
-const $searchChosung = document.getElementById("searchChosung");
+// const $searchChosung = document.getElementById("searchChosung");
 const $searchLoad = document.getElementById("searchLoad");
 $searchDongCd.style.cssText = "display: block; ";
-$searchChosung.style.cssText = "display: none; ";
-$searchLoad.style.cssText = "display: none; ";
+// $searchChosung.style.cssText = "display: none; ";
+// $searchLoad.style.cssText = "display: none; ";
 
 function fn_select_check(e) {
     if (e == 1) {
         $searchDongCd.style.cssText = "display: block; ";
-        $searchChosung.style.cssText = "display: none; ";
-        $searchLoad.style.cssText = "display: none; ";
+        // $searchChosung.style.cssText = "display: none; ";
+        // $searchLoad.style.cssText = "display: none; ";
     } else if (e == 2) {
         $searchDongCd.style.cssText = "display: none; ";
-        $searchChosung.style.cssText = "display: block; ";
-        $searchLoad.style.cssText = "display: block; ";
+        // $searchChosung.style.cssText = "display: block; ";
+        // $searchLoad.style.cssText = "display: block; ";
     }
 }
 
@@ -32,12 +34,18 @@ $searchSidoCd.addEventListener('click', sidoCd)
 const $searchGugunCd = document.getElementById("searchGugunCd");
 $searchGugunCd.addEventListener('click', gugunCd)
 
+//all을 갑을 줘서 null 값이 나오게 유도? 빈값으로 어떻게 주지?
+
 //시도
 function sidoCd(e) {
     if (e != '[object PointerEvent]') {
         const url = '/regionCounty/' + e;
         fn_sgg_search(e, url, cbSidoCd)
+    }else{
+        const url = '/regionCounty/'
+        fn_sgg_search({}, url, cbSidoCd)
     }
+    console.log(e)
 }
 
 //시군구

@@ -7,6 +7,7 @@ import com.ybkim.AptPrice.domain.MyHomePrice.svc.MyHomePriceSVC;
 import com.ybkim.AptPrice.domain.common.paging.FindCriteria;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceForm;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceListForm;
+import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceScatterChart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -140,17 +141,31 @@ public class MyHomePriceController {
     model.addAttribute("myHomePriceListForm", myHomePriceListForm);
     //상세차트 (수정중) (점차트?)
 
-    //상세정보 리스트 <li class="shop-each" th:each="item : ${list}"> 로 만든다
+    //상세정보 리스트
     List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceDetail(apt_id);
     List<MyHomePriceForm> partOfList = new ArrayList<>();
 
+    //점차트 데이터
+    List<MyHomePrice> chart = MyHomePriceSVC.MyHomePriceScatterChart(apt_id);
+    List<MyHomePriceScatterChart> partOfChart = new ArrayList<>();
+
     for (MyHomePrice MyHomePrice : list) {
+      //상세정보 리스트
       MyHomePriceForm MyHomePriceForm = new MyHomePriceForm();
       BeanUtils.copyProperties(MyHomePrice, MyHomePriceForm);
       partOfList.add(MyHomePriceForm);
     }
+    for (MyHomePrice MyHomePrice : chart) {
+      //점차트 데이터
+      MyHomePriceScatterChart MyHomePriceScatterChart = new MyHomePriceScatterChart();
+      BeanUtils.copyProperties(MyHomePrice, MyHomePriceScatterChart);
+      partOfChart.add(MyHomePriceScatterChart);
+    }
+
+    log.info("partOfChart@@ = {} ", partOfChart);
     log.info("partOfList = {} ", partOfList);
     model.addAttribute("list", partOfList);
+    model.addAttribute("chart", partOfChart);
 
     return "contentView";
   }

@@ -65,20 +65,20 @@
 //      } );
 
 
-const $coffeeShop1 = document.querySelector('.coffeeShop-wrap1');
-const category1 = ($coffeeShop1?.dataset.code)? $coffeeShop1.dataset.code : '';
+const $AptPrice1 = document.querySelector('.AptPrice-wrap1');
+const category1 = ($AptPrice1?.dataset.code)? $AptPrice1.dataset.code : '';
 
-const $coffeeShop2 = document.querySelector('.coffeeShop-wrap2');
-const category2 = ($coffeeShop2?.dataset.code)? $coffeeShop2.dataset.code : '';
+const $AptPrice2 = document.querySelector('.AptPrice-wrap2');
+const category2 = ($AptPrice2?.dataset.code)? $AptPrice2.dataset.code : '';
 
-const $coffeeShop3 = document.querySelector('.coffeeShop-wrap3');
-const category3 = ($coffeeShop3?.dataset.code)? $coffeeShop3.dataset.code : '';
+const $AptPrice3 = document.querySelector('.AptPrice-wrap3');
+const category3 = ($AptPrice3?.dataset.code)? $AptPrice3.dataset.code : '';
 
-const $coffeeShop4 = document.querySelector('.coffeeShop-wrap4');
-const category4 = ($coffeeShop4?.dataset.code)? $coffeeShop4.dataset.code : '';
+const $AptPrice4 = document.querySelector('.AptPrice-wrap4');
+const category4 = ($AptPrice4?.dataset.code)? $AptPrice4.dataset.code : '';
 
-const $coffeeShop5 = document.querySelector('.coffeeShop-wrap5');
-const category5 = ($coffeeShop5?.dataset.code)? $coffeeShop5.dataset.code : '';
+const $AptPrice5 = document.querySelector('.AptPrice-wrap5');
+const category5 = ($AptPrice5?.dataset.code)? $AptPrice5.dataset.code : '';
 
 // function onFileUpload(event) {
 //    event.preventDefault();
@@ -101,13 +101,13 @@ writeBtn?.addEventListener('click', e=> {
 
 // 취소
 cancelBtn?.addEventListener("click", e => {
- const url = `/admin/coffeeShop/list`;
+ const url = `/admin/AptPrice/list`;
   location.href = url;
 });
 
 // 목록
 listBtn?.addEventListener("click", e => {
- const url = `/coffeeShop/list`;
+ const url = `/AptPrice/list`;
   location.href = url;
 });
 //분류자동 선택

@@ -23,7 +23,7 @@ function search_f(e){
             $keyword.focus(); $keyword.select(); //커서이동
             return false;
             }
-            const url = `/coffeeShop/list/1/${$searchType.value}/${$keyword.value}`;
+            const url = `/AptPrice/list/1/${$searchType.value}/${$keyword.value}`;
             location.href= url;
 }
 

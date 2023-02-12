@@ -4,21 +4,21 @@ main {
   display: flex;
   justify-content: center;
 }
-.coffeeShop-wrap * {
+.AptPrice-wrap * {
   /* outline: 1px solid red; */
   box-sizing: border-box;
 }
 
-.coffeeShop-wrap {
+.AptPrice-wrap {
   width: 90%;
 }
 
-.coffeeShop-wrap .coffeeShop-title {
+.AptPrice-wrap .AptPrice-title {
   text-align: center;
   padding: 20px 0;
 }
 
-.coffeeShop-wrap .coffeeShop-page .coffeeShop-page-item {
+.AptPrice-wrap .AptPrice-page .AptPrice-page-item {
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -26,40 +26,40 @@ main {
   text-align: center;
 }
 
-.coffeeShop-wrap .coffeeShop-page .coffeeShop-page-item.active {
+.AptPrice-wrap .AptPrice-page .AptPrice-page-item.active {
   background-color: #333;
   color: white;
 }
-.coffeeShop-wrap .coffeeShop-content table {
+.AptPrice-wrap .AptPrice-content table {
   text-align: center;
   width: 100%;
   border: 1px solid #333;
   border-collapse: collapse;
 }
 
-.coffeeShop-wrap .coffeeShop-content table th,
-.coffeeShop-wrap .coffeeShop-content table td {
+.AptPrice-wrap .AptPrice-content table th,
+.AptPrice-wrap .AptPrice-content table td {
   border: 1px solid #333;
   padding: 5px;
 }
 
-.coffeeShop-wrap .coffeeShop-content table > thead > tr th:nth-child(3) {
+.AptPrice-wrap .AptPrice-content table > thead > tr th:nth-child(3) {
   width: 28%;
 }
 
-.coffeeShop-wrap .coffeeShop-btngrp {
+.AptPrice-wrap .AptPrice-btngrp {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
 }
 
-.coffeeShop-wrap .coffeeShop-page {
+.AptPrice-wrap .AptPrice-page {
   display: flex;
   justify-content: center;
   padding: 20px 0;
 }
 
-.coffeeShop-wrap .coffeeShop-search {
+.AptPrice-wrap .AptPrice-search {
   display: flex;
   justify-content: center;
 }
