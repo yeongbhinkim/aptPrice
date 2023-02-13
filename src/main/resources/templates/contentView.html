@@ -9,7 +9,7 @@
         ~{},              <!--/* styles */-->
         ~{},      <!--/* scripts */-->
         ~{},              <!--/* style */-->
-        ~{},              <!--/* script */-->
+        ~{::script},              <!--/* script */-->
         ~{::.upm-inner},  <!--/* upm */-->
         ~{::header},      <!--/* header */-->
         ~{::nav},         <!--/* nav */-->
@@ -20,24 +20,20 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>로그인 후</title>
+  <title>콘텐트</title>
 
 <!--  <link rel="stylesheet" href="" th:href="@{/css/common.css}">-->
 
-
-<!--  <script defer src="" th:src="@{/js/homeJs/afterDetailChk.js}"></script>-->
 <!--  <script defer src="" th:src="@{/js/homeJs/searchBar.js}"></script>-->
-<!--  <script defer src="" th:src="@{/js/contentItemJs/reviewList.js}"></script>-->
-<!--  <script defer src="" th:src="@{/js/contentItemJs/bookmark.js}"></script>-->
-<!--  <script defer src="" th:src="@{/js/contentItemJs/linkCopy.js}"></script>-->
-<!--  <script defer src="" th:src="@{/js/showhide.js}"></script>-->
+  <script defer src="" th:src="@{/js/contentItemJs/linkCopy.js}"></script>
+  <script defer src="" th:src="@{/js/homeJs/searchBar.js}"></script>
 
 </head>
 <body>
   <div class="global-wrap">
     <div class="upm">
       <div class="inner upm-inner">
-<!--        <th:block th:replace="~{fragment/uppermost::afterLoginUpm}"></th:block>-->
+        <div th:replace="~{fragment/homeCenter::global}"></div>
       </div>
     </div>
     <div class="hdr">

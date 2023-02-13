@@ -12,7 +12,7 @@ document.getElementById('contractDateTo').value = new Date().toISOString().subst
 const $searchDongCd = document.getElementById("searchDongCd");
 // const $searchChosung = document.getElementById("searchChosung");
 const $searchLoad = document.getElementById("searchLoad");
-$searchDongCd.style.cssText = "display: block; ";
+// $searchDongCd.style.cssText = "display: block; ";
 // $searchChosung.style.cssText = "display: none; ";
 // $searchLoad.style.cssText = "display: none; ";
 
@@ -40,19 +40,16 @@ $searchGugunCd.addEventListener('click', gugunCd)
 function sidoCd(e) {
     if (e != '[object PointerEvent]') {
         const url = '/regionCounty/' + e;
-        fn_sgg_search(e, url, cbSidoCd)
-    }else{
-        const url = '/regionCounty/'
-        fn_sgg_search({}, url, cbSidoCd)
+        fn_sgg_search(e, url, cbSidoCd);
     }
-    console.log(e)
+    // console.log(e)
 }
 
 //시군구
 function gugunCd(e) {
     if (e != '[object PointerEvent]') {
         const url = '/regionDistricts/' + e;
-        fn_sgg_search(e, url, cbGugunCd)
+        fn_sgg_search(e, url, cbGugunCd);
     }
 }
 
@@ -66,11 +63,25 @@ function fn_sgg_search(param, url, cbSuccess) {
         .catch((err) => {
             console.error('Err:', err);
         });
+    // console.log('res:', res)
+
 }
 
 //시도 -> 시군구 데이터 셋
 function cbSidoCd(res) {
     $searchGugunCd.add = res.data;
+    $searchGugunCd.innerHTML = "";
+    $searchDongCd.innerHTML = "";
+
+    var opt2 = document.createElement("option");
+    opt2.value = "";
+    opt2.innerHTML = "전체";
+    $searchGugunCd.appendChild(opt2);
+
+    var opt3 = document.createElement("option");
+    opt3.value = "";
+    opt3.innerHTML = "전체";
+    $searchDongCd.appendChild(opt3);
 
     for (var i = 0; i < res.data.length; i++) {
         var opt = document.createElement("option");
@@ -83,6 +94,12 @@ function cbSidoCd(res) {
 //시군구 -> 읍면동 데이터 셋
 function cbGugunCd(res) {
     $searchDongCd.add = res.data;
+    $searchDongCd.innerHTML = "";
+
+    var opt3 = document.createElement("option");
+    opt3.value = "";
+    opt3.innerHTML = "전체";
+    $searchDongCd.appendChild(opt3);
 
     for (var i = 0; i < res.data.length; i++) {
         var opt = document.createElement("option");
@@ -107,32 +124,43 @@ var $searchAreaValueTo = "";  //종료 면적
 //검색 버튼 클릭시
 $searchBtn?.addEventListener('click', search_f);
 
+
 function search_f(e) {
+    //날짜 필수값 체크
+    if ($contractDate.value == "" || $contractDateTo.value == "") {
+        alert('계약일자를 입력하세요');
+        if ($contractDate.value == "") {
+            $contractDate.focus();
+            $contractDate.select(); //커서이동
+        }
+        if ($contractDateTo.value == "") {
+            $contractDateTo.focus();
+            $contractDateTo.select(); //커서이동
+        }
+        return false;
+    }
+
     //면적 값
-
-if($searchArea.value == 1){
-     $searchAreaValue = 0;
-     $searchAreaValueTo = 60;
-}else if ($searchArea.value == 2){
-     $searchAreaValue = 60;
-     $searchAreaValueTo = 85;
-}else if ($searchArea.value == 3){
-     $searchAreaValue = 85;
-     $searchAreaValueTo = 102;
-}else if ($searchArea.value == 4){
-     $searchAreaValue = 102;
-     $searchAreaValueTo = 135;
-}else if ($searchArea.value == 5){
-     $searchAreaValue = 135;
-     $searchAreaValueTo = 10000;
-}else if ($searchArea.value == 0){
-    $searchAreaValue = 0;
-    $searchAreaValueTo = 10000;
-}
+    if ($searchArea.value == 1) {
+        $searchAreaValue = 0;
+        $searchAreaValueTo = 60;
+    } else if ($searchArea.value == 2) {
+        $searchAreaValue = 60;
+        $searchAreaValueTo = 85;
+    } else if ($searchArea.value == 3) {
+        $searchAreaValue = 85;
+        $searchAreaValueTo = 102;
+    } else if ($searchArea.value == 4) {
+        $searchAreaValue = 102;
+        $searchAreaValueTo = 135;
+    } else if ($searchArea.value == 5) {
+        $searchAreaValue = 135;
+        $searchAreaValueTo = 10000;
+    } else if ($searchArea.value == 0) {
+        $searchAreaValue = 0;
+        $searchAreaValueTo = 10000;
+    }
     //조건 검색
-    // const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.value}/${$searchGugunCd.value}/${$searchDongCd.value}/${$searchArea.value}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
-    // const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.options[$searchSidoCd .selectedIndex].text  }/${$searchGugunCd.options[$searchGugunCd .selectedIndex].text  }/${$searchDongCd.options[$searchDongCd .selectedIndex].text  }/${$searchArea.value}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
-    const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.options[$searchSidoCd .selectedIndex].text  }/${$searchGugunCd.options[$searchGugunCd .selectedIndex].text  }/${$searchDongCd.options[$searchDongCd .selectedIndex].text  }/${$searchArea.value}/${$searchAreaValue}/${$searchAreaValueTo}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
-
+    const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.options[$searchSidoCd.selectedIndex].text}/${$searchGugunCd.options[$searchGugunCd.selectedIndex].text}/${$searchDongCd.options[$searchDongCd.selectedIndex].text}/${$searchArea.value}/${$searchAreaValue}/${$searchAreaValueTo}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
     location.href = url;
 }

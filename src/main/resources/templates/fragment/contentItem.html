@@ -6,22 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Title</title>
-  <style>
-      table {
-          width: 100%;
-          border: 1px solid #444444;
-          border-collapse: collapse;
-      }
-      th, td {
-          border: 1px solid #444444;
-      }
-  </style>
 </head>
 <body>
 <main th:fragment="contentItem">
 
   <form action="" method="post" th:object="${myHomePriceListForm}">
     <input type="hidden" th:field="*{apt_id}" id="AptId">
+    <input type="text" id="AptUrl" name="AptUrl" style="display: none;"
+           th:value="|http://localhost:9080/MyHomePrice/detail/*{apt_id}|">
     <!-- container -->
     <!-- width : standard -->
     <div class="container">
@@ -55,7 +47,7 @@
                 <span class="mainHashtag">주소</span>
               </div>
               <div class="location-txt txt-box">
-                <span class="mainHashtag" th:text="*{city}">시군구</span>
+                <span class="AptAddress" th:text="*{city}">시군구</span>
               </div>
             </div>
 
@@ -65,17 +57,17 @@
                 <span class="mainHashtag">도로명</span>
               </div>
               <div class="location-txt txt-box">
-                <span id="AptAddress" th:text="*{road_name}">도로명</span>
+                <span id="AptAddressRoad" class="AptAddress" th:text="*{road_name}">도로명</span>
               </div>
             </div>
 
             <div class="Apt-info-content Apt-call-sub-box">
-              <div class="Apt-call-icon-box icon-box">
+              <div class="Apt-location-icon-box icon-box">
 <!--                <a href="#" class="call-icon"></a>-->
                 <span class="mainHashtag">전용면적(㎡)</span>
               </div>
               <div class="call-txt txt-box">
-                <span th:text="*{square_meter}">전용면적(㎡)</span>
+                <span class="AptAddress" th:text="*{square_meter}">전용면적(㎡)</span>
               </div>
             </div>
 
@@ -88,41 +80,26 @@
               <div class="hashtag-txt txt-box" style="display: contents;">
                 <div>
                   <span class="mainHashtag">건축년도</span>
-                  <span class="mainHashtag" th:text="*{construction_date}">건축년도</span>
+                  <span class="AptAddress" th:text="*{construction_date}">건축년도</span>
                 </div>
                 <div>
                   <span class="mainHashtag">층</span>
-                  <span class="mainHashtag" th:text="*{layer}">층</span>
+                  <span class="AptAddress" th:text="*{layer}">층</span>
                 </div>
                 <div>
                   <span class="mainHashtag">번지</span>
-                  <span class="mainHashtag" th:text="*{street}">번지</span>
+                  <span class="AptAddress" th:text="*{street}">번지</span>
                 </div>
                 <div>
                   <span class="mainHashtag">본번</span>
-                  <span class="mainHashtag" th:text="*{bon_bun}">본번</span>
+                  <span class="AptAddress" th:text="*{bon_bun}">본번</span>
                 </div>
                 <div>
                   <span class="mainHashtag">부번</span>
-                  <span class="mainHashtag" th:text="*{bu_bun}">부번</span>
+                  <span class="AptAddress" th:text="*{bu_bun}">부번</span>
                 </div>
               </div>
             </div>
-
-<!--            <div class="Apt-info-content">-->
-<!--              <div class="Apt-parking-icon-box icon-box">-->
-<!--                <img src="/img/icon/parking.png" class="allday-parking-icon">-->
-<!--              </div>-->
-<!--              <div class="parking-txt txt-box">-->
-<!--                &lt;!&ndash;                <span th:text="*{parking}">주차</span>&ndash;&gt;-->
-<!--              </div>-->
-<!--              <div class="Apt-allday-icon-box icon-box">-->
-<!--                <img src="/img/icon/24-hours.png" class="allday-parking-icon">-->
-<!--              </div>-->
-<!--              <div class="allday-txt txt-box">-->
-<!--                &lt;!&ndash;                <span th:text="*{allday}">24시간</span>&ndash;&gt;-->
-<!--              </div>-->
-<!--            </div>-->
 
             <!--
             해시태그 전체보기 / 링크 복사
@@ -154,43 +131,43 @@
 
 
       <div class="Apt-header">
-        <table>
+        <table class="Apt-content">
           <thead>
           <tr>
-<!--            <th>주소</th>-->
-<!--            <th>번지</th>-->
-<!--            <th>본번</th>-->
-<!--            <th>부번</th>-->
-<!--            <th>단지명</th>-->
-<!--            <th>전용면적(㎡)</th>-->
-            <th>계약년월</th>
-            <th>계약일</th>
-            <th>거래금액(만원)</th>
-<!--            <th>층</th>-->
-<!--            <th>건축년도</th>-->
-<!--            <th>도로명</th>-->
-            <th>해제사유발생일</th>
-            <th>거래유형</th>
-            <th>중개사소재지</th>
+<!--            <th class="Apt-content-th">주소</th>-->
+<!--            <th class="Apt-content-th">번지</th>-->
+<!--            <th class="Apt-content-th">본번</th>-->
+<!--            <th class="Apt-content-th">부번</th>-->
+<!--            <th class="Apt-content-th">단지명</th>-->
+<!--            <th class="Apt-content-th">전용면적(㎡)</th>-->
+            <th class="Apt-content-th">계약년월</th>
+            <th class="Apt-content-th">계약일</th>
+            <th class="Apt-content-th">거래금액(만원)</th>
+<!--            <th class="Apt-content-th">층</th>-->
+<!--            <th class="Apt-content-th">건축년도</th>-->
+<!--            <th class="Apt-content-th">도로명</th>-->
+            <th class="Apt-content-th">해제사유발생일</th>
+            <th class="Apt-content-th">거래유형</th>
+            <th class="Apt-content-th">중개사소재지</th>
           </tr>
           </thead>
           <tbody>
           <tr th:each="item : ${list}">
-<!--            <td th:text="${item.city}">시군구</td>-->
-<!--            <td th:text="${item.street}">번지</td>-->
-<!--            <td th:text="${item.bon_bun}">본번</td>-->
-<!--            <td th:text="${item.bu_bun}">부번</td>-->
-<!--            <td th:text="${item.dan_gi_myeong}">단지명</td>-->
-<!--            <td th:text="${item.square_meter}">전용면적(㎡)</td>-->
-            <td th:text="${item.contract_date}">계약년월</td>
-            <td th:text="${item.contract_day}">계약일</td>
-            <td th:text="${item.amount}">거래금액(만원)</td>
-<!--            <td th:text="${item.layer}">층</td>-->
-<!--            <td th:text="${item.construction_date}">건축년도</td>-->
-<!--            <td th:text="${item.road_name}">도로명</td>-->
-            <td th:text="${item.reason_cancellation_date}">해제사유발생일</td>
-            <td th:text="${item.transaction_type}">거래유형</td>
-            <td th:text="${item.location_agency}">중개사소재지</td>
+<!--            <td class="Apt-content-td" th:text="${item.city}">시군구</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.street}">번지</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.bon_bun}">본번</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.bu_bun}">부번</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.dan_gi_myeong}">단지명</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.square_meter}">전용면적(㎡)</td>-->
+            <td class="Apt-content-td" th:text="${item.contract_date}">계약년월</td>
+            <td class="Apt-content-td" th:text="${item.contract_day}">계약일</td>
+            <td class="Apt-content-td" th:text="${item.amount}">거래금액(만원)</td>
+<!--            <td class="Apt-content-td" th:text="${item.layer}">층</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.construction_date}">건축년도</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.road_name}">도로명</td>-->
+            <td class="Apt-content-td" th:text="${item.reason_cancellation_date}">해제사유발생일</td>
+            <td class="Apt-content-td" th:text="${item.transaction_type}">거래유형</td>
+            <td class="Apt-content-td" th:text="${item.location_agency}">중개사소재지</td>
           </tr>
           </tbody>
         </table>
@@ -206,7 +183,7 @@
   <script>
       const $AptName = AptName.textContent;
       //road_name으로 변경
-      const $AptAddress = AptAddress.textContent;
+      const $AptAddress = AptAddressRoad.textContent;
       var mapContainer = document.getElementById('map'), // 지도를 표시할 div
           mapOption = {
               center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표

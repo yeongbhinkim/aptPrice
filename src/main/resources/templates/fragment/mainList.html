@@ -22,14 +22,13 @@
 
         <li class="Apt-each" th:each="item : ${list}">
           <div class="Apt-container">
-            <div class="Apt-container-util Apt-each_imgApt-each_img Apt-img-rd ">
-              <canvas th:id="${'chart-' + item.apt_id + ' canvas'}" width="208" height="170"></canvas>
+            <div class="Apt-container-util Apt-each_img Apt-img-rd ">
+              <canvas th:id="${'chart-' + item.apt_id + ' canvas'}" width="240" height="170"></canvas>
             </div>
             <div class="Apt-container-util Apt-each_title">
               <span>
                 <a href="" th:href="@{/MyHomePrice/detail/{apt_id}(apt_id=${item.apt_id})}"
-                                   th:text="${item.dan_gi_myeong}">아파트이름</a>
-
+                                   th:text="${item.dan_gi_myeong}+${item.layer}+층">아파트이름</a>
 <!--                  <a href="" th:href="@{/MyHomePrice/detail/{city}/{street}/{bon_bun}/{bu_bun}/{dan_gi_myeong}/{square_meter}/{layer}/{construction_date}-->
 <!--                  (city=${item.city}, street=${item.street}, bon_bun=${item.bon_bun}, bu_bun=${item.bu_bun}, dan_gi_myeong=${item.dan_gi_myeong}, square_meter=${item.square_meter}, layer=${item.layer}, construction_date=${item.construction_date})}"-->
 <!--                     th:text="${item.dan_gi_myeong}">아파트이름</a>-->
@@ -40,16 +39,14 @@
                 <li class="Apt-hashtag-rep rep1">
                   <div>
                     <span class="mainHashtag" th:text="${item.city}">위치</span>
+                    <br>
                     <span class="mainHashtag" th:text="${item.square_meter}">전용면적(㎡)</span>
-                  </div>
-                </li>
-                <br>
-                <li class="Apt-hashtag-rep rep2">
-                  <div>
                     <span class="mainHashtag" th:text="${item.amount}">거래금액(만원)</span>
                     <span class="mainHashtag" th:text="${item.construction_date}">건축년도</span>
                   </div>
                 </li>
+                <br>
+
               </ul>
             </div>
           </div>
@@ -106,7 +103,7 @@
 
       $mainHashtag.forEach(ele => {
           if (ele.textContent.trim().length > 1) {
-              const $hashtagView = "#" + ele.textContent;
+              const $hashtagView = " #" + ele.textContent;
               ele.textContent = $hashtagView;
           }
       });

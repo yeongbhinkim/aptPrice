@@ -4,7 +4,9 @@ package com.ybkim.AptPrice.web;
 import com.ybkim.AptPrice.domain.MyHomePrice.MyHomePrice;
 import com.ybkim.AptPrice.domain.MyHomePrice.dao.MyHomePriceFilterCondition;
 import com.ybkim.AptPrice.domain.MyHomePrice.svc.MyHomePriceSVC;
+import com.ybkim.AptPrice.domain.home.svc.homeSVC;
 import com.ybkim.AptPrice.domain.common.paging.FindCriteria;
+import com.ybkim.AptPrice.domain.home.home;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceForm;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceListForm;
 import com.ybkim.AptPrice.web.form.MyHomePrice.MyHomePriceScatterChart;
@@ -29,6 +31,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MyHomePriceController {
   private final MyHomePriceSVC MyHomePriceSVC;
+  private final homeSVC homeSVC;
 
   @Autowired
   @Qualifier("fc5") //동일한 타입의 객체가 여러개있을때 빈이름을 명시적으로 지정해서 주입받을때
@@ -70,7 +73,8 @@ public class MyHomePriceController {
       @PathVariable(required = false) Optional<String> searchFromAmount,    //시작 금액
       @PathVariable(required = false) Optional<String> searchToAmnount,     //종료 금액
       Model model) {
-
+    List<home> regionCity = homeSVC.regionCity();
+    model.addAttribute("regionCity", regionCity);
 //    log.info("/list 요청됨 {},{},{},{},{},{},{},{},{}", reqPage, contractDate, contractDateTo
 //        , searchSidoCd, searchGugunCd, searchDongCd, searchArea, searchFromAmount, searchToAmnount);
 
@@ -129,7 +133,9 @@ public class MyHomePriceController {
   public String detail(
       @PathVariable(required = false) Long apt_id,             //PK_시퀀스
       Model model) {
-    //
+
+    List<home> regionCity = homeSVC.regionCity();
+    model.addAttribute("regionCity", regionCity);
 
     //상세정보 Form
     MyHomePrice myHomePrice = MyHomePriceSVC.MyHomePriceDetailForm(apt_id);

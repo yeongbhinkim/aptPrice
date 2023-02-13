@@ -1,5 +1,6 @@
 package com.ybkim.AptPrice.domain.MyHomePrice.dao;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -9,7 +10,9 @@ import lombok.ToString;
 @ToString
 public class MyHomePriceFilterCondition {
 
+  @NotBlank
   private String contractDate;       //시작 계약일자
+  @NotBlank
   private String contractDateTo;     //종료 계약일자
   private String searchSidoCd;       //시도
   private String searchGugunCd;      //시군구
