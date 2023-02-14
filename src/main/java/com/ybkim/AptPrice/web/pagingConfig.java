@@ -13,7 +13,7 @@ public class pagingConfig {
   private static final int REC_COUNT_10_PER_PAGE = 10;
   private static final int PAGE_COUNT_10_PER_PAGE = 10;
 
-  private static final int REC_COUNT_5_PER_PAGE = 12;
+  private static final int REC_COUNT_5_PER_PAGE = 9;
   private static final int PAGE_COUNT_5_PER_PAGE = 5;
 
   @Bean
@@ -38,7 +38,7 @@ public class pagingConfig {
 
   @Bean
   public PageCriteria pc5(){
-    return new PageCriteria(rc10(), PAGE_COUNT_5_PER_PAGE);
+    return new PageCriteria(rc5(), PAGE_COUNT_5_PER_PAGE);
   }
 
   @Bean

@@ -103,7 +103,7 @@ public class MyHomePriceController {
     //전체조회
     List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceList(myHomePriceFilterCondition);
     List<MyHomePriceListForm> partOfList = new ArrayList<>();
-
+//    log.info("myHomePriceFilterCondition = {} ", list);
     for (MyHomePrice MyHomePrice : list) {
       MyHomePriceListForm myHomePriceListForm = new MyHomePriceListForm();
       BeanUtils.copyProperties(MyHomePrice, myHomePriceListForm);
@@ -111,7 +111,7 @@ public class MyHomePriceController {
     }
 
 //    log.info("myHomePriceFilterCondition = {}", myHomePriceFilterCondition);
-    log.info("partOfList = {} ", partOfList);
+//    log.info("partOfList = {} ", partOfList);
 //    log.info("fc = {} ", fc);
     //조회 리스트
     model.addAttribute("list", partOfList);
@@ -145,7 +145,6 @@ public class MyHomePriceController {
     BeanUtils.copyProperties(myHomePrice, myHomePriceListForm);
     log.info("myHomePriceListForm = {} ", myHomePriceListForm);
     model.addAttribute("myHomePriceListForm", myHomePriceListForm);
-    //상세차트 (수정중) (점차트?)
 
     //상세정보 리스트
     List<MyHomePrice> list = MyHomePriceSVC.MyHomePriceDetail(apt_id);

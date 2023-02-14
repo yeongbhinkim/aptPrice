@@ -28,26 +28,25 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   public List<MyHomePrice> selectMyHomePriceList(MyHomePriceFilterCondition myHomePriceFilterCondition) {
     StringBuffer sql = new StringBuffer();
 
+    sql.append(" SELECT * FROM (");
     sql.append(" SELECT A.* ");
-//    sql.append("  ,GET_AMOUNT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS AMOUNTLIST ");
+    sql.append("  ,ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO ");
     sql.append("  ,GET_CONTRACT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS CONTRACT ");
     sql.append("  ,GET_TRANSACTIONCOUNT_LIST(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS TRANSACTIONCOUNTLIST ");
     sql.append("  FROM( ");
-//    sql.append("   SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO, a.* FROM APT A ");
-    sql.append("   SELECT ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO ");
-    sql.append("  ,ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  ");
+    sql.append("   SELECT  ");
+    sql.append("  ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  ");
     sql.append("  ,A.* FROM APT A ");
     sql.append("   WHERE 1 = 1");
     sql.append("   AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(?,'-','') AND REPLACE(?,'-','') ");
     sql.append("   AND CITY  LIKE '%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%' ");
-//    sql.append("   AND DAN_GI_MYEONG LIKE '%'||?||'%'");
-//    sql.append("   AND ROAD_NAME LIKE '%'||?||'%'");
     sql.append("   AND TO_NUMBER(SUBSTR(SQUARE_METER, 1, INSTR(SQUARE_METER, '.') - 1))  BETWEEN  TO_NUMBER(?)  AND  TO_NUMBER(?)");
     sql.append("   AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(?, ','))  AND  TO_NUMBER(REPLACE(?, ','))");
     sql.append("   ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC ");
     sql.append(" ) A ");
-    sql.append(" WHERE A.NO BETWEEN ? AND ? ");
-    sql.append(" AND A.RN= 1 ");
+    sql.append(" WHERE A.RN= 1 ");
+    sql.append(" ) ");
+    sql.append(" WHERE NO BETWEEN ? AND ? ");
 
     List<MyHomePrice> list = jdbcTemplate.query(sql.toString(),
         new BeanPropertyRowMapper<>(MyHomePrice.class),
@@ -65,7 +64,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         myHomePriceFilterCondition.getEndRec()
     );
 
-    log.info("list123 = {}", list);
+//    log.info("list123 = {}", list);
 
     return list;
   }
@@ -77,17 +76,16 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
    */
   @Override
   public int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition) {
-
     StringBuffer sql = new StringBuffer();
-
-    sql.append(" SELECT count(*) FROM( ");
+    log.info("myHomePriceFilterCondition123 = {}", myHomePriceFilterCondition);
+    sql.append(" SELECT count(*) as COUNT FROM( ");
     sql.append("   SELECT ");
     sql.append("   ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  ");
     sql.append("   FROM APT A ");
     sql.append("   WHERE 1 = 1");
     sql.append("   AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(?,'-','') AND REPLACE(?,'-','') ");
     sql.append("   AND CITY  LIKE '%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%'||'%'||REPLACE(?,'전체','')||'%' ");
-    sql.append("   AND TO_NUMBER(REPLACE(SQUARE_METER, '.')) BETWEEN  TO_NUMBER(?)  AND  TO_NUMBER(?)");
+    sql.append("   AND TO_NUMBER(SUBSTR(SQUARE_METER, 1, INSTR(SQUARE_METER, '.') - 1))  BETWEEN  TO_NUMBER(?)  AND  TO_NUMBER(?)");
     sql.append("   AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(?, ','))  AND  TO_NUMBER(REPLACE(?, ','))");
     sql.append(" ) A ");
     sql.append(" WHERE A.RN= 1 ");
@@ -104,8 +102,8 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         myHomePriceFilterCondition.getSearchAreaValueTo(),
         myHomePriceFilterCondition.getSearchFromAmount(),
         myHomePriceFilterCondition.getSearchToAmnount()
-    );
-    log.info("cnt = {}", cnt);
+        );
+    log.info("cnt1 = {}", cnt);
 
     return cnt;
   }
