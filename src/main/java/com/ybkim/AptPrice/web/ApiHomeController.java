@@ -28,7 +28,7 @@ public class ApiHomeController {
   public ApiResult<List<home>> regionCounty(@PathVariable Optional<String> CITY_CODE) {
     List<home> HomeForm = homeSVC.regionCounty(CITY_CODE.orElse(""));
     ApiResult<List<home>> result = new ApiResult<>("00", "success", HomeForm);
-    log.info("/regionCounty 요청됨 {} ", result);
+//    log.info("/regionCounty 요청됨 {} ", result);
     return result;
   }
 
@@ -38,7 +38,7 @@ public class ApiHomeController {
   public ApiResult<List<home>> regionDistricts(@PathVariable Optional<String> COUNTY_CODE) {
     List<home> HomeForm = homeSVC.regionDistricts(COUNTY_CODE.orElse(""));
     ApiResult<List<home>> result = new ApiResult<>("00", "success", HomeForm);
-    log.info("/regionDistricts 요청됨 {} ", result);
+//    log.info("/regionDistricts 요청됨 {} ", result);
     return result;
   }
 

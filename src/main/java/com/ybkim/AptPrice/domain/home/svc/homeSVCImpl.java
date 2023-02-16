@@ -30,14 +30,14 @@ public class homeSVCImpl implements homeSVC {
 
   @Override
   public List<home> regionCounty(String CITY_CODE) {
-    log.info("/regionCounty 요청됨 {} ", CITY_CODE);
+//    log.info("/regionCounty 요청됨 {} ", CITY_CODE);
     return homeDAO.selectRegionCounty(CITY_CODE);
 
   }
 
   @Override
   public List<home> regionDistricts(String COUNTY_CODE) {
-    log.info("/regionDistricts 요청됨 {} ", COUNTY_CODE);
+//    log.info("/regionDistricts 요청됨 {} ", COUNTY_CODE);
     return homeDAO.selectRegionDistricts(COUNTY_CODE);
   }
 

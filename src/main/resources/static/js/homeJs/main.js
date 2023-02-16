@@ -2,7 +2,6 @@
 
 
 function chartBox(e) {
-    console.log("123")
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {

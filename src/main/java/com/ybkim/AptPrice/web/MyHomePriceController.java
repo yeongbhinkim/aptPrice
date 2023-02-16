@@ -143,7 +143,7 @@ public class MyHomePriceController {
     MyHomePriceListForm myHomePriceListForm = new MyHomePriceListForm();
 
     BeanUtils.copyProperties(myHomePrice, myHomePriceListForm);
-    log.info("myHomePriceListForm = {} ", myHomePriceListForm);
+//    log.info("myHomePriceListForm = {} ", myHomePriceListForm);
     model.addAttribute("myHomePriceListForm", myHomePriceListForm);
 
     //상세정보 리스트
@@ -167,8 +167,8 @@ public class MyHomePriceController {
       partOfChart.add(MyHomePriceScatterChart);
     }
 
-    log.info("partOfChart@@ = {} ", partOfChart);
-    log.info("partOfList = {} ", partOfList);
+//    log.info("partOfChart@@ = {} ", partOfChart);
+//    log.info("partOfList = {} ", partOfList);
     model.addAttribute("list", partOfList);
     model.addAttribute("chart", partOfChart);
 

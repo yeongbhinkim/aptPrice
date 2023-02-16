@@ -77,7 +77,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
   @Override
   public int totalCount(MyHomePriceFilterCondition myHomePriceFilterCondition) {
     StringBuffer sql = new StringBuffer();
-    log.info("myHomePriceFilterCondition123 = {}", myHomePriceFilterCondition);
+//    log.info("myHomePriceFilterCondition123 = {}", myHomePriceFilterCondition);
     sql.append(" SELECT count(*) as COUNT FROM( ");
     sql.append("   SELECT ");
     sql.append("   ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  ");
@@ -103,7 +103,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         myHomePriceFilterCondition.getSearchFromAmount(),
         myHomePriceFilterCondition.getSearchToAmnount()
         );
-    log.info("cnt1 = {}", cnt);
+//    log.info("cnt1 = {}", cnt);
 
     return cnt;
   }
@@ -139,7 +139,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         apt_id
     );
 
-    log.info("MyHomePriceItem = {}", MyHomePriceItem);
+//    log.info("MyHomePriceItem = {}", MyHomePriceItem);
 
     return MyHomePriceItem;
   }
@@ -175,7 +175,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         apt_id
     );
 
-    log.info("detaillist = {}", detaillist);
+//    log.info("detaillist = {}", detaillist);
 
     return detaillist;
   }
@@ -209,7 +209,7 @@ public class MyHomePriceDAOImpl implements MyHomePriceDAO {
         apt_id
     );
 
-    log.info("ScatterChart = {}", ScatterChart);
+//    log.info("ScatterChart = {}", ScatterChart);
 
     return ScatterChart;
   }
