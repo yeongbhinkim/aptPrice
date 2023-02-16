@@ -12,7 +12,6 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Title</title>
-
 </head>
 <body>
 <main th:fragment="mainList">
@@ -28,7 +27,10 @@
             <div class="Apt-container-util Apt-each_title">
               <span>
                 <a href="" th:href="@{/MyHomePrice/detail/{apt_id}(apt_id=${item.apt_id})}"
-                   th:text="${item.dan_gi_myeong}+${item.layer}+층">아파트이름</a>
+                                   th:text="${item.dan_gi_myeong}+${item.layer}+층">아파트이름</a>
+<!--                  <a href="" th:href="@{/MyHomePrice/detail/{city}/{street}/{bon_bun}/{bu_bun}/{dan_gi_myeong}/{square_meter}/{layer}/{construction_date}-->
+<!--                  (city=${item.city}, street=${item.street}, bon_bun=${item.bon_bun}, bu_bun=${item.bu_bun}, dan_gi_myeong=${item.dan_gi_myeong}, square_meter=${item.square_meter}, layer=${item.layer}, construction_date=${item.construction_date})}"-->
+<!--                     th:text="${item.dan_gi_myeong}">아파트이름</a>-->
               </span>
             </div>
             <div class="Apt-container-util Apt-each_hashtag">

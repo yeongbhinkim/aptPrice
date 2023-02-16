@@ -1,3 +1,9 @@
+<!--
+'*  파 일 명 : src\main\resources\templates\fragment\contentItem.html
+'*  기    능 : 메인 -> 콘텐츠
+'*  작 성 자 : 김영빈
+'*  비    고 : 2023.02.12 작성
+  -->
 <!DOCTYPE html>
 <html lang="ko"
       xmlns:th="http://www.thymeleaf.org">
@@ -24,13 +30,11 @@
 
           <!--   Apt-info_img  차트 박스-->
           <div class="Apt-info_img">
-            <div class="info-img-box">
-              <div class="Apt-container-util Apt-each_imgApt-each_img Apt-img-rd ">
-                <canvas id="chart-canvas" width="330" height="300"></canvas>
+              <div class="chart_canvas_box">
+                <canvas id="chart-canvas"></canvas>
               </div>
-            </div>
-            <br/>
           </div><!--   Apt-info_img  차트 박스-->
+
 
           <!-- Apt-info_content-wrap 상세정보 박스-->
           <div class="Apt-info-content-wrap">
@@ -43,7 +47,6 @@
 
             <div class="Apt-info-content Apt-location-sub-box">
               <div class="Apt-location-icon-box icon-box">
-<!--                <a href="#" class="location-icon"></a>-->
                 <span class="mainHashtag">주소</span>
               </div>
               <div class="location-txt txt-box">
@@ -53,7 +56,6 @@
 
             <div class="Apt-info-content Apt-location-sub-box">
               <div class="Apt-location-icon-box icon-box">
-<!--                <a href="#" class="location-icon"></a>-->
                 <span class="mainHashtag">도로명</span>
               </div>
               <div class="location-txt txt-box">
@@ -63,7 +65,6 @@
 
             <div class="Apt-info-content Apt-call-sub-box">
               <div class="Apt-location-icon-box icon-box">
-<!--                <a href="#" class="call-icon"></a>-->
                 <span class="mainHashtag">전용면적(㎡)</span>
               </div>
               <div class="call-txt txt-box">
@@ -74,7 +75,6 @@
 
             <div class="Apt-info-content Apt-hashtag-sub-box">
               <div class="Apt-hashtag-icon-box icon-box">
-<!--                <img src="/img/icon/icon-hashtag.png" class="hashtag-icon">-->
                 <span class="mainHashtag">기타</span>
               </div>
               <div class="hashtag-txt txt-box" style="display: contents;">
@@ -117,38 +117,40 @@
         <table class="Apt-content">
           <thead>
           <tr>
-<!--            <th class="Apt-content-th">주소</th>-->
-<!--            <th class="Apt-content-th">번지</th>-->
-<!--            <th class="Apt-content-th">본번</th>-->
-<!--            <th class="Apt-content-th">부번</th>-->
-<!--            <th class="Apt-content-th">단지명</th>-->
-<!--            <th class="Apt-content-th">전용면적(㎡)</th>-->
-            <th class="Apt-content-th">계약년월</th>
-            <th class="Apt-content-th">계약일</th>
-            <th class="Apt-content-th">거래금액(만원)</th>
-<!--            <th class="Apt-content-th">층</th>-->
-<!--            <th class="Apt-content-th">건축년도</th>-->
-<!--            <th class="Apt-content-th">도로명</th>-->
-            <th class="Apt-content-th">해제사유발생일</th>
-            <th class="Apt-content-th">거래유형</th>
-            <th class="Apt-content-th">중개사소재지</th>
+            <!--            <th class="Apt-content-th">주소</th>-->
+            <!--            <th class="Apt-content-th">번지</th>-->
+            <!--            <th class="Apt-content-th">본번</th>-->
+            <!--            <th class="Apt-content-th">부번</th>-->
+            <!--            <th class="Apt-content-th">단지명</th>-->
+            <!--            <th class="Apt-content-th">전용면적(㎡)</th>-->
+            <th class="Apt-content-th">계약<br>년월일</th>
+<!--            <th class="Apt-content-th">계약<br>년월</th>-->
+<!--            <th class="Apt-content-th">일</th>-->
+            <th class="Apt-content-th">거래금액<br>(만원)</th>
+            <!--            <th class="Apt-content-th">층</th>-->
+            <!--            <th class="Apt-content-th">건축년도</th>-->
+            <!--            <th class="Apt-content-th">도로명</th>-->
+<!--            <th class="Apt-content-th">해제사유발생일</th>-->
+            <th class="Apt-content-th">거래<br>유형</th>
+            <th class="Apt-content-th">중개사<br>소재지</th>
           </tr>
           </thead>
           <tbody>
           <tr th:each="item : ${list}">
-<!--            <td class="Apt-content-td" th:text="${item.city}">시군구</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.street}">번지</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.bon_bun}">본번</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.bu_bun}">부번</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.dan_gi_myeong}">단지명</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.square_meter}">전용면적(㎡)</td>-->
-            <td class="Apt-content-td" th:text="${item.contract_date}">계약년월</td>
-            <td class="Apt-content-td" th:text="${item.contract_day}">계약일</td>
+            <!--            <td class="Apt-content-td" th:text="${item.city}">시군구</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.street}">번지</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.bon_bun}">본번</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.bu_bun}">부번</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.dan_gi_myeong}">단지명</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.square_meter}">전용면적(㎡)</td>-->
+            <td class="Apt-content-td" th:text="${item.contract_date}+.+${item.contract_day}">계약년월</td>
+<!--            <td class="Apt-content-td" th:text="${item.contract_date}">계약년월</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.contract_day}">계약일</td>-->
             <td class="Apt-content-td" th:text="${item.amount}">거래금액(만원)</td>
-<!--            <td class="Apt-content-td" th:text="${item.layer}">층</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.construction_date}">건축년도</td>-->
-<!--            <td class="Apt-content-td" th:text="${item.road_name}">도로명</td>-->
-            <td class="Apt-content-td" th:text="${item.reason_cancellation_date}">해제사유발생일</td>
+            <!--            <td class="Apt-content-td" th:text="${item.layer}">층</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.construction_date}">건축년도</td>-->
+            <!--            <td class="Apt-content-td" th:text="${item.road_name}">도로명</td>-->
+<!--            <td class="Apt-content-td" th:text="${item.reason_cancellation_date}">해제사유발생일</td>-->
             <td class="Apt-content-td" th:text="${item.transaction_type}">거래유형</td>
             <td class="Apt-content-td" th:text="${item.location_agency}">중개사소재지</td>
           </tr>
