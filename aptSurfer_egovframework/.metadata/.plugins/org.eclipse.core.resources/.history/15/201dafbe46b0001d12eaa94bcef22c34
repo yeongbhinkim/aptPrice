@@ -1,0 +1,40 @@
+package egovframework.aptSurfer.common.mapper;
+
+
+import java.util.List;
+
+import egovframework.rte.psl.dataaccess.mapper.Mapper;
+import net.sf.json.JSONObject;
+
+/**
+ * @Class Name : com.dbvalley.premier.scm1.rgstBarco.Mapper.java
+ * @Description : PREMIER_QMS 분석의뢰
+ * @Modification Information
+ * @ @ 수정일 수정자 수정내용 @ ---------- --------- ------------------------------- @
+ *   2021.10.12 디비밸리 최초생성
+ *
+ * @author 디비밸리
+ * @since 2021.11.19
+ * @version 1.0.0
+ * @see
+ *
+ * 		copyright (c) dbvalley.inc All rights reserved.
+ */
+
+@Mapper("RgstBarcoMapper")
+public interface RgstBarcoMapper {
+
+	/**
+	 * 
+	 * @param param
+	 * @return
+	 * @throws Exception
+	 */
+	public List<JSONObject> selectRgstBarcoList(JSONObject param) throws Exception;
+
+	public JSONObject selectRgstBarcoInfo(JSONObject param) throws Exception;
+
+	public void mergeRgstBarcoInfo(JSONObject param) throws Exception;
+
+	public void deleteRgstBarcoInfo(JSONObject param) throws Exception;
+}
