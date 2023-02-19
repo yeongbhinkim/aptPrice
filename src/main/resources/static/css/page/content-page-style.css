@@ -154,7 +154,7 @@
     margin-left: 5px;
   }
 /* 웹뷰 css*/
-@media screen and (min-width: 370px) and (max-width: 420px) {
+@media screen and (min-width: 370px) and (max-width: 500px) {
   .Apt-info {
     display: block;
   }
