@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.qms.qualityindex.mapper.MonthlyTargetMapper">
+	<!-- 월목표 목록 조회 -->
+	<select id="selectMonthlyTargetList" parameterType="json" resultType="json">
+		SELECT TO_CHAR(ROWNUM) "id", T1.B_GBN, NVL(T1.B_DTL, '0000000000') B_DTL
+		     , PREMIER_SYS.GET_ITGR_CODE_NAME(T1.B_GBN, #{LANG}) B_GBN_NM
+		     , PREMIER_SYS.GET_ITGR_CODE_NAME(T1.B_DTL, #{LANG}) B_DTL_NM
+		     , NVL(T2.COMPANYCD,#{COMPANYCD}) COMPANYCD
+		     , NVL(T2.PLANTCD, #{PLANTCD}) PLANTCD
+		     , NVL(T2.YY, #{YY}) YY
+		     , NVL(T2.G01,0) G01, NVL(T2.G02,0) G02, NVL(T2.G03,0) G03, NVL(T2.G04,0) G04, NVL(T2.G05,0) G05, NVL(T2.G06,0) G06
+		     , NVL(T2.G07,0) G07, NVL(T2.G08,0) G08, NVL(T2.G09,0) G09, NVL(T2.G10,0) G10, NVL(T2.G11,0) G11, NVL(T2.G12,0) G12  
+		  FROM (SELECT GBN.CODE_SEQ B_GBN, DTL.CODE_SEQ B_DTL
+		          FROM (SELECT CODE_SEQ,CODE_ORDERNO, MGT1 FROM SYS_ITGR_CODE_MGMT 
+		          		 WHERE CODE_SEQ_UP = #{QUALITY_INDEX_GUBUN}
+		          	<!-- <choose>
+		          		<when test='PLANTCD =="9999999999"'>
+		          		   AND MGT1 = '2'
+		          		</when>
+		          		<otherwise>
+		          		   AND MGT1 <![CDATA[<>]]> '2'
+		          		</otherwise>
+		          	</choose> --> 
+		          		) GBN
+		             , (SELECT CODE_SEQ,CODE_ORDERNO, MGT1 FROM SYS_ITGR_CODE_MGMT 
+		             	 WHERE CODE_SEQ_UP = #{QUALITY_INDEX_GUBUN_DTL}
+		            <!-- <choose>
+		          		<when test='PLANTCD =="9999999999"'>
+		          		   AND MGT1 = '2'
+		          		</when>
+		          		<otherwise>
+		          		   AND MGT1 <![CDATA[<>]]> '2'
+		          		</otherwise>
+		          	</choose> --> 
+		             	) DTL
+		         WHERE GBN.MGT1 = DTL.MGT1(+)
+		         ORDER BY GBN.CODE_ORDERNO, DTL.CODE_ORDERNO) T1,
+		       (SELECT * FROM Q_050 WHERE COMPANYCD = #{COMPANYCD} AND PLANTCD = #{PLANTCD, jdbcType=VARCHAR} AND YY = #{YY})T2
+		 WHERE T1.B_GBN = T2.B_GBN(+)
+		   AND T1.B_DTL = T2.B_DTL(+)
+	</select>
+	
+	<!-- 월목표 정보 삭제 -->
+	<delete id="deleteMonthlyTargetInfo" parameterType="json">
+		DELETE FROM Q_050 WHERE COMPANYCD = #{COMPANYCD} AND PLANTCD = #{PLANTCD} AND YY = #{YY}
+	</delete>
+	
+	<!-- 월목표 정보 저장 -->
+	<update id="mergeMonthlyTargetInfo" parameterType="json">
+		MERGE INTO Q_050 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{PLANTCD} AS PLANTCD
+		      ,#{YY} AS YY
+		      ,#{B_GBN} AS B_GBN
+		      ,#{B_DTL} AS B_DTL
+		      ,#{G01} AS G01
+		      ,#{G02} AS G02
+		      ,#{G03} AS G03
+		      ,#{G04} AS G04
+		      ,#{G05} AS G05
+		      ,#{G06} AS G06
+		      ,#{G07} AS G07
+		      ,#{G08} AS G08
+		      ,#{G09} AS G09
+		      ,#{G10} AS G10
+		      ,#{G11} AS G11
+		      ,#{G12} AS G12
+		      ,#{LOGIN_COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{LOGIN_ID} AS LOGIN_ID
+		      ,SYSDATE AS LOGIN_YMD
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.PLANTCD = D.PLANTCD
+		AND A.YY = D.YY
+		AND A.B_GBN = D.B_GBN
+		AND A.B_DTL = D.B_DTL
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.G01 = D.G01
+		            ,A.G02 = D.G02
+		            ,A.G03 = D.G03
+		            ,A.G04 = D.G04
+		            ,A.G05 = D.G05
+		            ,A.G06 = D.G06
+		            ,A.G07 = D.G07
+		            ,A.G08 = D.G08
+		            ,A.G09 = D.G09
+		            ,A.G10 = D.G10
+		            ,A.G11 = D.G11
+		            ,A.G12 = D.G12
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+		            ,A.LOGIN_ID = D.LOGIN_ID
+		            ,A.LOGIN_YMD = D.LOGIN_YMD
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.PLANTCD, A.YY, A.B_GBN, A.B_DTL, A.G01, A.G02, A.G03, A.G04, A.G05, A.G06, A.G07, A.G08, A.G09, A.G10, A.G11, A.G12, A.LOGIN_COMPANYCD, A.LOGIN_ID, A.LOGIN_YMD)
+		VALUES(D.COMPANYCD, D.PLANTCD, D.YY, D.B_GBN, D.B_DTL, D.G01, D.G02, D.G03, D.G04, D.G05, D.G06, D.G07, D.G08, D.G09, D.G10, D.G11, D.G12, D.LOGIN_COMPANYCD, D.LOGIN_ID, D.LOGIN_YMD)
+	</update>
+</mapper>

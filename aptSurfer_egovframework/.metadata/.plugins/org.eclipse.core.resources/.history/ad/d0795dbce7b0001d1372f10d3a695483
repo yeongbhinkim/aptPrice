@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.common.mapper.CommonMapper">
+	<!-- 현재시각 조회 -->
+	<select id="selectSysdate" resultType="string">
+		SELECT TO_CHAR(SYSDATE,'YYYY-MM-DD') FROM DUAL
+	</select>
+	<!-- 차종 검색 갯수 조회 -->
+	<select id="selectKindInfoCount" parameterType="string" resultType="int">
+		SELECT COUNT(*) FROM XM000 WHERE KINDCD = UPPER(#{KIND_CD})
+	</select>
+	<!-- 차종목록 조회 -->
+	<select id="selectKindList" parameterType="hashmap" resultType="egovMap">
+		SELECT KINDCD AS KIND_CD, KINDNM AS KIND_NM, KINDCD AS VALUE, KINDNM AS CONTENT 
+		  FROM XM000 
+		 WHERE KINDCD LIKE '%'||#{KIND_CD}||'%' 
+		   AND KINDNM LIKE '%'||#{KIND_NM}||'%'  
+	</select>
+	<select id="selectKindList2" parameterType="hashmap" resultType="egovMap">
+		SELECT '','','' AS VALUE, ' ' AS CONTENT FROM DUAL
+		UNION ALL
+		SELECT KINDCD AS KIND_CD, KINDNM AS KIND_NM, KINDCD AS VALUE, KINDCD||' ['||NVL(KINDNM,' ')||']' AS CONTENT 
+		  FROM XM000 
+		 WHERE KINDCD LIKE '%'||#{KIND_CD}||'%' 
+		   AND KINDNM LIKE '%'||#{KIND_NM}||'%'  
+	</select>
+	<!-- 차종목록 조회 COMBO -->
+	<select id="selectKindCombo" parameterType="json" resultType="json">
+		SELECT KINDCD AS KIND_CD, KINDNM AS KIND_NM, KINDCD AS "id", KINDCD AS "value"
+		  FROM XM000 
+		 WHERE KINDCD LIKE '%'||#{KIND_CD}||'%' 
+		   AND KINDNM LIKE '%'||#{KIND_NM}||'%'  
+	</select>
+	<!-- 공통코드 목록 조회 GRID -->
+	<select id="selectCodeListToGrid" parameterType="json" resultType="json">
+		SELECT MGMT.CODE_SEQ AS CODE_SEQ, LANG.CODE_NAME AS CODE_NAME 
+	      FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG
+	     WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+	       AND MGMT.ACTIVE_FLAG = 'A'
+	       AND LANG.CODE_SEQ_LANG = #{lang}
+	       AND MGMT.CODE_SEQ_UP = #{codeseq}
+	    ORDER BY MGMT.CODE_ORDERNO
+	</select>
+	<!-- 공통코드 목록 조회 COMBO -->
+	<select id="selectCodeListFromCombo" parameterType="hashmap" resultType="egovMap">
+		SELECT T.* FROM (
+			SELECT TO_CHAR(MGMT.CODE_SEQ) AS ID, LANG.CODE_NAME AS VALUE,MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2
+			FROM SYS_ITGR_CODE_MGMT MGMT, SYS_ITGR_CODE_LANG LANG
+			WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+			  AND MGMT.ACTIVE_FLAG = 'A'
+			  AND LANG.CODE_SEQ_LANG = #{lang}
+			  AND MGMT.CODE_SEQ_UP = #{codeseq}
+			  <if test="mgt1 != null and mgt1 != ''">
+			  AND MGMT.MGT1 = #{mgt1}
+			  </if>
+			  <if test="mgt2 != null and mgt2 != ''">
+			  AND MGMT.MGT2 = #{mgt2}
+			  </if>
+			ORDER BY MGMT.CODE_ORDERNO) T
+	</select>
+	<!-- 공통코드 목록 조회 SELECT BOX-->
+	<select id="selectCodeList" parameterType="hashmap" resultType="egovMap">
+		<if test='IS_ALL != null and IS_ALL == "true"'>
+		SELECT '' CODESEQ, '' MGT1, '' MGT2, '' CODESEQUP, '' CODEORDERNO, '' ACTIVEFLAG, '' CODESEQLANG, '' CODENAME, '' VALUE, ' ' CONTENT
+		  FROM DUAL
+		UNION ALL 
+		</if>
+		SELECT T.* FROM (
+		SELECT TO_CHAR(MGMT.CODE_SEQ) AS CODESEQ, MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2, 
+		       TO_CHAR(MGMT.CODE_SEQ_UP) AS CODESEQUP, 
+		       TO_CHAR(MGMT.CODE_ORDERNO) AS CODEORDERNO, 
+		       MGMT.ACTIVE_FLAG AS ACTIVEFLAG, LANG.CODE_SEQ_LANG AS CODESEQLANG, LANG.CODE_NAME AS CODENAME,
+		       TO_CHAR(MGMT.CODE_SEQ) AS VALUE, LANG.CODE_NAME AS CONTENT
+		FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG
+		WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+		  <if test="IS_ACTIVE == null or IS_ACTIVE == ''">
+		  AND MGMT.ACTIVE_FLAG = 'A'
+		  </if>
+		  AND LANG.CODE_SEQ_LANG = #{lang}
+		  AND MGMT.CODE_SEQ_UP = #{codeseq}
+		  <if test="mgt1 != null and mgt1 != ''">
+		  AND MGMT.MGT1 = #{mgt1}
+		  </if>
+		  <if test="mgt2 != null and mgt2 != ''">
+		  AND MGMT.MGT2 = #{mgt2}
+		  </if>
+		ORDER BY MGMT.CODE_ORDERNO) T
+	</select>
+	<!-- 공장별 공통코드 목록 조회 COMBO -->
+	<select id="selectCodeListFromComboForPlant" parameterType="hashmap" resultType="egovMap">
+		SELECT T.* FROM (
+			SELECT TO_CHAR(MGMT.CODE_SEQ) AS ID, LANG.CODE_NAME AS VALUE,MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2
+			FROM SYS_ITGR_CODE_MGMT MGMT, SYS_ITGR_CODE_LANG LANG, PREMIER_SYS.SYS_PLANT_CODE PLNT
+			WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+			  AND MGMT.ACTIVE_FLAG = 'A'
+			  AND PLNT.CMPY_SN = #{cmpysn}
+			  AND PLNT.PLANT_CD = #{plantcd}
+			  AND LANG.CODE_SEQ_LANG = #{lang}
+			  AND MGMT.CODE_SEQ_UP = #{codeseq}
+			  <if test="mgt1 != null and mgt1 != ''">
+			  AND MGMT.MGT1 = #{mgt1}
+			  </if>
+			  <if test="mgt2 != null and mgt2 != ''">
+			  AND MGMT.MGT2 = #{mgt2}
+			  </if>
+			ORDER BY MGMT.CODE_ORDERNO) T
+	</select>
+	<!-- 공장별 공통코드 목록 조회  SELECT BOX-->
+	<select id="selectCodeListForPlant" parameterType="hashmap" resultType="egovMap">
+		<if test='IS_ALL != null and IS_ALL == "true"'>
+		SELECT '' CODESEQ, '' MGT1, '' MGT2, '' CODESEQUP, '' CODEORDERNO, '' ACTIVEFLAG, '' CODESEQLANG, '' CODENAME, '' VALUE, ' ' CONTENT
+		  FROM DUAL
+		UNION ALL 
+		</if>
+		SELECT T.* FROM (
+		SELECT TO_CHAR(MGMT.CODE_SEQ) AS CODESEQ, MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2, 
+		       TO_CHAR(MGMT.CODE_SEQ_UP) AS CODESEQUP, 
+		       TO_CHAR(MGMT.CODE_ORDERNO) AS CODEORDERNO, 
+		       MGMT.ACTIVE_FLAG AS ACTIVEFLAG, LANG.CODE_SEQ_LANG AS CODESEQLANG, LANG.CODE_NAME AS CODENAME,
+		       TO_CHAR(MGMT.CODE_SEQ) AS VALUE, LANG.CODE_NAME AS CONTENT
+		FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG, PREMIER_SYS.SYS_PLANT_CODE PLNT
+		WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+		  AND MGMT.CODE_SEQ = PLNT.CODE_SEQ
+		  AND PLNT.CMPY_SN = #{cmpysn}
+		  AND PLNT.PLANT_CD = #{plantcd}
+		  <if test="IS_ACTIVE == null or IS_ACTIVE == ''">
+		  AND MGMT.ACTIVE_FLAG = 'A'
+		  </if>
+		  AND LANG.CODE_SEQ_LANG = #{lang}
+		  AND MGMT.CODE_SEQ_UP = #{codeseq}
+		  <if test="mgt1 != null and mgt1 != ''">
+		  AND MGMT.MGT1 = #{mgt1}
+		  </if>
+		  <if test="mgt2 != null and mgt2 != ''">
+		  AND MGMT.MGT2 = #{mgt2}
+		  </if>
+		ORDER BY MGMT.CODE_ORDERNO) T
+	</select>
+	<!-- 공통코드 항목 조회 -->
+	<select id="selectCodeInfo" parameterType="hashmap" resultType="egovMap">
+		SELECT MGMT.CODE_SEQ AS VALUE, LANG.CODE_NAME AS CONTENT,MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2
+		  FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG
+		 WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+		   <if test="IS_ACTIVE == null or IS_ACTIVE == ''">
+		   AND MGMT.ACTIVE_FLAG = 'A'
+		  </if>
+		   AND LANG.CODE_SEQ_LANG = #{lang}
+		   AND MGMT.CODE_SEQ = #{codeseq}
+		   <if test="mgt1 != null and mgt1 != ''">
+		   AND MGMT.MGT1 = #{mgt1}
+		   </if>
+		   <if test="mgt2 != null and mgt2 != ''">
+		   AND MGMT.MGT2 = #{mgt2}
+		   </if>
+	</select>
+	<!-- 공통코드 항목 mgt1로 조회 -->
+	<select id="selectMGT1List" parameterType="json" resultType="egovMap">
+		<if test='IS_ALL != null and IS_ALL == "true"'>
+		SELECT '' VALUE, ' ' CONTENT
+		FROM DUAL
+		UNION ALL 
+		</if>
+		SELECT T.MGT1 AS VALUE
+		      ,T.CONTENT 
+		 FROM (
+				SELECT TO_CHAR(MGMT.CODE_SEQ) AS CODESEQ, MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2, 
+				       TO_CHAR(MGMT.CODE_SEQ_UP) AS CODESEQUP, 
+				       TO_CHAR(MGMT.CODE_ORDERNO) AS CODEORDERNO, 
+				       MGMT.ACTIVE_FLAG AS ACTIVEFLAG, LANG.CODE_SEQ_LANG AS CODESEQLANG, LANG.CODE_NAME AS CODENAME,
+				       TO_CHAR(MGMT.CODE_SEQ) AS VALUE, LANG.CODE_NAME AS CONTENT
+				FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG
+				WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+				  AND MGMT.ACTIVE_FLAG = 'A'
+				  AND LANG.CODE_SEQ_LANG = #{lang}
+				  AND MGMT.CODE_SEQ_UP = #{CODE_SEQ_UP}
+				ORDER BY MGMT.CODE_ORDERNO) T	
+	</select>
+	<!-- 사업장 SELECT BOX -->
+	<select id="selectInnerCompanyList" resultType="egovMap">
+	    SELECT CMPY_SN AS VALUE
+	    <choose>
+	    	<when test="lang != null and lang != ''">
+	    	, NVL(DECODE(#{lang},'KOR',CMPY_NM,CMPY_NMENG),CMPY_NM) AS CONTENT
+	    	</when>
+	    	<otherwise>
+	    	 , CMPY_NM AS CONTENT
+	    	</otherwise>
+	    </choose>
+		  FROM PREMIER_SYS.COM_COMPANY_INFO 
+		 WHERE USE_YN = 'Y'
+		   AND CMPY_TYPE_CD = 'A'
+		 ORDER BY VALUE
+	</select>
+	<!-- 공장 SELECT BOX -->
+	<select id="selectPlantList" parameterType="hashmap" resultType="egovMap">
+		<if test='IS_ALL != null and IS_ALL == "true"'>
+		SELECT '' VALUE, ' ' CONTENT
+		  FROM DUAL
+		UNION ALL 
+		</if>
+		SELECT R.* FROM (
+		SELECT T.PLANT_CD AS VALUE, T.PLANT_NM AS CONTENT  
+		  FROM COM_PLANT_INFO T
+		   <if test="cmpysn != null and cmpysn != ''">
+		 WHERE T.CMPY_SN = #{cmpysn}
+		 </if>
+		 ORDER BY VALUE) R
+	</select>
+	<!-- 공장 SELECT BOX -->
+	<select id="selectPlantListAll" parameterType="hashmap" resultType="egovMap">
+		<if test='IS_ALL != null and IS_ALL == "true"'>
+		SELECT '' VALUE, ' ' CONTENT
+		  FROM DUAL
+		UNION ALL 
+		</if>
+		SELECT '9999' VALUE, '전사' CONTENT
+		  FROM DUAL
+		UNION ALL 
+		SELECT R.* FROM (
+		SELECT T.PLANT_CD AS VALUE, T.PLANT_NM AS CONTENT  
+		  FROM COM_PLANT_INFO T
+		   <if test="cmpysn != null and cmpysn != ''">
+		 WHERE T.CMPY_SN = #{cmpysn}
+		 </if>
+		 ORDER BY VALUE) R
+	</select>
+	<!-- 공장 COMBO -->
+	<select id="selectPlantListFromCombo" parameterType="hashmap" resultType="egovMap">
+		SELECT T.PLANT_CD AS ID, T.PLANT_NM AS VALUE, T.PLANT_CD, T.PLANT_NM 
+		  FROM COM_PLANT_INFO T
+		 <if test="cmpysn != null and cmpysn != ''">
+		 WHERE T.CMPY_SN = #{cmpysn}
+		 </if>
+		 ORDER BY VALUE
+	</select>
+	<!-- 공장 목록 -->
+	<select id="selectPlantListFromJson" parameterType="string" resultType="json">
+		SELECT PLANT_CD, PLANT_NM
+		  FROM COM_PLANT_INFO
+		 WHERE CMPY_SN = #{CMPY_SN}
+	</select>
+	<!-- 작업반 SELECT BOX -->
+	<select id="selectWorkGroupList" parameterType="hashmap" resultType="egovMap">
+		SELECT T.CMPY_SN AS CMPYSN, T.PLANT_CD AS PLANTCD, T.WGRP_CD AS WGRPCD, T.WGRP_NM AS WGRPNM
+			 , T.WGRP_CD AS VALUE, T.WGRP_NM AS CONTENT, T.WGRP_CD AS ID
+		  FROM FMS_WORK_GRP_IF T
+		 WHERE T.CMPY_SN = #{cmpysn}
+		 <if test="plantcd != null and plantcd != ''">
+		   AND T.PLANT_CD = #{plantcd}
+		 </if>
+		   AND T.USE_YN = 'Y'
+		   ORDER BY VALUE
+	</select>
+	<!-- 라인 SELECT BOX -->
+	<select id="selectLineList" parameterType="hashmap" resultType="egovMap">
+		SELECT T.LINE_CD AS VALUE, T.LINE_NM AS CONTENT
+		  FROM FMS_LINE_IF T
+		 WHERE T.CMPY_SN = #{cmpysn}
+		   AND T.PLANT_CD = #{plantcd}
+		   <if test="wgrpcd != null and wgrpcd != ''">
+		   AND T.WGRP_CD = #{wgrpcd}
+		   </if>
+		   <if test="linecd != null and linecd != ''">
+		   AND T.LINE_CD = #{linecd}
+		   </if>
+		   AND T.USE_YN = 'Y'
+		   ORDER BY VALUE
+	</select>
+	<!-- 작업자  조회 -->
+	<select id="selectEmpList" parameterType="hashmap" resultType="egovMap">
+		SELECT ROWNUM AS ROWNO, A.* FROM (
+		SELECT T.EMP_NO AS VALUE, T.EMP_NM AS CONTENT, 0 AS CHECKROW, T.EMP_NO AS ID, T.PLANT_CD AS PLANTCD
+		  FROM FMS_EMP_IF T
+		 WHERE T.CMPY_SN = #{cmpysn}
+		   AND T.PLANT_CD = #{plantcd}
+		   AND T.WGRP_CD = #{wgrpcd}
+		   AND T.USE_YN = 'Y'
+		<if test="titlenm != null and titlenm != ''">
+		   AND T.TITLE_NM = #{titlenm}	
+		</if>
+		 ORDER BY VALUE) A
+	</select>
+	<!-- 메뉴명 조회 -->
+	<select id="getMenuName" parameterType="egovMap" resultType="string">
+		SELECT B.MENUNAME
+		FROM PREMIER_SYS.SYS_MENU A, PREMIER_SYS.SYS_MENULANG B
+		WHERE A.MENUSEQ = B.MENUSEQ
+		AND A.MENUURL = #{menuurl}
+		AND B.LANG = #{lang}
+		AND A.ACTIVEFLAG = 'A'
+		AND A.USEYN = 'Y'
+		AND ROWNUM = 1
+	</select>
+	<!-- 메뉴SEQ 조회 -->	
+	<select id="getMenuSeq" parameterType="string" resultType="int">
+		SELECT A.MENUSEQ AS MENUSEQ
+		FROM PREMIER_SYS.SYS_MENU A
+		WHERE A.MENUURL = #{menuurl}
+		AND   A.ACTIVEFLAG = 'A'
+		AND   A.USEYN = 'Y'
+	</select>
+	
+	<!-- 첨부파일 다운로드 정보 조회 -->
+	<select id="selectSysFileInfo" parameterType="json" resultType="json">
+		SELECT A.FILESEQ AS "id", A.FILENAME AS "name", A.LINKTYPECD, A.LINKID, A.FILESIZE AS "size", A.FILEPATH AS "link", A.FULLFILENAME
+			 , A.LINKTYPECD as "linktypecd", A.LINKID as "linkid"
+		  FROM PREMIER_SYS.SYS_FILE_UPLOAD A 
+		 WHERE 1=1
+		   <choose>
+			   <when test="fileseq != null and fileseq != ''">
+		   AND FILESEQ = #{fileseq}   
+			   </when>
+			   <otherwise>
+		   AND A.LINKTYPECD = #{linktypecd}
+		   AND LINKID = #{linkid}   
+			   </otherwise>
+		   </choose>
+		 ORDER BY A.FILESEQ 
+	</select>
+	<!-- 임시 첨부파일 다운로드 정보 조회 -->
+	<select id="selectSysFileTempInfo" parameterType="json" resultType="json">
+		SELECT FILESEQ, FILENAME, LINKTYPECD, LINKID, FULLFILENAME 
+		  FROM SYS_FILE_UPLOAD_TEMP 
+		 WHERE FILESEQ = #{fileseq}
+	</select>
+	<!-- 임시첨부파일 저장 -->
+	<insert id="insertSysFileUploadTemp" parameterType="json">
+		<selectKey resultType="Integer" keyProperty="fileseq" order="BEFORE">
+            SELECT PREMIER_SYS.SEQ_SYS_FILE_TEMP.NEXTVAL FROM DUAL
+        </selectKey>
+		INSERT INTO PREMIER_SYS.SYS_FILE_UPLOAD_TEMP (FILESEQ,FILETYPECD,FILENAME, TEMPFILENAME, LINKTYPECD, LINKID, 
+		                             CONTENTTYPE, FULLFILENAME, REALFILENAME, ACTIVEFLAG,CREATE_ACC_NO,CREATE_DATE,FILECOMMENT, FILESIZE, FILEPATH)
+		VALUES
+		(#{fileseq},'',REGEXP_REPLACE(#{filename},',',' '),#{tempfilename}, #{linktypecd}, #{linkid},
+		 #{contenttype}, #{fullfilename}, #{realfilename}, 'A',#{accno},SYSDATE,'', #{filesize}, #{filepath})
+	</insert>
+	<!-- 첨부파일 저장 -->
+	<insert id="insertSysFileUpload" parameterType="json">
+		<selectKey resultType="Integer" keyProperty="sysfileseq" order="BEFORE">
+            SELECT PREMIER_SYS.SEQ_SYS_FILE.NEXTVAL FROM DUAL
+        </selectKey>
+		INSERT INTO PREMIER_SYS.SYS_FILE_UPLOAD (FILESEQ,FILETYPECD,FILENAME, TEMPFILENAME, LINKTYPECD, LINKID,CONTENTTYPE, FULLFILENAME, REALFILENAME, ACTIVEFLAG,CREATE_ACC_NO,CREATE_DATE,FILECOMMENT, FILESIZE, FILEPATH)
+		SELECT #{sysfileseq}, FILETYPECD,FILENAME, TEMPFILENAME, LINKTYPECD, #{linkid} ,CONTENTTYPE, FULLFILENAME, REALFILENAME, ACTIVEFLAG,CREATE_ACC_NO,CREATE_DATE,FILECOMMENT, FILESIZE
+			 , '/file/downloadFile.do?fileseq='||#{sysfileseq}||'&amp;filename='||TEMPFILENAME||'&amp;linktypecd='||LINKTYPECD||'&amp;linkid='||#{linkid} FILEPATH
+		  FROM PREMIER_SYS.SYS_FILE_UPLOAD_TEMP
+		 WHERE FILESEQ = #{fileseq}
+	</insert>
+	
+	<!-- 첨부파일 저장 복사 (LinkTypeCD변경)-->
+	<insert id="insertSysFileUploadModify" parameterType="json">
+		<selectKey resultType="Integer" keyProperty="sysfileseq" order="BEFORE">
+            SELECT PREMIER_SYS.SEQ_SYS_FILE.NEXTVAL FROM DUAL
+        </selectKey>
+		INSERT INTO PREMIER_SYS.SYS_FILE_UPLOAD (FILESEQ,FILETYPECD,FILENAME, TEMPFILENAME, LINKTYPECD, LINKID,CONTENTTYPE, FULLFILENAME, REALFILENAME, ACTIVEFLAG,CREATE_ACC_NO,CREATE_DATE,FILECOMMENT, FILESIZE, FILEPATH)
+		SELECT #{sysfileseq}, FILETYPECD,FILENAME, TEMPFILENAME, #{linktypecd}, #{linkid} ,CONTENTTYPE, FULLFILENAME, REALFILENAME, ACTIVEFLAG,CREATE_ACC_NO,CREATE_DATE,FILECOMMENT, FILESIZE
+			 , '/file/downloadFile.do?fileseq='||#{sysfileseq}||'&amp;filename='||TEMPFILENAME||'&amp;linktypecd='||#{linktypecd}||'&amp;linkid='||#{linkid} FILEPATH
+		  FROM PREMIER_SYS.SYS_FILE_UPLOAD_TEMP
+		 WHERE FILESEQ = #{fileseq}
+	</insert>
+	
+	<!-- 첨부파일 저장 (임시테이블 사용하지 않고 저장, 업데이트 X) -->
+	<update id="insertSysFileUploadDirect" parameterType="json">
+		<selectKey resultType="Integer" keyProperty="SYSFILESEQ" order="BEFORE">
+            SELECT PREMIER_SYS.SEQ_SYS_FILE.NEXTVAL FROM DUAL
+        </selectKey>
+		MERGE INTO SYS_FILE_UPLOAD A USING (
+		    SELECT #{SYSFILESEQ} AS FILESEQ
+		         , #{FILENAME} AS FILENAME
+		         , #{TEMPFILENAME} AS TEMPFILENAME
+		         , #{LINKTYPECD} AS LINKTYPECD
+		         , #{LINKID} AS LINKID
+		         , #{CONTENTTYPE} AS CONTENTTYPE
+		         , #{FULLFILENAME} AS FULLFILENAME
+		         , 'A' AS ACTIVEFLAG
+		         , #{ACC_NO} AS CREATE_ACC_NO
+		         , SYSDATE AS CREATE_DATE
+		         , #{ACC_NO} AS UPDATE_ACC_NO
+		         , SYSDATE AS UPDATE_DATE
+		         , #{FILESIZE} AS FILESIZE
+		         , '/file/downloadFile.do?fileseq='||#{SYSFILESEQ}||'&amp;filename='||#{TEMPFILENAME}||'&amp;linktypecd='||#{LINKTYPECD}||'&amp;linkid='||#{LINKID} AS FILEPATH
+		      FROM DUAL ) D
+		ON (A.LINKID = D.LINKID AND A.LINKTYPECD = D.LINKTYPECD)
+		WHEN NOT MATCHED THEN
+		    INSERT (A.FILESEQ, A.FILENAME, A.TEMPFILENAME, A.LINKTYPECD, A.LINKID, A.CONTENTTYPE, A.FULLFILENAME,
+		            A.ACTIVEFLAG, A.CREATE_ACC_NO, A.CREATE_DATE, A.UPDATE_ACC_NO, A.UPDATE_DATE, A.FILESIZE, A.FILEPATH)
+		    VALUES (D.FILESEQ, D.FILENAME, D.TEMPFILENAME, D.LINKTYPECD, D.LINKID, D.CONTENTTYPE, D.FULLFILENAME,
+		            D.ACTIVEFLAG, D.CREATE_ACC_NO, D.CREATE_DATE, D.UPDATE_ACC_NO, D.UPDATE_DATE, D.FILESIZE, D.FILEPATH)
+	</update>
+	<!-- 임시첨부파일 linkid 수정 -->
+	<update id="updateSysFileUploadTemp" parameterType="json">
+		UPDATE PREMIER_SYS.SYS_FILE_UPLOAD_TEMP 
+		   SET LINKID = #{linkid}
+		 WHERE FILESEQ = #{fileseq}
+	</update>
+	
+	<!-- 첨부파일 경로 조회 -->
+	<select id="selectSysFilePath" parameterType="json" resultType="string">
+		SELECT FULLFILENAME FROM PREMIER_SYS.SYS_FILE_UPLOAD
+		 WHERE FILESEQ = #{fileseq}
+	</select>
+	<!-- 임시첨부파일 삭제 -->
+	<delete id="deleteSysFileUploadTemp" parameterType="hashmap">
+		DELETE FROM PREMIER_SYS.SYS_FILE_UPLOAD_TEMP 
+		 WHERE LINKTYPECD = #{linktypecd}
+		   AND LINKID = #{linkid}
+	</delete>
+	<!-- 첨부파일 삭제 -->
+	<delete id="deleteSysFileUpload" parameterType="hashmap">
+		DELETE FROM PREMIER_SYS.SYS_FILE_UPLOAD
+		 WHERE LINKTYPECD = #{linktypecd}
+		   AND LINKID = #{linkid}
+	</delete>
+	<!-- 임시 첨부파일 경로 조회 -->
+	<select id="selectSysFileTempPath" parameterType="hashmap" resultType="egovMap">
+		SELECT a.filename, a.fullfilename
+		FROM PREMIER_SYS.SYS_FILE_UPLOAD_TEMP a
+		 WHERE a.FILESEQ = #{fileseq}
+	</select>
+	<!-- combo 컨트롤 체크 항목 , 구분값 한줄로 만드는 쿼리 -->
+	<select id="selectSortSysItgrCodeMgmt" parameterType="String" resultType="egovMap">
+		with temp as  (
+		       select #{codeSeq} code_seq  from dual
+		     )
+		select LISTAGG(b.code_seq, ',') within group (order by b.code_orderno) as code_seq
+		from (
+		    SELECT distinct trim(regexp_substr(code_seq, '[^,]+', 1, level)) code_seq
+		      FROM (SELECT code_seq FROM temp) t
+		    CONNECT BY instr(code_seq, ',', 1, level - 1) > 0
+		) a, sys_itgr_code_mgmt b
+		where a.code_seq = b.code_seq
+		order by b.code_orderno
+	</select>	
+	<!-- 개인메뉴 권한 갯수 조회 -->	
+	<select id="selectMenuAuthCnt" parameterType="json" resultType="int">
+		SELECT COUNT(*) FROM (
+			SELECT A.MENUSEQ
+			  FROM COM_AUTH_USER_MENU A, SYS_MENU B
+			 WHERE B.ACTIVEFLAG = 'A'
+			   AND B.USEYN = 'Y'
+			   AND A.MENUSEQ = B.MENUSEQ
+			   AND A.ACC_NO = #{ACC_NO}
+			   AND B.MENUURL = #{MENUURL}
+			UNION ALL
+			SELECT B.MENUSEQ
+			  FROM COM_USER_AUTH A, COM_AUTH_MENU B, SYS_MENU C
+			 WHERE A.AUTHSEQ = B.AUTHSEQ 
+			   AND B.MENUSEQ = C.MENUSEQ
+			   AND C.ACTIVEFLAG = 'A'
+			   AND C.USEYN = 'Y'
+			   AND A.USERSEQ = #{ACC_NO}
+			   AND C.MENUURL = #{MENUURL}
+		)R
+	</select>
+	<!-- 결재상신 유무  -->
+	<select id="selectApprovalCheck" parameterType="json" resultType="int">
+		SELECT COUNT(*) FROM SYS_SIGNLINK WHERE SIGNLINKTYPECD = #{SIGNLINKTYPECD} AND LINKID = #{LINKID}
+	</select> 
+	<!-- 결재완료 유무 -->
+	<select id="selectApprovalCmplCheck" parameterType="json" resultType="int">
+		SELECT COUNT(*) FROM SYS_SIGNLINK WHERE SIGNLINKTYPECD = #{SIGNLINKTYPECD} AND LINKID = #{LINKID} AND SIGNTYPECD = 'C'
+	</select>
+	<!-- 최종 결재 상태  -->
+	<select id="selectLastApprovalCheck" parameterType="json" resultType="string">
+		SELECT SIGNTYPECD
+			FROM (SELECT ROW_NUMBER() OVER(ORDER BY DCS_ID  DESC) RNUM, DCS_ID, SIGNTYPECD FROM PREMIER_SYS.SYS_SIGNLINK ss 
+			WHERE SIGNLINKTYPECD  = #{SIGNLINKTYPECD}
+			AND LINKID = #{LINKID})
+			WHERE RNUM = 1
+	</select> 
+	<!-- 첨부파일 삭제 2 -->
+	<delete id="deleteSysFileUpload2" parameterType="hashmap">
+		DELETE FROM PREMIER_SYS.SYS_FILE_UPLOAD
+		 WHERE LINKTYPECD = #{linktypecd}
+		   AND LINKID LIKE '%' || #{linkid} || '%'
+	</delete>   
+	<!-- 메뉴번호 조회 -->
+	<select id="selectMenuseqByMenuurl" parameterType="string" resultType="json">
+		SELECT TO_CHAR(A.MENUSEQ) MENUSEQ, B.MENUNAME FROM PREMIER_SYS.SYS_MENU A, PREMIER_SYS.SYS_MENULANG B WHERE A.MENUSEQ = B.MENUSEQ AND MENUURL = #{MENUURL} AND ROWNUM = 1
+	</select>
+	<!-- 메뉴사용 이력저장 정보조회 -->
+	<select id="selectSaveMenuAccessInfo" parameterType="json" resultType="json">
+		SELECT LISTAGG(T.MENUSEQ, '>') WITHIN GROUP (ORDER BY T.MENULEVEL, T.SORTNUM) AS MENUSEQ_LIST 
+		     , LISTAGG(T.MENUNAME, '>') WITHIN GROUP (ORDER BY T.MENULEVEL, T.SORTNUM) AS MENUNAME_LIST
+		  FROM (
+		 SELECT DISTINCT A.*, B.MENUNAME
+		   FROM PREMIER_SYS.SYS_MENU A, PREMIER_SYS.SYS_MENULANG B 
+		  WHERE A.MENUSEQ = B.MENUSEQ 
+		    AND B.LANG='KOR' 
+		    AND (A.USEYN = 'Y' OR A.USEYN = 'A')
+		    AND A.ACTIVEFLAG = 'A' 
+		    AND A.MENULEVEL <![CDATA[<>]]> 1 
+		  START WITH A.MENUSEQ = #{MENUSEQ}
+		CONNECT BY PRIOR A.UPMENUID = A.MENUSEQ
+		) T
+		ORDER BY MENULEVEL, SORTNUM 
+	</select>
+	<!-- 메뉴사용 이력저장 -->
+	<insert id="insertMenuAccessLog" parameterType="json">
+		INSERT INTO PREMIER_SYS.SYS_MENU_ACCESS_LOG (BIZ_TYPE_NM, ACC_NO, ACC_NM, MENUSEQ_LIST, MENUNAME_LIST, MENUSEQ, MENUNAME, DEPT_NO, DEPT_NM)
+		VALUES (#{BIZ_TYPE_NM}, #{ACC_NO}, #{ACC_NM}, #{MENUSEQ_LIST}, #{MENUNAME_LIST}, #{MENUSEQ}, #{MENUNAME}, #{DEPT_NO}, #{DEPT_NM}) 
+	</insert>
+	<!-- 시스템 설정 정보 조회 -->
+	<select id="selectSysConfigInfo" resultType="json">
+		SELECT * FROM PREMIER_SYS.SYS_CONFIG
+	</select>
+	
+	<!-- 사업장 SELECT BOX -->
+	<select id="selectCompanyListBox" parameterType="hashmap" resultType="egovMap">
+    	<if test="IS_ALL != null and IS_ALL != ''">
+    	SELECT '' VALUE, ' ' CONTENT
+    	FROM DUAL
+    	UNION ALL
+		</if>
+	    SELECT CMPY_SN AS VALUE
+	    <choose>
+	    	<when test="lang != null and lang != ''">
+	    	, NVL(DECODE(#{lang}, 'KOR', CMPY_NM, CMPY_NM_ENG),CMPY_NM) AS CONTENT
+	    	</when>
+	    	<otherwise>
+	    	 , CMPY_NM AS CONTENT
+	    	</otherwise>
+	    </choose>
+		  FROM PREMIER_SYS.COM_COMPANY_INFO 
+		 WHERE USE_YN = 'Y'
+		   AND CMPY_TYPE_CD = 'B'
+	    	<if test="DEPT_GBN != null and DEPT_GBN != ''">
+	    	AND DEPT_GBN = #{DEPT_GBN}
+	    	</if>
+		 ORDER BY VALUE NULLS FIRST
+	</select>
+	
+	<!-- 공통코드 항목 mgt1로 Json 조회 -->
+	<select id="selectMGT1JsonList" parameterType="json" resultType="json">
+		SELECT T.MGT1 AS "value"
+			  ,T.CONTENT AS "content" 
+		 FROM (
+				SELECT TO_CHAR(MGMT.CODE_SEQ) AS CODESEQ, MGMT.MGT1 AS MGT1, MGMT.MGT2 AS MGT2, 
+					   TO_CHAR(MGMT.CODE_SEQ_UP) AS CODESEQUP, 
+					   TO_CHAR(MGMT.CODE_ORDERNO) AS CODEORDERNO, 
+					   MGMT.ACTIVE_FLAG AS ACTIVEFLAG, LANG.CODE_SEQ_LANG AS CODESEQLANG, LANG.CODE_NAME AS CODENAME,
+					   TO_CHAR(MGMT.CODE_SEQ) AS VALUE, LANG.CODE_NAME AS CONTENT
+				FROM PREMIER_SYS.SYS_ITGR_CODE_MGMT MGMT, PREMIER_SYS.SYS_ITGR_CODE_LANG LANG
+				WHERE MGMT.CODE_SEQ = LANG.CODE_SEQ
+				  AND MGMT.ACTIVE_FLAG = 'A'
+				  AND LANG.CODE_SEQ_LANG = #{lang}
+				  AND MGMT.CODE_SEQ_UP = #{CODE_SEQ_UP}
+				ORDER BY MGMT.CODE_ORDERNO) T	
+	</select>
+</mapper>

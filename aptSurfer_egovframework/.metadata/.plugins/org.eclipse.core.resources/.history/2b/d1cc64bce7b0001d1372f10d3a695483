@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.subcontractStock.mapper.SubcontractStockMapper">
+
+<select id="selectSubcontractStockList" parameterType="json"
+		resultType="json">
+	SELECT ROWNUM RNO, R.* FROM(
+		SELECT A.*
+		, B.MAKTX
+		, PREMIER_SYS.GETCMPYNMBYCMPYSN_IF(A.LIFNR) AS LIFNRNM
+		FROM TSCM_SUBCONTRACT_STOCK A, TSCM_M_MATL_MST_IF B
+		WHERE A.MATNR = B.MATNR(+)
+		AND B.WERKS(+) = #{WERKS}
+		AND A.SEQNO = #{SEQNO}
+		AND A.MATNR LIKE '%'||#{MATNR}||'%'
+		ORDER BY A.LIFNR, A.MATNR
+	)R
+	</select>
+	
+</mapper>

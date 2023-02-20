@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.inbPurSpecDN.mapper.InbPurSpecDNMapper">
+
+<select id="selectInbPurSpecDNList" parameterType="json"
+	resultType="json">
+		
+   select *
+     from(
+            select a.*
+            , TO_CHAR(TO_DATE(LFDAT, 'YYYYMMDD') ,'YYYY.MM.DD') AS LFDAT_1
+            , (case when STCQTY is null then 'B' else 'A' end ) AS IS_STCQTY
+            , PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_LGORT}, A.LGORT,'',#{SYSLANG}) AS LGORTNM
+            from(
+                  SELECT A.* ,
+                         (SELECT STOCK_QTY FROM TSCM_INB_PUR_SPEC_STCQTY 
+                          WHERE SEQNO =#{SEQNO}
+                          AND   REPLACE(LFDAT,'-','') = A.LFDAT
+                          AND   VBELN = A.VBELN
+                          AND   POSNR = A.POSNR
+                          AND   MATNR = A.MATNR
+                         ) AS STCQTY,
+                         (SELECT SUM(STOCK_QTY) FROM TSCM_INB_PUR_SPEC_STCQTY 
+                          WHERE SEQNO = #{SEQNO}
+                          AND   REPLACE(LFDAT,'-','') = A.LFDAT
+                          AND   VBELN = A.VBELN
+                          AND   LIFNR = A.LIFNR
+                          AND   MATNR = A.MATNR 
+                          AND   NVL(CHARG,'Z') = NVL(A.CHARG,NVL(CHARG,'Z'))  
+                         ) AS SSTCQTY 
+                  FROM (
+                          SELECT  MAX(COMPANYCD) COMPANYCD,
+                                  MAX(CAE_DIV) CAE_DIV,
+                                  MAX(PSTYP_N) PSTYP_N,  
+                                  MAX(WERKS) WERKS, 
+                                  VBELN, 
+                                  POSNR, 
+                                  MATNR, 
+                                  MAX(LFDAT) LFDAT, 
+                                  LIFNR, 
+                                  MAX(NAME1) NAME1, 
+                                  CHARG CHARG, 
+                                  SUM(LFIMG) LFIMG, 
+                                  MAX(MEINS) MEINS, 
+                                  MAX(LGORT) LGORT, 
+                                  MAX(ISSUE_CNT) ISSUE_CNT,
+                                  MAX(DESCR) DESCR,
+                                  MAX(MAKTX) MAKTX, 
+                                  MAX(IMDEA_GBN) IMDEA_GBN, 
+                                  MAX(OUT_GBN) OUT_GBN, 
+                                  MAX(ISSUE_DIV) ISSUE_DIV, 
+                                  MAX(II_DIV) II_DIV, 
+                                  MAX(DEL_DIV) DEL_DIV,
+                                  MAX(EWBEZ) EWBEZ,
+                                  MAX(BISMT) BISMT,
+                                  MAX(MATKL) MATKL,
+                                  MAX(MTART) MTART
+                          FROM(SELECT     A.COMPANYCD,
+                                          A.CAE_DIV,
+                                          A.PSTYP_N,
+                                          A.WERKS,
+                                          A.VBELN,
+                                          A.POSNR,
+                                          A.MATNR,
+                                          A.LFDAT,
+                                          A.LIFNR,
+                                          B.NAME1,
+                                          A.CHARG,
+                                          A.LFIMG,
+                                          A.MEINS, 
+                                          A.LGORT, A.ISSUE_CNT, A.DESCR, A.MAKTX,
+                                          DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),
+                                                  'F10', 'Y',
+                                                  'X10', 'Y',
+                                                  'N') IMDEA_GBN,                                             
+                                          DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),
+                                                'F30', 'Y',
+                                                'X30', 'Y',
+                                                'N') OUT_GBN,                                            
+                                          A.ISSUE_DIV,
+                                          A.II_DIV,
+                                          A.DEL_DIV, 
+                                          SUBSTR(C.EWBEZ,INSTR(C.EWBEZ,'[')+1,(INSTR(C.EWBEZ,']')-INSTR(C.EWBEZ,'['))-1) EWBEZ,
+                                          c.BISMT, 
+                                          c.MATKL,  
+                                          c.MTART  
+                               FROM    
+                               (
+                                           select WERKS, VBELN, POSNR, MATNR, LFDAT, LIFNR, 
+                                                   LFIMG, MEINS, LGORT,  max(crt_date) crt_date, max(SEQNO) SEQNO, 
+                                                   MAX(descr) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS DESCR, 
+                                                   MAX(CHARG) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS CHARG, 
+                                                   MAX(ISSUE_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS ISSUE_DIV, 
+                                                   MAX(II_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS II_DIV,
+                                                   MAX(DEL_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS DEL_DIV,
+                                                   MAX(MAKTX) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS MAKTX ,
+                                                   MAX(PSTYP_N) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS PSTYP_N ,
+                                                   MAX(COMPANYCD) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS COMPANYCD ,
+                                                   MAX(ISSUE_NO) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS ISSUE_NO ,
+                                                   MAX(RCPT_DATE) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS RCPT_DATE,
+                                                   MAX(ISSUE_DATE) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS ISSUE_DATE,
+                                                   MAX(ISSUE_CNT) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS ISSUE_CNT,
+                                                   MAX(CAE_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS CAE_DIV,
+                                                   MAX(IP_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS IP_DIV,
+                                                   MAX(INSP_DIV) KEEP(DENSE_RANK FIRST ORDER BY crt_date DESC) AS INSP_DIV  
+                                            from  TSCM_INB_PUR_SPEC   
+                                            where ISSUE_DIV = 'Y'
+                                            group by   WERKS, VBELN, POSNR, MATNR, LFDAT, LIFNR, LFIMG, MEINS, LGORT
+                               )
+                                A, TSCM_S_LIFNR B, TSCM_M_MATL_MST_IF C
+                                   WHERE  A.LIFNR = B.LIFNR(+)
+                                   AND    A.WERKS = C.WERKS(+)
+                                   AND    A.MATNR = C.MATNR(+)
+                                   AND    A.WERKS  = #{WERKS}
+                                   AND    A.LGORT = DECODE(#{LGORT},'%',A.LGORT,#{LGORT})
+                                   AND    A.VBELN LIKE '%'||#{VBELN}||'%'
+                                   AND    A.MATNR LIKE '%'||#{MATNR}||'%'
+                                   AND    A.LIFNR = #{LIFNR}
+                                   AND    A.LFDAT between #{LFDAT_LA} and #{LFDAT_LA_TO}
+                                   AND    NVL(A.DEL_DIV,'N')  =  NVL(#{DEL_DIV}, A.DEL_DIV)
+                          ) 
+                          GROUP BY LIFNR, VBELN, POSNR, MATNR, CHARG
+                ) A
+            ) a
+    )
+    WHERE IS_STCQTY = NVL(#{IS_STCQTY},IS_STCQTY)
+
+	</select>
+
+	<insert id="insertInbPurSpecDN" parameterType="json">
+		INSERT INTO	SAP_RFC_PUT_LOG(
+			SEQ_,SER_,PARAM1_,PARAM2_,PARAM3_,LOGIN_COMP,LOGIN_ID,LOGIN_YMD
+		)VALUES(
+			#{SEQNO},#{NUMBER},#{VBELN},'','X',#{COMPANYCD}, #{SYSID}, sysdate
+		)
+	</insert>
+	<!-- 삭제 값을 구분 -->
+	<select id="selectSapTest" parameterType="json"
+		resultType="json">
+		select msg_typ, msg_txt
+		from SAP_TEST_RETURN
+		where seqno = #{SEQNO}
+		and proc_nm='Z_MM_SCM_R_INB_PUR_SPEC_DEL'
+		and rownum=1
+	</select>
+
+	<update id="updateInbPurSpecCharg" parameterType="json">
+		update TSCM_INB_PUR_SPEC
+		set del_div = 'Y',
+		del_userid = #{SYSID},
+		del_date = sysdate
+		where lifnr = #{LIFNR}
+		and vbeln = #{VBELN}
+		and posnr = nvl(#{POSNR},posnr)
+		and matnr =	nvl(#{MATNR},matnr)
+		and nvl(charg,'Z') = nvl(#{CHARG},nvl(charg,'Z'))
+	</update>
+	
+	<update id="updateInbDelivCreateCharg" parameterType="json">
+		update TSCM_INB_DELIV_CREATE
+		set flag = 'D'
+		where lifnr = #{LIFNR}
+		and vbeln =	#{VBELN}
+		and matnr = nvl(#{MATNR},matnr)
+		and nvl(charg,'Z') = nvl(#{CHARG},nvl(charg,'Z'))
+	</update>
+
+	<update id="updateInbDelivDispHistory" parameterType="json">
+		update TSCM_INB_DELIV_DISP_HISTORY
+		set delyn = 'Y',
+		DEL_USERID = #{SYSID},
+		DEL_DATE = sysdate
+		where vbeln = #{VBELN}
+		and matnr = nvl(#{MATNR},matnr)
+		and nvl(charg,'Z') =
+		nvl(#{CHARG},nvl(charg,'Z'))
+	</update>
+
+	<update id="updatePartIdnttyLbl" parameterType="json">
+		UPDATE TSCM_PART_IDNTTY_LBL
+		SET DELYN = 'Y'
+		where VBELN = #{VBELN}
+		and matnr =	nvl(#{MATNR},matnr)
+		and nvl(charg,'Z') = nvl(#{CHARG},nvl(charg,'Z'))
+	</update>
+
+	<select id="selectMinPosnr" parameterType="json"
+		resultType="json">
+		select min(POSNR) as POSNR_MIN
+		from TSCM_INB_PUR_SPEC
+		where vbeln = #{VBELN}
+		and matnr = #{MATNR}
+		and nvl(charg,'Z') =
+		nvl(#{CHARG},nvl(charg,'Z'))
+
+	</select>
+	
+	<insert id="insertPoCancelIf" parameterType="json">
+		INSERT into TSCM_PO_CANCEL_IF(
+			IFKEY, IFYN, IFDATE, VBELN, POSNR, USERID, REGDAT
+		)VALUES(
+			SCM_PO_CANCEL_IF_SEQ.nextval,'N',null,#{VBELN},#{POSNR_MIN},#{SYSID}, sysdate)
+	</insert>
+	
+	<insert id="insertPoCancelIfHist" parameterType="json">
+		INSERT INTO TSCM_PO_CANCEL_IF_HIST(
+			IFKEY, IFYN, IFDATE, VBELN, POSNR, USERID, REGDAT, DESCR
+		)VALUES(
+			SCM_PO_CANCEL_HIST_SEQ.nextval,'N',null,,#{VBELN},,#{IPGO},#{SYSID},sysdate,'PASS')
+	</insert>
+	
+	<insert id="insertTscmInbPurSpecErr" parameterType="json">
+		 INSERT INTO SCM_SAVE_LOG(
+		 	P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,USERID,YMD) 
+         VALUES(
+         	'TSCM_INB_PUR_SPEC', #{msg_typ}, #{msg_txt}, #{V_SQLERRM}, #{LIFNR}, #{VBELN}, #{POSNR}, #{MATNR}, #{CHARG}, #{V_ERR_CNT}, #{SYSID}, SYSDATE)
+	</insert>
+	
+	<insert id="insertTscmInbDelivCreatEErr" parameterType="json">
+		 INSERT INTO SCM_SAVE_LOG(
+		 	P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,USERID,YMD) 
+         VALUES(
+         	'TSCM_INB_DELIV_CREATE', #{msg_typ}, #{msg_txt}, #{V_SQLERRM}, #{LIFNR}, #{VBELN}, #{POSNR}, #{MATNR}, #{CHARG}, #{V_ERR_CNT}, #{SYSID}, SYSDATE)
+	</insert>
+	
+	<insert id="insertTscmInbDelivDispHistoryErr" parameterType="json">
+		 INSERT INTO SCM_SAVE_LOG(
+		 	P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,USERID,YMD) 
+         VALUES(
+         	'TSCM_INB_DELIV_DISP_HISTORY', #{msg_typ}, #{msg_txt}, #{V_SQLERRM}, #{LIFNR}, #{VBELN}, #{POSNR}, #{MATNR}, #{CHARG}, #{V_ERR_CNT}, #{SYSID}, SYSDATE)
+	</insert>
+	
+	<insert id="insertTscmPartIdnttyLblErr" parameterType="json">
+		 INSERT INTO SCM_SAVE_LOG(
+		 	P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,USERID,YMD) 
+         VALUES(
+         	'TSCM_PART_IDNTTY_LBL', #{msg_typ}, #{msg_txt}, #{V_SQLERRM}, #{LIFNR}, #{VBELN}, #{POSNR}, #{MATNR}, #{CHARG}, #{V_ERR_CNT}, #{SYSID}, SYSDATE)
+	</insert>
+	
+	<insert id="insertExceptionErr" parameterType="json">
+		INSERT INTO SCM_SAVE_LOG(
+			P1,P2,USERID,YMD) 
+		VALUES(
+			'EXCEPTION', #{V_SQLERRM}, #{SYSID}, SYSDATE)
+	</insert>
+
+</mapper>

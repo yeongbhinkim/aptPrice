@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.draw1050.mapper.Draw1050Mapper">
+	<select id="draw1050List" parameterType="json" resultType="json">
+		select a.companycd, a.vendcd, count(eono) AS total_cnt, count(receipt_ymd) AS receipt_cnt, sum(nvl2(receipt_ymd,0,1)) AS no_receipt_cnt
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'01',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'01',nvl2(receipt_ymd,1,0),0)) n_M01 
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'02',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'02',nvl2(receipt_ymd,1,0),0)) n_M02
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'03',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'03',nvl2(receipt_ymd,1,0),0)) n_M03
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'04',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'04',nvl2(receipt_ymd,1,0),0)) n_M04
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'05',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'05',nvl2(receipt_ymd,1,0),0)) n_M05
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'06',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'06',nvl2(receipt_ymd,1,0),0)) n_M06
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'07',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'07',nvl2(receipt_ymd,1,0),0)) n_M07
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'08',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'08',nvl2(receipt_ymd,1,0),0)) n_M08
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'09',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'09',nvl2(receipt_ymd,1,0),0)) n_M09
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'10',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'10',nvl2(receipt_ymd,1,0),0)) n_M10
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'11',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'11',nvl2(receipt_ymd,1,0),0)) n_M11
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'12',1,0)) - sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'12',nvl2(receipt_ymd,1,0),0)) n_M12
+
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'01',nvl2(receipt_ymd,1,0),0)) s_M01
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'02',nvl2(receipt_ymd,1,0),0)) s_M02
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'03',nvl2(receipt_ymd,1,0),0)) s_M03
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'04',nvl2(receipt_ymd,1,0),0)) s_M04
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'05',nvl2(receipt_ymd,1,0),0)) s_M05
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'06',nvl2(receipt_ymd,1,0),0)) s_M06
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'07',nvl2(receipt_ymd,1,0),0)) s_M07
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'08',nvl2(receipt_ymd,1,0),0)) s_M08
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'09',nvl2(receipt_ymd,1,0),0)) s_M09
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'10',nvl2(receipt_ymd,1,0),0)) s_M10
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'11',nvl2(receipt_ymd,1,0),0)) s_M11
+        ,sum(decode(to_char(b_date,'YYYYMM'),#{Y_DATE}||'12',nvl2(receipt_ymd,1,0),0)) s_M12
+
+      from draw_vendor a , draw_vendor_list b                      
+      where a.companycd = b.companycd
+      and   a.drawno = b.drawno
+      <if test="COMPANYCD != null and COMPANYCD != ''">	
+      and    a.companycd = #{COMPANYCD}
+      </if>
+      group by a.companycd, a.vendcd
+     </select>
+     
+     <select id="draw1050detail" parameterType="json" resultType="json">
+	  select ROWNUM AS SEQNO, a.companycd, a.drawno, a.vendcd, b.apno, TO_CHAR(A.B_DATE, 'YYYY-MM-DD')AS B_DATE, b.eono, TO_CHAR(b.receipt_ymd, 'YYYY-MM-DD')AS receipt_ymd, 
+	  	a.eco_no, a.kindcd, a.login_id, a.SEND_DATE, a.SEND_XUSER, b.APNO, b.APNM, b.RECEIPT_YMD,  TO_CHAR(A.LOGIN_YMD, 'YYYY-MM-DD')AS LOGIN_YMD,        
+        (select  d.apnm from draw_master d where d.companycd = a.companycd and d.apno = b.apno  and d.eono = a.eco_no) AS file_name,
+        (select  d.apnm from draw_master d where d.companycd = a.companycd and d.apno = b.apno  and d.eono = a.eco_no) AS full_file_name
+	    from  draw_vendor a, draw_vendor_list b
+	    where a.companycd= #{COMPANYCD}
+	    and   a.drawno = b.drawno(+)
+	    and   to_char(a.b_date,'yyyy') = #{Y_DATE}
+	    and   b.drawno is not null	    	        
+	    order by b_date desc
+     </select>
+
+</mapper>

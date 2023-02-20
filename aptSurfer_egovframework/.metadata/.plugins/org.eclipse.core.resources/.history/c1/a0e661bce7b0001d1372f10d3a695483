@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.kqis6150.mapper.Kqis6150Mapper">
+	
+	<select id="kqis6150List" parameterType="json" resultType="json">
+	   select t.companycd, t.yy, t.xusernm, t.partno, t.gubun, t.xuser, t.partnm, t.kindcd, 
+       			t.m00, t.m01, t.m02, t.m03, t.m04, t.m05, t.m06, t.m07, t.m08, t.m09, t.m10, t.m11, t.m12, t.descr, t.jugi, t.d_user,
+       			t1.CHECK_M01, t1.CHECK_M02, t1.CHECK_M03, t1.CHECK_M04, t1.CHECK_M05, t1.CHECK_M06, t1.CHECK_M07, t1.CHECK_M08, t1.CHECK_M09, t1.CHECK_M10, t1.CHECK_M11, t1.CHECK_M12
+        from q_585 t left join (select q.companycd, q.yy, q.xusernm, q.partno, q.kindcd, q.ymd,
+				(decode(qx.flag,1,decode(substr(q.YMD,5,2),'01',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'01',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'01',1,0),0)) as CHECK_M01 
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'02',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'02',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'02',1,0),0)) as CHECK_M02
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'03',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'03',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'03',1,0),0)) as CHECK_M03
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'04',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'04',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'04',1,0),0)) as CHECK_M04
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'05',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'05',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'05',1,0),0)) as CHECK_M05
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'06',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'06',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'06',1,0),0)) as CHECK_M06
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'07',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'07',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'07',1,0),0)) as CHECK_M07
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'08',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'08',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'08',1,0),0)) as CHECK_M08
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'09',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'09',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'09',1,0),0)) as CHECK_M09
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'10',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'10',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'10',1,0),0)) as CHECK_M10
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'11',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'11',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'11',1,0),0)) as CHECK_M11
+		         , (decode(qx.flag,1,decode(substr(q.YMD,5,2),'12',1,0),0))||(decode(qt.flag,2,decode(substr(q.YMD,5,2),'12',1,0),0))||(decode(qs.flag,3,decode(substr(q.YMD,5,2),'12',1,0),0)) as CHECK_M12    
+		 		from q_595 q inner join 
+				(select qr.companycd, qr.yy, qr.xusernm, qr.partno, qr.kindcd ,qr.flag from q_595 qr where qr.flag = '1') qx
+				on(q.companycd = qx.companycd and q.yy = qx.yy and q.xusernm = qx.xusernm and q.partno = qx.partno and q.kindcd = qx.kindcd)left join 
+				(select qr.companycd, qr.yy, qr.xusernm, qr.partno, qr.kindcd ,qr.flag from q_595 qr where qr.flag = '2') qt
+				on(q.companycd = qt.companycd and q.yy = qt.yy and q.xusernm = qt.xusernm and q.partno = qt.partno and q.kindcd = qt.kindcd)left join 
+				(select qr.companycd, qr.yy, qr.xusernm, qr.partno, qr.kindcd ,qr.flag from q_595 qr where qr.flag = '3') qs
+				on(q.companycd = qs.companycd and q.yy = qs.yy and q.xusernm = qs.xusernm and q.partno = qs.partno and q.kindcd = qs.kindcd)
+		group by  q.companycd, q.yy, q.xusernm, q.partno, qs.flag,qx.flag, qt.flag, q.ymd, q.kindcd) t1 on(t.companycd = t1.companycd and t.yy = t1.yy and t.xusernm = t1.xusernm and t.partno = t1.partno)
+		where t.yy = #{Y_DATE}
+		<if test="MONTH != null and MONTH != ''">
+		and substr(t1.ymd,5,2) = #{MONTH}
+		</if>
+		<if test="VENDCD != null and VENDCD != ''">
+		and t.xusernm =  PREMIER_SYS.GET_ITGR_CODE_MGT(#{VENDCD},#{LANG},1)
+		</if>
+		<if test="D_USER != null and D_USER != ''">
+		and t.xuser = #{D_USER}
+		</if>
+		group by  t.companycd, t.yy, t.xusernm, t.partno, t.gubun, t.xuser, t.partnm, t.kindcd, 
+       t.m00, t.m01, t.m02, t.m03, t.m04, t.m05, t.m06, t.m07, t.m08, t.m09, t.m10, t.m11, t.m12, t.descr, t.jugi, t.d_user,
+       t1.CHECK_M01, t1.CHECK_M02, t1.CHECK_M03, t1.CHECK_M04, t1.CHECK_M05, t1.CHECK_M06, t1.CHECK_M07, t1.CHECK_M08, t1.CHECK_M09, t1.CHECK_M10, t1.CHECK_M11, t1.CHECK_M12
+		
+				
+     </select>
+     
+     <select id="selectkqis6150Edit" parameterType="json" resultType="json">
+	 select * from q_595
+	    where companycd = #{COMPANYCD}
+	    and yy = #{YY}
+	    and xusernm = #{XUSERNM}
+	    and partno = #{PARTNO}	
+	    and ymd = #{YMD}
+	    and flag = 1    			
+     </select>
+     
+     <select id="selectkqis6150PEdit" parameterType="json" resultType="json">
+	 select * from q_595
+	    where companycd = #{COMPANYCD}
+	    and yy = #{YY}
+	    and xusernm = #{XUSERNM}
+	    and partno = #{PARTNO}	
+	    and ymd = #{YMD}
+	    and flag = 2    			
+     </select>
+     
+     <select id="selectkqis6150MEdit" parameterType="json" resultType="json">
+	 select * from q_595
+	    where companycd = #{COMPANYCD}
+	    and yy = #{YY}
+	    and xusernm = #{XUSERNM}
+	    and partno = #{PARTNO}
+	    and ymd = #{YMD}	
+	    and flag = 3   			
+     </select>
+               
+     
+   	<update id="setkqis6150new" parameterType="json">
+   		MERGE INTO Q_585 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{Y_DATE} AS YY
+		      ,PREMIER_SYS.GET_ITGR_CODE_MGT(#{XUSERNM},#{LANG},1) AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,#{GUBUN} AS GUBUN
+		      ,#{XUSER} AS XUSER
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD		     
+		      ,#{M01} AS M01
+		      ,#{M02} AS M02
+		      ,#{M03} AS M03
+		      ,#{M04} AS M04
+		      ,#{M05} AS M05
+		      ,#{M06} AS M06
+		      ,#{M07} AS M07
+		      ,#{M08} AS M08
+		      ,#{M09} AS M09
+		      ,#{M10} AS M10
+		      ,#{M11} AS M11
+		      ,#{M12} AS M12	     		      
+		      ,#{DESCR} AS DESCR		     
+		      ,to_char(sysdate,'yyyymmdd') AS LOGIN_YMD
+		      ,#{JUGI} AS JUGI
+		      ,#{D_USER} AS D_USER
+		      
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.GUBUN = D.GUBUN
+		            ,A.XUSER = D.XUSER
+		            ,A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD		            
+		            ,A.M01 = D.M01
+		            ,A.M02 = D.M02
+		            ,A.M03 = D.M03
+		            ,A.M04 = D.M04
+		            ,A.M05 = D.M05
+		            ,A.M06 = D.M06
+		            ,A.M07 = D.M07
+		            ,A.M08 = D.M08
+		            ,A.M09 = D.M09
+		            ,A.M10 = D.M10
+		            ,A.M11 = D.M11
+		            ,A.M12 = D.M12
+		            ,A.DESCR = D.DESCR		            
+		            ,A.LOGIN_YMD = D.LOGIN_YMD
+		            ,A.JUGI = D.JUGI
+		            ,A.D_USER = D.D_USER		            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.GUBUN, A.XUSER, A.PARTNM, A.KINDCD, A.M01, A.M02, A.M03, A.M04, A.M05, A.M06, A.M07, A.M08, A.M09, A.M10, A.M11, A.M12, A.DESCR, A.LOGIN_YMD, A.JUGI, A.D_USER)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.GUBUN, D.XUSER, D.PARTNM, D.KINDCD, D.M01, D.M02, D.M03, D.M04, D.M05, D.M06, D.M07, D.M08, D.M09, D.M10, D.M11, D.M12, D.DESCR, D.LOGIN_YMD, D.JUGI, D.D_USER)
+
+     </update>
+     
+    <update id="setkqis6150Edit" parameterType="json">  						
+			
+ 		MERGE INTO Q_595 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{YY} AS YY
+		      ,#{XUSERNM} AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,'1' AS FLAG
+		      ,REPLACE(#{YMD},'-','') AS YMD
+		      ,REPLACE(#{YMD_1},'-','') AS YMD_1
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{YN} AS YN
+		      ,#{DESCR} AS DESCR
+		      ,#{COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{ACCNO} AS LOGIN_ID
+		      ,to_char(sysdate,'yyyymmdd') AS LOGIN_YMD				      
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		AND A.FLAG = D.FLAG
+		AND A.YMD = D.YMD
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD
+		            ,A.YN = D.YN
+		            ,A.YMD_1 = D.YMD_1
+		            ,A.DESCR = D.DESCR
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+		            ,A.LOGIN_ID = D.LOGIN_ID
+		            ,A.LOGIN_YMD = D.LOGIN_YMD		            	            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.FLAG, A.YMD, A.YMD_1, A.PARTNM, A.KINDCD, A.YN, A.DESCR, A.LOGIN_COMPANYCD, A.LOGIN_ID, A.LOGIN_YMD)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.FLAG, D.YMD, D.YMD_1, D.PARTNM, D.KINDCD, D.YN, D.DESCR, D.LOGIN_COMPANYCD, D.LOGIN_ID, D.LOGIN_YMD)
+		 		                                      
+     </update>      
+     
+     <update id="setkqis6150PEdit" parameterType="json">  						
+			
+ 		MERGE INTO Q_595 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{YY} AS YY
+		      ,#{XUSERNM} AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,'2' AS FLAG
+		      ,REPLACE(#{YMD},'-','') AS YMD
+		      ,REPLACE(#{YMD_1},'-','') AS YMD_1
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{YN} AS YN
+		      ,#{DESCR} AS DESCR
+		      ,#{COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{ACCNO} AS LOGIN_ID
+		      ,to_char(sysdate,'yyyymmdd') AS LOGIN_YMD				      
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		AND A.FLAG = D.FLAG
+		AND A.YMD = D.YMD
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD
+		            ,A.YN = D.YN
+		            ,A.YMD_1 = D.YMD_1
+		            ,A.DESCR = D.DESCR
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+		            ,A.LOGIN_ID = D.LOGIN_ID
+		            ,A.LOGIN_YMD = D.LOGIN_YMD		            	            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.FLAG, A.YMD, A.YMD_1, A.PARTNM, A.KINDCD, A.YN, A.DESCR, A.LOGIN_COMPANYCD, A.LOGIN_ID, A.LOGIN_YMD)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.FLAG, D.YMD, D.YMD_1, D.PARTNM, D.KINDCD, D.YN, D.DESCR, D.LOGIN_COMPANYCD, D.LOGIN_ID, D.LOGIN_YMD)
+		 		                                      
+     </update>    
+     
+     <update id="setkqis6150MEdit" parameterType="json">  						
+			
+ 		MERGE INTO Q_595 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{YY} AS YY
+		      ,#{XUSERNM} AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,'3' AS FLAG
+		      ,REPLACE(#{YMD},'-','') AS YMD
+		      ,REPLACE(#{YMD_1},'-','') AS YMD_1
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{YN} AS YN
+		      ,#{DESCR} AS DESCR
+		      ,#{COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{ACCNO} AS LOGIN_ID
+		      ,to_char(sysdate,'yyyymmdd') AS LOGIN_YMD				      
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		AND A.FLAG = D.FLAG
+		AND A.YMD = D.YMD
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD
+		            ,A.YN = D.YN
+		            ,A.YMD_1 = D.YMD_1
+		            ,A.DESCR = D.DESCR
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+		            ,A.LOGIN_ID = D.LOGIN_ID
+		            ,A.LOGIN_YMD = D.LOGIN_YMD		            	            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.FLAG, A.YMD, A.YMD_1, A.PARTNM, A.KINDCD, A.YN, A.DESCR, A.LOGIN_COMPANYCD, A.LOGIN_ID, A.LOGIN_YMD)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.FLAG, D.YMD, D.YMD_1, D.PARTNM, D.KINDCD, D.YN, D.DESCR, D.LOGIN_COMPANYCD, D.LOGIN_ID, D.LOGIN_YMD)
+		 		                                      
+     </update>            
+     
+     <update id="setkqis6150domyeonsend" parameterType="json">   		
+		   MERGE INTO DRAW_VENDOR_LIST A USING (
+			SELECT #{COMPANYCD} AS COMPANYCD
+			      ,#{DRAWNO} AS DRAWNO
+			      ,#{APNO} AS APNO
+			      ,#{ECO_NO} AS EONO
+			      ,SYSDATE AS RECEIPT_YMD
+			      ,#{VENDCD} AS RECEIPT_VENDCD
+			      ,SYSDATE AS LOGIN_YMD
+			      ,#{COMPANYCD} AS LOGIN_COMPANYCD			      
+			      ,#{APNM} AS APNM
+			FROM DUAL ) D
+			ON (A.COMPANYCD = D.COMPANYCD
+			AND A.DRAWNO = D.DRAWNO
+			AND A.APNO = D.APNO
+			AND A.EONO = D.EONO
+			)
+			WHEN MATCHED THEN
+			  UPDATE SET A.RECEIPT_VENDCD = D.RECEIPT_VENDCD
+			  			,A.RECEIPT_YMD = D.RECEIPT_YMD			  
+			            ,A.LOGIN_YMD = D.LOGIN_YMD
+			            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD			            
+			            ,A.APNM = D.APNM         			            
+			WHEN NOT MATCHED THEN
+			INSERT(A.COMPANYCD, A.DRAWNO, A.APNO, A.EONO, A.RECEIPT_VENDCD, A.RECEIPT_YMD, A.LOGIN_YMD, A.LOGIN_COMPANYCD, A.APNM)
+			VALUES(D.COMPANYCD, D.DRAWNO, D.APNO, D.EONO, D.RECEIPT_VENDCD, D.RECEIPT_YMD, D.LOGIN_YMD, D.LOGIN_COMPANYCD, D.APNM)
+
+     </update>     
+     
+     <update id="uploadkqis6150" parameterType="json">   		
+		   insert into q_585
+                    ( companycd, yy, xusernm, partno, gubun,
+                      partnm, kindcd, m01, m02, m03, m04, m05, m06,
+                      m07, m08, m09, m10, m11, m12,
+                      descr, jugi, d_user)
+                    values 
+                    ( #{COMPANYCD}, #{YY}, #{XUSERNM}, #{PARTNO}, #{GUBUN}, #{PARTNM}, #{KINDCD}, 
+                      #{M01}, #{M02}, #{M03}, #{M04}, #{M05}, #{M06}, #{M07}, #{M08}, #{M09}, #{M10}, #{M11}, #{M12}, 
+                      #{DESCR}, #{JUGI}, #{D_USER}
+                    )
+     </update>    
+     
+     
+   	<delete id="delkqis6150Edit" parameterType="json"> 
+    delete from q_595
+     where companycd = #{COMPANYCD}
+     and yy = #{YY}
+     and xusernm = #{XUSERNM}
+     and partno = #{PARTNO}
+     and ymd = #{YMD} 
+     and flag = #{FLAG}
+     </delete>
+     
+    <delete id="delkqis6150copy" parameterType="json">      
+	delete from q_585
+    where companycd = #{COMPANYCD}
+      and yy = #{E_DATE} 
+    </delete>
+     
+    <update id="setkqis6150capy" parameterType="json">   		
+	  insert into q_585
+	  select
+	  COMPANYCD, #{E_DATE}, XUSERNM, PARTNO, GUBUN, XUSER, PARTNM, KINDCD, M00, M01, M02, M03, M04, M05, M06, M07, M08, M09, M10, M11, M12, DESCR, LOGIN_COMPANYCD, LOGIN_ID, LOGIN_YMD, JUGI, D_USER
+	  from q_550
+	  where companycd = #{COMPANYCD}
+	  and    yy = #{S_DATE}
+    </update> 
+
+</mapper>

@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.scmupnew.mapper.ScmUpNewMapper">
+   <select id="getScmUpNewList" parameterType="json" resultType="json">
+		select ROWNUM AS ROWNO, a.*,SUBSTR(a.ISDAT,0,4)||'.'||SUBSTR(a.ISDAT,5,2)||'.'||SUBSTR(a.ISDAT,7,2) as JDATE,
+			( select  stress_yn 
+                from    q_312_0 
+                where   companycd = #{COMPANYCD}
+                and     matnr = a.matnr
+                and     lifnr = a.lifnr 
+                and     isdat = a.isdat
+              ) as stress_yn,
+              (select 'Y'
+	            from        Q_312_1
+	            where      companycd = decode(a.WERKS ,'1110', '11', '1210', '13', '1220', '14', '31')
+	            and            matnr = a.matnr
+	            and            lifnr = a.lifnr
+	            and          sdecgbn is not null
+	            and     to_char(jdate,'yyyymmdd') = a.lfdat_la 
+	            and rownum = 1) as cur_sung_,
+	          (select 'Y'
+		        from   q_312_1m
+		        where    companycd = decode(a.WERKS ,'1110', '11', '1210', '13', '1220', '14', '31') 
+		        and    lifnr = a.LIFNR
+		        and    matnr = a.MATNR
+		        and    barco = a.SEQNO) as cur_sung,
+		      (select 'Y'
+		        from   q_615
+		        where  companycd = decode(a.WERKS ,'1110', '11', '1210', '13', '1220', '14', '31')
+		        and    vendcd = a.lifnr
+		        and    partno = a.matnr
+<!-- 		        and   'Y' = check_complete_finish_doc(doc_id)   -->
+		        and    rownum = 1) as cur_q615  ,
+		      (select 'Y'
+	            from   q_251 
+	            where  partno = a.MATNR
+	            and    vendcd = a.LIFNR
+	            and	   rownum = 1) as cur_find  
+           from (  select  a.lfdat_la as isdat, a.lfuhr_la, a.werks, a.lifnr, a.lgort, get_apnonm(decode(a.WERKS ,'1110', '11', '1210', '13', '1220', '14', '31'),a.matnr) as matnrnm,
+                  a.charg, a.pstyp_n, a.matnr, a.qty as menge, a.meins, premier_sys.GETCMPYNMBYCMPYSN_IF(a.lifnr) as lifnrnm,
+                  (case when a.lfdat_la <![CDATA[<]]> '20190408' then null else a.seqno end ) seqno,
+                  (case when a.lfdat_la <![CDATA[<]]> '20190408' then (select vbeln from TSCM_INB_PUR_SPEC where  lfdat = a.lfdat_la and matnr = A.MATNR and lifnr = a.lifnr and rownum = 1)
+                        else a.vbeln end 
+                   ) barco, lfdat_la,
+                  '100' as mandt, 
+                  a.GUIDELINE,
+                  (select companycd from xm001 where werks = a.werks and rownum = 1) as companycd,
+                  (SELECT MAX(REV_NO) FROM Q_251 WHERE VENDCD = A.LIFNR AND PARTNO = A.MATNR AND SDATE <![CDATA[<=]]>  a.lfdat_la) REV_NO                 
+          from    TSCM_INB_DELIV_DISP_HISTORY a
+          where   a.lfdat_la BETWEEN  replace(#{S_DATE},'-','') AND replace(#{E_DATE},'-','')
+			and   a.werks = #{COMPANY}
+            and   a.delyn = 'N'                  	
+			
+			<if test="p_g_vendcd != null and p_g_vendcd != ''">		
+			 	 AND  lifnr = #{p_g_vendcd}			 	 
+			</if>	
+			<if test="p_partno != null and p_partno != ''">					
+			 	 AND  matnr like nvl('%'||#{p_partno}||'%', a.matnr)
+			</if>	
+			<if test="p_barco != null and p_barco != ''">		
+				 AND  nvl(a.vbeln,'*') like '%'||nvl(#{p_barco}, nvl(a.vbeln,'*'))||'%'	 	 
+			</if>	
+				
+          		 and (not exists (select 1 from m_1120 where mandt = '100' and matnr = a.matnr and isdat= a.lfdat_la and lifnr=a.lifnr and scm_barco = a.vbeln and nvl(charg,'Z') = nvl(a.charg,nvl(charg,'Z')) ) 
+                    or not exists (select 1 from q_312_1m where lifnr = a.lifnr and matnr = a.matnr and to_char(write_date,'yyyymmdd') = a.lfdat_la)   
+                    )
+                    
+                 and     exists ( select  1 
+                       from    q_615 b
+                       where     companycd = decode(a.WERKS ,'1110', '11', '1210', '13', '1220', '14', '31') 
+                       and     vendcd = a.lifnr
+                       and     partno = a.matnr  
+                       and     vendcd = a.lifnr 
+                      
+                       )     
+           		and     exists ( select 1 from q_251    
+           				where partno = a.matnr
+                        and vendcd = a.lifnr 
+                        and to_char(sdate,'yyyymmdd')  <![CDATA[<=]]> a.lfdat_la
+                       )
+                order by  LIFNR, isdat desc, seqno              
+      ) a
+      where 1=1  
+      
+	</select>
+		
+	
+	<select id="getStandardList" parameterType="json" resultType="json"> 
+		select   a.companycd, a.partno, get_part_name(a.partno,a.companycd) as part_name,  a.vendcd, b.rev_no, b.register_no, b.kindcd, to_char(b.sdate)
+      		from     q_615 a, 
+           			(select  a.companycd, a.partno, a.partnm, a.vendcd, a.rev_no, a.register_no, a.kindcd, a.sdate
+              			from    q_251 a ) b
+   	 	where   a.companycd = b.companycd(+)
+      	and       a.partno = b.partno(+)
+      	and     a.vendcd = b.vendcd(+)
+      	
+     	
+      	and       a.partno like #{MATNR}||'%'
+    	and     a.sno = (select nvl(max(sno),1) from q_615 where companycd = a.companycd and vendcd = a.vendcd and partno = a.partno )  
+      order by  a.vendcd, a.partno, b.rev_no
+	</select>	
+	
+	<select id="selectStress" parameterType="json" resultType="json">        
+        select * from(
+              select '1' AS GROUP_ORDER, ROWNUM AS S_NO,
+              			 b.seq, b.sno, b.item agroup, bgroup, b.item gauge, b.device, 
+                         b.standard g_hangmok, unit, sample, minnum, maxnum,
+                         (CASE WHEN a.sx1 IS NULL THEN ' ' ELSE a.sx1 END) as sx1,
+               			(CASE WHEN a.sx2 IS NULL THEN ' ' ELSE a.sx2 END) as sx2,
+               			(CASE WHEN a.sx3 IS NULL THEN ' ' ELSE a.sx3 END) as sx3,
+               			(CASE WHEN a.sx4 IS NULL THEN ' ' ELSE a.sx4 END) as sx4,
+               			(CASE WHEN a.sx5 IS NULL THEN ' ' ELSE a.sx5 END) as sx5,               
+               			(CASE WHEN a.sdecgbn IS NULL THEN ' ' ELSE a.sdecgbn END) as sdecgbn,                             
+               			a.sx, b.stress_yn, b.spec_min, b.spec_max, b.item_no, a.JDATE, a.lotno,
+                         b.item_check  
+                  from   q_252 b,
+                        ( select  * 
+                          from    q_312_1 a
+                          where   barco = #{BARCO}
+                        ) a
+                  where b.companycd = a.companycd(+)
+                  and   b.partno = a.matnr(+)
+                  and   b.vendcd = a.lifnr(+)
+                  and   b.seq = a.seq(+)
+                  and   b.vendcd = #{LIFNR}
+                  and   b.partno = #{MATNR}
+                  and   b.companycd = #{COMPANYCD}
+                  and   a.jdate(+) = to_date(#{ISDAT}, 'yyyymmdd')
+                  and   nvl(b.stress_yn,'*') = decode( nvl('',( select stress_yn
+                                                                 from q_312_0
+                                                                 where lifnr = #{LIFNR}
+                                                                 and   matnr = #{MATNR}
+                                                                 and   isdat = #{ISDAT})),'N',nvl(b.stress_yn,'*'),'Y')
+                   and   b.rev_no = (  select max(rev_no)
+                                      from    q_251 
+                                      where companycd = b.companycd   
+                                      and   vendcd = b.vendcd
+                                      and   partno = b.partno 
+                                      and   to_char(sdate,'yyyymmdd') <![CDATA[<=]]>  #{ISDAT})       
+                  
+                   UNION ALL
+                   
+                   select '2' AS GROUP_ORDER, ROWNUM AS S_NO,
+                         b.seq, b.sno, b.item agroup, bgroup, b.item gauge, b.device, 
+                         b.standard g_hangmok, unit, sample, minnum, maxnum,
+<!--                          a.cx1 AS SX1, a.cx2 AS SX2, a.cx3 AS SX3, a.cx4 AS SX4, a.cx5 AS SX5, -->
+                         (CASE WHEN a.cx1 IS NULL THEN ' ' ELSE a.cx1 END) as sx1,
+               			 (CASE WHEN a.cx2 IS NULL THEN ' ' ELSE a.cx2 END) as sx2,
+               			 (CASE WHEN a.cx3 IS NULL THEN ' ' ELSE a.cx3 END) as sx3,
+               			 (CASE WHEN a.cx4 IS NULL THEN ' ' ELSE a.cx4 END) as sx4,
+               			 (CASE WHEN a.cx5 IS NULL THEN ' ' ELSE a.cx5 END) as sx5, 
+                         a.cx, a.cdecgbn,                
+                         b.stress_yn, b.spec_min, b.spec_max, b.item_no, a.JDATE, a.lotno,
+                         b.item_check  
+                  from   q_252 b,
+                        ( select  * 
+                          from    q_312_1 a
+                          where   barco = #{BARCO}
+                        ) a
+                  where b.companycd = a.companycd(+)
+                  and   b.partno = a.matnr(+)
+                  and   b.vendcd = a.lifnr(+)
+                  and   b.seq = a.seq(+)
+                  and   b.vendcd = #{LIFNR}
+                  and   b.partno = #{MATNR}
+                  and   b.companycd = #{COMPANYCD}
+                  and   a.jdate(+) = to_date(#{ISDAT}, 'yyyymmdd')
+                  and   nvl(b.stress_yn,'*') = decode( nvl('',( select stress_yn
+                                                                 from q_312_0
+                                                                 where lifnr = #{LIFNR}
+                                                                 and   matnr = #{MATNR}
+                                                                 and   isdat = #{ISDAT})),'N',nvl(b.stress_yn,'*'),'Y')
+                   and   b.rev_no = (  select max(rev_no)
+                                      from    q_251 
+                                      where companycd = b.companycd   
+                                      and   vendcd = b.vendcd
+                                      and   partno = b.partno 
+                                      and   to_char(sdate,'yyyymmdd') <![CDATA[<=]]>  #{ISDAT})   
+        	)                  
+        order by seq, sno, GROUP_ORDER
+        
+	</select>
+	
+	<select id="selectStressJ" parameterType="json" resultType="json">        
+        select * from(
+              select '1' AS GROUP_ORDER, ROWNUM AS S_NO,
+              			 b.seq, b.sno, b.item agroup, bgroup, b.item gauge, b.device, 
+                         b.standard g_hangmok, unit, sample, minnum, maxnum,
+                         (CASE WHEN a.sx1 IS NULL THEN ' ' ELSE a.sx1 END) as sx1,
+               			(CASE WHEN a.sx2 IS NULL THEN ' ' ELSE a.sx2 END) as sx2,
+               			(CASE WHEN a.sx3 IS NULL THEN ' ' ELSE a.sx3 END) as sx3,
+               			(CASE WHEN a.sx4 IS NULL THEN ' ' ELSE a.sx4 END) as sx4,
+               			(CASE WHEN a.sx5 IS NULL THEN ' ' ELSE a.sx5 END) as sx5,               
+               			(CASE WHEN a.sdecgbn IS NULL THEN ' ' ELSE a.sdecgbn END) as sdecgbn,                             
+               			a.sx, b.stress_yn, b.spec_min, b.spec_max, b.item_no, a.JDATE, a.lotno,
+                         b.item_check  
+                  from   q_252 b,
+                        ( select  * 
+                          from    q_312_1 a
+                          where   barco = #{BARCO}
+                        ) a
+                  where b.companycd = a.companycd(+)
+                  and   b.partno = a.matnr(+)
+                  and   b.vendcd = a.lifnr(+)
+                  and   b.seq = a.seq(+)
+                  and   b.vendcd = #{LIFNR}
+                  and   b.partno = #{MATNR}
+                  and   b.companycd = #{COMPANYCD}
+                  and   a.jdate(+) = to_date(#{ISDAT}, 'yyyymmdd')                  
+                  and   b.rev_no = (  select max(rev_no)
+                                      from    q_251 
+                                      where companycd = b.companycd   
+                                      and   vendcd = b.vendcd
+                                      and   partno = b.partno 
+                                      and   to_char(sdate,'yyyymmdd') <![CDATA[<=]]>  #{ISDAT})       
+                  
+                   UNION ALL
+                   
+                   select '2' AS GROUP_ORDER, ROWNUM AS S_NO,
+                         b.seq, b.sno, b.item agroup, bgroup, b.item gauge, b.device, 
+                         b.standard g_hangmok, unit, sample, minnum, maxnum,
+                         a.cx1, a.cx2, a.cx3, a.cx4, a.cx5, a.cx, a.cdecgbn,                
+                         b.stress_yn, b.spec_min, b.spec_max, b.item_no, a.JDATE, a.lotno,
+                         b.item_check  
+                  from   q_252 b,
+                        ( select  * 
+                          from    q_312_1 a
+                          where   barco = #{BARCO}
+                        ) a
+                  where b.companycd = a.companycd(+)
+                  and   b.partno = a.matnr(+)
+                  and   b.vendcd = a.lifnr(+)
+                  and   b.seq = a.seq(+)
+                  and   b.vendcd = #{LIFNR}
+                  and   b.partno = #{MATNR}
+                  and   b.companycd = #{COMPANYCD}
+                  and   a.jdate(+) = to_date(#{ISDAT}, 'yyyymmdd')                 
+                  and   b.rev_no = (  select max(rev_no)
+                                      from    q_251 
+                                      where companycd = b.companycd   
+                                      and   vendcd = b.vendcd
+                                      and   partno = b.partno 
+                                      and   to_char(sdate,'yyyymmdd') <![CDATA[<=]]>  #{ISDAT})   
+        	)                  
+        order by seq, sno, GROUP_ORDER
+        
+	</select>
+	
+	<select id="getStressList" parameterType="json" resultType="json"> 
+	SELECT COMPANYCD, PARTNO, return_html_text(PARTNM) PARTNM, REV_NO, EO_NO, VENDCD, KINDCD, GET_KIND(KINDCD,'')as KINDNM,
+       MAX(LIFNR) AS LIFNR, MAX(SIRO) AS SIRO, MAX(SUPP_A) AS SUPP_A, MAX(SUPP_B) AS SUPP_B, MAX(SUPP_C) AS SUPP_C,
+       MAX(K_A) AS K_A, MAX(K_B) AS K_B, MAX(K_C) AS K_C, MAX(PJ) AS PJ, MAX(PJ_ETC) AS PJ_ETC, MAX(LOTNO) AS LOTNO, MAX(WRITE_DATE) AS WRITE_DATE ,MAX(DESCR) AS DESCR FROM 
+	(SELECT A.COMPANYCD, A.PARTNO, A.PARTNM, A.REV_NO, A.EO_NO, A.VENDCD, A.KINDCD,        
+	        B.LIFNR, B.SIRO, B.SUPP_A, B.SUPP_B, B.SUPP_C, B.K_A, B.K_B, B.K_C, B.PJ, B.PJ_ETC, B.LOTNO, B.WRITE_DATE, B.DESCR          
+	      FROM Q_251 A RIGHT JOIN Q_312_1M B ON (A.COMPANYCD = B.COMPANYCD AND A.PARTNO = B.MATNR AND A.VENDCD = B.LIFNR AND B.BARCO = #{SEQNO}) 
+	      WHERE     PARTNO = TO_CHAR(#{MATNR})
+	      AND       VENDCD = #{LIFNR}
+	      AND       REV_NO = (    SELECT MAX(REV_NO)
+	                              FROM Q_251
+	                              WHERE COMPANYCD = A.COMPANYCD
+	                              AND   PARTNO = A.PARTNO
+	                              AND   VENDCD = A.VENDCD                                            
+	                              AND   TO_CHAR(SDATE,'yyyymmdd')  <![CDATA[<=]]> #{ISDAT} )
+	                                                
+	UNION ALL
+	 SELECT  A.COMPANYCD, A.PARTNO, A.PARTNM, A.REV_NO, A.EO_NO, A.VENDCD, A.KINDCD,  
+	       '' AS LIFNR,'' AS SIRO,'' AS SUPP_A,'' AS SUPP_B,'' AS SUPP_C,'' AS K_A, '' AS K_B, '' AS K_C,
+	       '' AS PJ, '' AS PJ_ETC, '' AS LOTNO, NULL AS WRITE_DATE, '' AS DESCR                                       
+	    FROM Q_251 A
+	    WHERE     PARTNO = TO_CHAR(#{MATNR})
+	      AND       VENDCD = #{LIFNR}
+	      AND		COMPANYCD = #{COMPANYCD}
+	      AND       REV_NO = (    SELECT MAX(REV_NO)
+	                              FROM Q_251
+	                              WHERE COMPANYCD = A.COMPANYCD
+	                              AND   PARTNO = A.PARTNO
+	                              AND   VENDCD = A.VENDCD                                            
+	                              AND   TO_CHAR(SDATE,'yyyymmdd') <![CDATA[<=]]> #{ISDAT} )
+	                              )Z
+	GROUP BY  COMPANYCD, PARTNO, PARTNM, REV_NO, EO_NO, VENDCD, KINDCD
+	
+	
+	</select>
+	
+	<select id="getStandardSecondList" parameterType="json" resultType="json"> 
+	select  *
+      from    q_252 a
+      where     companycd = #{PLANTCD} 
+      and        partno =  #{MATNR}
+      and      vendcd = #{LIFNR}
+      and      rev_no = decode(#{REV_NO}, null, (  select max(rev_no)  from q_251  where companycd = a.companycd and partno = a.partno and vendcd = a.vendcd  ), #{REV_NO})
+      ORDER BY SEQ, SNO, ORDERNO,ITEM_NO
+           
+	</select>
+	
+	
+	<select id="selectbullHist" parameterType="json" resultType="json"> 
+	select distinct(a.isdat), b.bad_type, b.bad_qty, GET_CATALOG_NAME('QIS','TYPE_GBN_U','KO',substr(b.bad_type,1,3)) as bad_nm 
+      from m_1120 a, m_1120_bultype b
+     WHERE a.companycd = b.companycd
+       and a.tblid = b.tblid
+       and a.mandt = b.mandt
+       and a.matnr = b.matnr
+       and a.isdat = b.isdat
+       and a.lifnr = b.lifnr       
+       and a.MATNR = #{MATNR}
+       and a.lifnr = #{LIFNR}
+       and a.isdat between #{ISDAT} and #{IEDAT}
+       order by isdat desc           
+	</select>
+	
+	<select id="selectStressImg" parameterType="json" resultType="json"> 
+    SELECT rownum, t.filename, NULL as files
+      FROM PREMIER_SYS.SYS_FILE_UPLOAD t                        
+     WHERE t.linktypecd = 'SCM_UP_NEW'
+       AND t.linkid =   #{COMPANYCD}||'!'||#{MATNR}||'!'||#{LIFNR}||'!'||#{ISDAT} 
+	UNION ALL
+	  SELECT rownum,
+	         '' AS file_name,
+	         NULL AS files
+	         FROM PREMIER_SYS.SYS_FILE_UPLOAD t           
+	        WHERE NOT EXISTS(SELECT rownum, t.filename, NULL as files
+	                          FROM PREMIER_SYS.SYS_FILE_UPLOAD t                        
+	                         WHERE t.linktypecd = 'SCM_UP_NEW'
+	                           AND t.linkid =   #{COMPANYCD}||'!'||#{MATNR}||'!'||#{LIFNR}||'!'||#{ISDAT} )
+	         AND ROWNUM = 1 
+	</select>
+	
+	
+	
+	<update id="setStress1" parameterType="json">        
+    
+	MERGE INTO q_312_1m A USING (
+    SELECT #{COMPANYCD} AS COMPANYCD
+          ,#{MANDT} AS MANDT
+          ,#{LIFNR} AS LIFNR
+          ,#{MATNR} AS MATNR 
+          ,TO_NUMBER(#{SEQ}) AS seq
+          ,#{SNO} AS sno
+          ,#{BARCO} AS BARCO 
+          ,#{SIRO} AS SIRO
+          ,#{SUPP_A} AS SUPP_A
+          ,#{SUPP_B} AS SUPP_B 
+          ,#{SUPP_C} AS SUPP_C
+          ,#{K_A} AS K_A
+          ,#{K_B} AS K_B 
+          ,#{K_C} AS K_C
+          ,#{PJ} AS PJ
+          ,#{PJ_ETC} AS PJ_ETC 
+          ,#{LOTNO} AS LOTNO
+          ,#{COMPANYCD} AS LOGIN_COMPANYCD          
+          ,sysdate AS LOGIN_YMD 
+          ,TO_DATE(#{ISDAT}, 'yyyymmdd') AS WRITE_DATE 
+          ,#{DESCR} AS DESCR        
+	    FROM DUAL ) D
+	    ON (A.COMPANYCD = D.COMPANYCD
+	    AND A.MANDT = d.MANDT
+	    AND A.LIFNR = d.LIFNR
+	    AND A.MATNR = d.MATNR
+	    AND A.BARCO = d.BARCO )
+	    WHEN MATCHED THEN
+	      UPDATE SET A.siro = D.siro 
+	      			,A.PJ = D.PJ
+	                ,A.supp_a = D.supp_a
+	                ,A.supp_b = D.supp_b 
+	                ,A.supp_c = D.supp_c 
+	                ,A.lotno = D.lotno 
+	                ,A.descr = D.descr
+	                ,A.write_date = TO_DATE(#{ISDAT}, 'yyyymmdd')	                
+	                ,A.login_ymd = sysdate                
+               
+    WHEN NOT MATCHED THEN
+    INSERT(A.COMPANYCD, A.MANDT, A.LIFNR, A.MATNR, A.SEQ, A.SNO, A.BARCO, A.SIRO, A.SUPP_A, A.SUPP_B, A.SUPP_C, 
+           A.K_A, A.K_B, A.K_C, A.PJ, A.PJ_ETC, A.LOTNO, A.LOGIN_COMPANYCD, A.LOGIN_YMD, A.WRITE_DATE, A.DESCR)
+    VALUES(D.COMPANYCD, D.MANDT,  D.LIFNR, D.MATNR, D.SEQ, D.SNO, D.BARCO, D.SIRO, D.SUPP_A, D.SUPP_B, D.SUPP_C, 
+           D.K_A, D.K_B, D.K_C, D.PJ, D.PJ_ETC, D.LOTNO, D.LOGIN_COMPANYCD, sysdate, TO_DATE(#{ISDAT}, 'yyyymmdd'), D.DESCR)
+        
+	</update>
+	
+	<update id="setStress2" parameterType="json">            
+	 MERGE INTO q_312_0 A USING (
+ 	 SELECT #{COMPANYCD} AS COMPANYCD
+           ,#{MANDT} AS MANDT
+           ,#{LIFNR} AS LIFNR
+           ,#{MATNR} AS MATNR 
+           ,TO_NUMBER('0') AS DOC_ID
+           ,#{ISDAT} AS ISDAT
+           ,#{COMPANYCD} AS LOGIN_COMPANYCD  
+           ,#{STRESS_YN} AS STRESS_YN        
+      FROM DUAL ) D
+      ON (A.COMPANYCD = D.COMPANYCD
+      AND A.MANDT = d.MANDT
+      AND A.LIFNR = d.LIFNR
+      AND A.MATNR = d.MATNR  )
+      WHEN MATCHED THEN
+        UPDATE SET A.STRESS_YN = D.STRESS_YN 
+      WHEN NOT MATCHED THEN
+        INSERT(A.COMPANYCD, A.MANDT, A.LIFNR, A.MATNR, A.DOC_ID, A.ISDAT, A.LOGIN_COMPANYCD, A.LOGIN_YMD, A.STRESS_YN)
+        VALUES(D.COMPANYCD, D.MANDT, D.LIFNR, D.MATNR, D.DOC_ID, D.ISDAT, D.LOGIN_COMPANYCD, SYSDATE, D.STRESS_YN)
+	</update>
+	
+	<update id="setStress3" parameterType="json">            
+	MERGE INTO q_312_1 A USING (
+    SELECT #{COMPANYCD} AS COMPANYCD
+          ,#{MANDT} AS MANDT
+          ,#{LIFNR} AS LIFNR
+          ,#{MATNR} AS MATNR 
+          ,TO_NUMBER(#{SEQ}) AS SEQ
+          ,#{SNO} AS SNO
+          ,#{AGROUP} AS AGROUP 
+          ,#{GAUGE} AS GAUGE
+          ,#{G_HANGMOK} AS G_HANGMOK
+          ,#{SX1} AS SX1 
+          ,#{SX2} AS SX2
+          ,#{SX3} AS SX3
+          ,#{SX4} AS SX4
+          ,#{SX5} AS SX5 
+          ,#{VC_R_VAL} AS SX
+          ,#{VC_S_VAL} AS SR
+          ,#{DESCR} AS G_DESCR
+          ,#{SDECGBN} AS SDECGBN       
+          ,#{COMPANYCD} AS LOGIN_COMPANYCD          
+          ,sysdate AS LOGIN_YMD 
+          ,TO_DATE(#{ISDAT}, 'yyyymmdd') AS JDATE 
+          ,#{LOTNO} AS LOTNO  
+          ,#{BARCO} AS BARCO                 
+      FROM DUAL ) D
+      ON (A.COMPANYCD = D.COMPANYCD
+      AND A.MANDT = d.MANDT
+      AND A.LIFNR = d.LIFNR
+      AND A.MATNR = d.MATNR
+      AND A.BARCO = d.BARCO
+      AND A.SEQ = D.SEQ
+      AND to_char(A.JDATE,'yyyymmdd') = #{ISDAT})
+      WHEN MATCHED THEN
+        UPDATE SET A.SX1 = D.SX1
+                  ,A.SX2 = D.SX2
+                  ,A.SX3 = D.SX3 
+                  ,A.SX4 = D.SX4 
+                  ,A.SX5 = D.SX5 
+                  ,A.SX = D.SX
+                  ,A.SR = D.SR
+                  ,A.SDECGBN = TRIM(D.SDECGBN)
+                  ,A.G_DESCR = D.G_DESCR
+                  ,A.LOTNO = D.LOTNO                
+    WHEN NOT MATCHED THEN
+    INSERT(A.COMPANYCD, A.MANDT, A.LIFNR, A.MATNR, A.SEQ, A.SNO, A.AGROUP, A.GAUGE, A.G_HANGMOK, A.SX1, A.SX2, 
+           A.SX3, A.SX4, A.SX5, A.SX, A.SR, A.G_DESCR, A.SDECGBN, A.LOGIN_COMPANYCD, A.LOGIN_YMD, A.JDATE, A.LOTNO, A.BARCO)
+    VALUES(D.COMPANYCD, D.MANDT,  D.LIFNR, D.MATNR, D.SEQ, D.SNO, D.AGROUP, D.GAUGE, D.G_HANGMOK, D.SX1, D.SX2, 
+           D.SX3, D.SX4, D.SX5, D.SX, D.SR, D.G_DESCR, D.SDECGBN, D.LOGIN_COMPANYCD, sysdate, TO_DATE(#{ISDAT}, 'yyyymmdd'), D.LOTNO, D.BARCO)
+
+	</update>
+	<!-- 협력사 성적서 저장 -->
+	<update id="setStress3_1" parameterType="json">            
+	MERGE INTO q_312_1 A USING (
+    SELECT #{COMPANYCD} AS COMPANYCD
+          ,#{MANDT} AS MANDT
+          ,#{LIFNR} AS LIFNR
+          ,#{MATNR} AS MATNR 
+          ,TO_NUMBER(#{SEQ}) AS SEQ
+          ,#{SNO} AS SNO
+          ,#{AGROUP} AS AGROUP 
+          ,#{GAUGE} AS GAUGE
+          ,#{G_HANGMOK} AS G_HANGMOK
+          ,#{SX1} AS SX1 
+          ,#{SX2} AS SX2
+          ,#{SX3} AS SX3
+          ,#{SX4} AS SX4
+          ,#{SX5} AS SX5 
+          ,#{VC_R_VAL} AS SX
+          ,#{VC_S_VAL} AS SR
+          ,#{DESCR} AS G_DESCR
+          ,#{SDECGBN} AS SDECGBN       
+          ,#{COMPANYCD} AS LOGIN_COMPANYCD          
+          ,sysdate AS LOGIN_YMD 
+          ,TO_DATE(#{ISDAT}, 'yyyymmdd') AS JDATE 
+          ,#{LOTNO} AS LOTNO  
+          ,#{BARCO} AS BARCO                 
+      FROM DUAL ) D
+      ON (A.COMPANYCD = D.COMPANYCD
+      AND A.MANDT = d.MANDT
+      AND A.LIFNR = d.LIFNR
+      AND A.MATNR = d.MATNR
+      AND A.BARCO = d.BARCO
+      AND A.SEQ = D.SEQ
+      AND to_char(A.JDATE,'yyyymmdd') = #{ISDAT})
+      WHEN MATCHED THEN
+        UPDATE SET A.CX1 = D.SX1
+                  ,A.CX2 = D.SX2
+                  ,A.CX3 = D.SX3 
+                  ,A.CX4 = D.SX4 
+                  ,A.CX5 = D.SX5 
+                  ,A.CX = D.SX
+                  ,A.CR = D.SR
+                  ,A.CDECGBN = TRIM(D.SDECGBN)
+                  ,A.G_DESCR = D.G_DESCR
+                  ,A.LOTNO = D.LOTNO                
+    WHEN NOT MATCHED THEN
+    INSERT(A.COMPANYCD, A.MANDT, A.LIFNR, A.MATNR, A.SEQ, A.SNO, A.AGROUP, A.GAUGE, A.G_HANGMOK, A.CX1, A.CX2, 
+           A.CX3, A.CX4, A.CX5, A.CX, A.CR, A.G_DESCR, A.CDECGBN, A.LOGIN_COMPANYCD, A.LOGIN_YMD, A.JDATE, A.LOTNO, A.BARCO)
+    VALUES(D.COMPANYCD, D.MANDT,  D.LIFNR, D.MATNR, D.SEQ, D.SNO, D.AGROUP, D.GAUGE, D.G_HANGMOK, D.SX1, D.SX2, 
+           D.SX3, D.SX4, D.SX5, D.SX, D.SR, D.G_DESCR, D.SDECGBN, D.LOGIN_COMPANYCD, sysdate, TO_DATE(#{ISDAT}, 'yyyymmdd'), D.LOTNO, D.BARCO)
+
+	</update>
+	
+	<select id="selectQ_251List" parameterType="json"
+	resultType="json">
+		SELECT A.*,TO_CHAR(SDATE,'yyyy-MM-dd') SDATE_1, 
+       TO_CHAR(EO_DATE,'yyyy-MM-dd') EO_DATE_1 FROM Q_251 A
+		WHERE COMPANYCD = #{COMPANYCD}
+    	AND PARTNO = #{PARTNO}
+    	AND VENDCD = #{VENDCD}
+        AND REV_NO = (SELECT MAX(REV_NO) FROM Q_251 WHERE COMPANYCD = A.COMPANYCD
+    	AND PARTNO = A.PARTNO
+    	AND VENDCD = A.VENDCD )
+    	
+	</select>
+
+	<select id="selectQ_252List" parameterType="json"
+	resultType="json">
+   		SELECT * FROM Q_252
+		WHERE COMPANYCD = #{COMPANYCD}
+    	AND PARTNO = #{PARTNO}
+    	AND VENDCD = #{VENDCD} 	
+    	ORDER BY SEQ 
+    	
+	</select>
+	
+	<update id="setKqis3201_2Info" parameterType="json">
+		MERGE INTO Q_251 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{PARTNO} AS PARTNO
+		      ,#{VENDCD} AS VENDCD
+		      ,#{REV_NO} AS REV_NO
+		      ,#{SDATE_1} AS SDATE
+		      ,#{EDATE} AS EDATE
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{GRADE} AS GRADE
+		      ,#{IRE} AS IRE
+		      ,#{EO_NO} AS EO_NO
+		      ,#{EO_DATE_1} AS EO_DATE
+		      ,#{GUARANTOR} AS GUARANTOR
+		      ,#{REASON} AS REASON
+		      ,#{DOC_ID} AS DOC_ID
+		      ,#{LOGIN_COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{LOGIN_ID} AS LOGIN_ID
+	   	      ,#{LOGIN_YMD} AS LOGIN_YMD
+	   	      ,#{REGISTER_NO} AS REGISTER_NO
+	   	      ,#{SIRO} AS SIRO
+	   	      ,#{SUPP_A} AS SUPP_A
+	   	      ,#{SUPP_B} AS SUPP_B
+	   	      ,#{SUPP_C} AS SUPP_C
+	   	      ,#{K_A} AS K_A
+	   	      ,#{K_B} AS K_B
+	   	      ,#{K_C} AS K_C
+	   	      ,#{PJ} AS PJ
+	   	      ,#{PJ_ETC} AS PJ_ETC
+	   	      ,#{LOTNO} AS LOTNO
+	   	      ,#{STATUS} AS STATUS
+	   	      ,#{REJECT_DESCR} AS REJECT_DESCR
+	   	      ,#{DESCR} AS DESCR
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD AND A.PARTNO = D.PARTNO AND A.VENDCD = D. VENDCD AND A.REV_NO = D.REV_NO)
+		WHEN MATCHED THEN
+		  UPDATE SET A.SDATE = D.SDATE
+					,A.EDATE = D.EDATE
+					,A.PARTNM = D.PARTNM
+					,A.KINDCD = D.KINDCD
+					,A.GRADE = D.GRADE
+					,A.IRE = D.IRE
+					,A.EO_NO = D.EO_NO
+					,A.EO_DATE = D.EO_DATE
+					,A.GUARANTOR = D.GUARANTOR
+					,A.REASON = D.REASON
+					,A.DOC_ID = D.DOC_ID
+					,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+					,A.LOGIN_ID = D.LOGIN_ID
+					,A.LOGIN_YMD = D.LOGIN_YMD
+					,A.REGISTER_NO = D.REGISTER_NO
+					,A.SIRO = D.SIRO
+					,A.SUPP_A = D.SUPP_A
+					,A.SUPP_B = D.SUPP_B
+					,A.SUPP_C = D.SUPP_C
+					,A.K_A = D.K_A
+					,A.K_B = D.K_B
+					,A.K_C = D.K_C
+					,A.PJ = D.PJ
+					,A.PJ_ETC = D.PJ_ETC
+					,A.LOTNO = D.LOTNO
+					,A.STATUS = D.STATUS
+					,A.REJECT_DESCR = D.REJECT_DESCR
+					,A.DESCR = D.DESCR 
+		WHEN NOT MATCHED THEN
+			INSERT (	
+				A.COMPANYCD, A.PARTNO, A.VENDCD, A.REV_NO, A.SDATE, A.EDATE, A.PARTNM, A.KINDCD, A.GRADE, 
+	          	A.IRE, A.EO_NO, A.EO_DATE, A.GUARANTOR, A.REASON, A.DOC_ID, 
+	         	A.LOGIN_COMPANYCD, A.LOGIN_ID, A.LOGIN_YMD, A.REGISTER_NO, A.SIRO,
+	            A.SUPP_A, A.SUPP_B, A.SUPP_C, A.K_A, A.K_B, A.K_C, A.PJ, A.PJ_ETC, A.LOTNO, A.STATUS, A.REJECT_DESCR, A.DESCR)
+	        VALUES( 
+	        	D.COMPANYCD, D.PARTNO, D.VENDCD, D.REV_NO, D.SDATE, D.EDATE, D.PARTNM, D.KINDCD, D.GRADE, 
+	          	D.IRE, D.EO_NO, D.EO_DATE,D.GUARANTOR, D.REASON, D.DOC_ID, 
+	         	D.LOGIN_COMPANYCD, D.LOGIN_ID, D.LOGIN_YMD, D.REGISTER_NO, D.SIRO,
+	            D.SUPP_A, D.SUPP_B, D.SUPP_C, D.K_A, D.K_B, D.K_C, D.PJ, D.PJ_ETC, D.LOTNO, D.STATUS, D.REJECT_DESCR, D.DESCR)
+	</update>
+	
+	<!-- 수입검사 기준서(을) 삭제 -->
+	<delete id="deleteAllStdItemInfo" parameterType="json"> 
+		DELETE FROM Q_252 A
+		WHERE A.COMPANYCD = #{COMPANYCD}
+		  AND A.PARTNO	  = #{PARTNO}
+		  AND A.VENDCD    = #{VENDCD}
+		  AND A.REV_NO	  = #{REV_NO}
+	</delete>
+	
+	<update id="setKqis3201_2Grid" parameterType="json">
+		<selectKey resultType="String" keyProperty="SEQ" order="BEFORE">
+				<choose>
+					<when test="SEQ != null and SEQ != ''">
+						SELECT #{SEQ} AS SEQ
+						FROM DUAL	
+					</when>
+					<otherwise>
+						SELECT NVL(MAX(SEQ), 0) + 1 AS SEQ FROM Q_252 WHERE COMPANYCD = #{COMPANYCD} AND PARTNO = #{PARTNO} AND VENDCD = #{VENDCD}
+					</otherwise>
+				</choose>
+        </selectKey>
+		MERGE INTO Q_252 A USING (
+			SELECT #{COMPANYCD} AS COMPANYCD
+			,#{PARTNO} AS PARTNO
+			,#{VENDCD} AS VENDCD
+			,#{REV_NO} AS REV_NO
+			,#{SEQ} AS SEQ
+			,#{SNO} AS SNO
+			,#{ITEM} AS ITEM
+			,#{DEVICE} AS DEVICE
+			,#{STANDARD} AS STANDARD
+			,#{SPEC_MIN} AS SPEC_MIN
+			,#{SPEC_MAX} AS SPEC_MAX
+			,#{MGR_CLASS} AS MGR_CLASS
+			,#{SAMPLE_CNT} AS SAMPLE_CNT
+			,#{PERIOD_SUPPLY} AS PERIOD_SUPPLY
+			,#{PERIOD_DEMAND} AS PERIOD_DEMAND
+			,#{DESCR} AS DESCR
+			,#{LOGIN_COMPANYCD} AS LOGIN_COMPANYCD
+			,#{LOGIN_ID} AS LOGIN_ID
+			,#{STRESS_YN} AS STRESS_YN
+			,#{ITEM_NO} AS ITEM_NO
+			,#{ITEM_CHECK} AS ITEM_CHECK
+			,#{ORDERNO} AS ORDERNO
+			FROM DUAL 
+			) D
+			ON (A.COMPANYCD = D.COMPANYCD AND A.PARTNO = D.PARTNO AND A.VENDCD = D.VENDCD AND A.SEQ = D.SEQ
+			)
+			WHEN MATCHED THEN
+			UPDATE SET 	A.REV_NO = D.REV_NO
+						,A.SNO = D.SNO
+						,A.ITEM = D.ITEM
+						,A.DEVICE = D.DEVICE
+						,A.STANDARD = D.STANDARD
+						,A.SPEC_MIN = D.SPEC_MIN
+						,A.SPEC_MAX = D.SPEC_MAX
+						,A.MGR_CLASS = D.MGR_CLASS
+						,A.SAMPLE_CNT = D.SAMPLE_CNT
+						,A.PERIOD_SUPPLY = D.PERIOD_SUPPLY
+						,A.PERIOD_DEMAND = D.PERIOD_DEMAND
+						,A.DESCR = D.DESCR
+						,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+						,A.LOGIN_ID = D.LOGIN_ID
+						,A.STRESS_YN = D.STRESS_YN
+						,A.ITEM_NO = D.ITEM_NO
+						,A.ITEM_CHECK = D.ITEM_CHECK
+						,A.ORDERNO = D.ORDERNO
+			WHEN NOT MATCHED THEN
+			INSERT(
+				A.COMPANYCD, A.PARTNO, A.VENDCD, A.REV_NO, A.SEQ, A.SNO, A.ITEM, A.DEVICE, A.STANDARD, A.SPEC_MIN, 
+				A.SPEC_MAX, A.MGR_CLASS, A.SAMPLE_CNT, A.PERIOD_SUPPLY, A.PERIOD_DEMAND, A.DESCR, A.LOGIN_COMPANYCD, 
+				A.LOGIN_ID, A.STRESS_YN, A.ITEM_NO, A.ITEM_CHECK, A.ORDERNO
+			)
+			VALUES(
+				D.COMPANYCD, D.PARTNO, D.VENDCD, D.REV_NO, D.SEQ, D.SNO, D.ITEM, D.DEVICE, D.STANDARD, D.SPEC_MIN, 
+				D.SPEC_MAX, D.MGR_CLASS, D.SAMPLE_CNT, D.PERIOD_SUPPLY, D.PERIOD_DEMAND, D.DESCR, D.LOGIN_COMPANYCD, 
+				D.LOGIN_ID, D.STRESS_YN, D.ITEM_NO, D.ITEM_CHECK, D.ORDERNO
+			)
+	</update>
+</mapper>

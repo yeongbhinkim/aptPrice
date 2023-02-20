@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="egovframework.aptSurfer.home.mapper.HomeMapper">
+
+	<!-- 시도 조회 -->
+	<select id="selectRegionCity" parameterType="json" resultType="json">
+<!-- 		SELECT *  -->
+<!-- 		FROM REGION_CITY  -->
+<!-- 		ORDER BY 2 -->
+	</select>
+	
+	<!-- 시군구 조회 -->
+	<select id="selectRegionCounty" parameterType="json" resultType="json">
+<!-- 		SELECT * FROM REGION_COUNTY -->
+<!-- 		WHERE SUBSTR(COUNTY_CODE, 1,2 ) = #{searchSidoCd} -->
+<!-- 		ORDER BY 2 -->
+
+	</select>
+	
+	<!-- 읍면동 조회 -->
+	<select id="selectRegionDistricts" parameterType="json" resultType="json">
+<!-- 		 SELECT * FROM REGION_DISTRICTS -->
+<!-- 		 WHERE SUBSTR(DISTRICTS_CODE, 1, 5 ) = #{searchGugunCd} -->
+<!-- 		 ORDER BY 2 -->
+	</select>
+
+
+</mapper>

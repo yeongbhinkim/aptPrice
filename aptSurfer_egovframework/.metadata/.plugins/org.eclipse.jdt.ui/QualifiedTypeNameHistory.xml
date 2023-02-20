@@ -3,4 +3,8 @@
 <fullyQualifiedTypeName name="egovframework.aptSurfer.common.mapper.CommonMapper"/>
 <fullyQualifiedTypeName name="egovframework.aptSurfer.common.service.CommonService"/>
 <fullyQualifiedTypeName name="org.springframework.ui.Model"/>
+<fullyQualifiedTypeName name="java.util.logging.Logger"/>
+<fullyQualifiedTypeName name="org.apache.log4j.spi.LoggerFactory"/>
+<fullyQualifiedTypeName name="org.apache.log4j.Logger"/>
+<fullyQualifiedTypeName name="org.slf4j.LoggerFactory"/>
 </qualifiedTypeNameHistroy>

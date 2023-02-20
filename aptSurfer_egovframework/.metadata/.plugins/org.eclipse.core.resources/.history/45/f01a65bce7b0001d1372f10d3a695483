@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="com.dbvalley.premier.scm1.vendorKpi.mapper.VendorKpiMapper">
+
+	<!-- 입고처리 진행 LIST -->
+	<select id="selectVendorKpiList" parameterType="json" resultType="json">
+
+		SELECT ROWNUM RNO,
+				PREMIER_SYS.GETCMPYNMBYCMPYSN(DECODE(A.WERKS,'1110','11','1210','13','1220','14','31')) WERKSNM, <!-- 플랜트명   -->  
+				A.WERKS, A.LIFNR, A.LIFNRNM, A.VBELN, A.POSNR,  				<!-- 플랜트, 업체, 업체명, 입하번호, 항번   -->
+		        A.MATNR, A.MAKTX, A.GUIDENM,                    				<!-- 품번, 품명,검사구분                                -->                 
+		        TO_CHAR(A.REG_DATE, 'YYYY.MM.DD HH24:MI')        REGDAT, 		<!-- 등록일시                                            	 -->                 
+		        TO_CHAR(A.LF_DATE, 'YYYY.MM.DD HH24:MI')         LFDAT,   		<!-- 납품예정일시                                             -->                 
+		        TO_CHAR(A.ARRIVAL_DATE, 'YYYY.MM.DD HH24:MI')    ARRDAT,  		<!-- 수입검사의뢰일시                                        -->                 
+		        TO_CHAR(A.INSP_DATE, 'YYYY.MM.DD HH24:MI')       INSPDAT, 		<!-- 수입검사완료일시                                        -->                 
+		        TO_CHAR(A.SCANDATE, 'YYYY.MM.DD HH24:MI')        SCANDAT, 		<!-- 입고일시                                                    -->                 
+		        A.QTY, A.SCANQTY, A.MEINS,                             	 		<!-- 예약수량,입고수량, 단위                           -->                 
+		        A.DELYN, A.DEL_USERNM,                                  		<!-- 삭제여부,삭제자                                         -->                 
+		        TO_CHAR(A.DEL_DATE, 'YYYY.MM.DD HH24:MI:SS') DELDAT       		<!-- 삭제일시                                                     -->                 
+		FROM    VIEW_SCM_PURLIST A                                                                                                                     
+		WHERE   A.LIFNR     LIKE '%'||#{LIFNR}||'%'                        		<!-- 업체                                                           -->                 
+		AND     A.LF_YMD BETWEEN TO_DATE(REPLACE(#{LF_YMD},'-','')||'000000','YYYYMMDDHH24MISS')
+						     AND TO_DATE(REPLACE(#{LF_YMD_TO},'-','')||'235959','YYYYMMDDHH24MISS') <!-- 입고일자        -->                 
+		AND     A.II_DIV    LIKE '%'||#{II_DIV}||'%'      						<!-- 수입검사여부                                               -->                 
+		AND     A.GUIDEYN   LIKE '%'||#{GUIDEYN}||'%'                      	 	<!-- 유/무검사                                                   -->                 
+		AND     A.IPGOYN    LIKE '%'||#{IPGOYN}||'%'                       		<!-- 입고여부                                                     -->                 
+		AND     A.DELYN     LIKE '%'||#{DELYN}||'%'                         	<!-- 삭제여부                                                     -->                 
+		AND     A.WERKS     LIKE '%'||#{WERKS}||'%'                         	<!-- 플랜트                                                        -->                 
+		ORDER BY RNO, A.WERKS, A.LIFNR, A.VBELN, TO_NUMBER(A.POSNR), A.REG_DATE 	
+
+	</select>
+
+	<!-- 업체별 지표(기준일자 기준 지표)  -->
+	<select id="selectVendorKpiInput" parameterType="json" resultType="json">
+
+		SELECT  A.WERKS, A.LIFNR, A.LIFNRNM,                                                                                                 		   					<!--  사업장, 업체, 업체명    -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD <![CDATA[ < ]]> TO_CHAR(SYSDATE, 'YYYYMMDD') AND A.IPGOYN = 'N' THEN 1 ELSE 0 END), 'FM999,999,999,990') AS DLY_CNT,   		<!--  이전 미 입고건수       -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD') THEN 1 ELSE 0 END), 'FM999,999,999,990') AS REG_CNT,     									<!--  당일 입하확정 건수      -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD') AND A.IPGOYN = 'N' AND A.ARRIVALYN = 'N' THEN 1 ELSE 0 END), 'FM999,999,999,990') AS STD_CNT,<!--  당일 대기건수         -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD') AND A.IPGOYN = 'N' AND A.ARRIVALYN = 'Y' THEN 1 ELSE 0 END), 'FM999,999,999,990') AS ARR_CNT,<!--  당일 수입검사대기건수     -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD') AND A.IPGOYN = 'N' AND A.II_DIV = 'Y' THEN 1 ELSE 0 END), 'FM999,999,999,990') AS DIV_CNT,   <!--  당일 입고대기건수       -->
+               TO_CHAR(SUM(CASE WHEN LF_YMD = TO_CHAR(SYSDATE, 'YYYYMMDD') AND A.IPGOYN = 'Y' THEN 1 ELSE 0 END), 'FM999,999,999,990') AS IPG_CNT    					<!--  당일 입고완료 건수      -->
+		FROM    VIEW_SCM_PURLIST A
+		WHERE   A.LIFNR     LIKE '%'||#{LIFNR}||'%'                          																							<!--  업체  -->
+		AND     DELYN = 'N'
+		AND     SUBSTR(A.LF_YMD, 1 , 4) = TO_CHAR(ADD_MONTHS(SYSDATE,-12),'YYYY')     
+		GROUP BY WERKS, LIFNR, LIFNRNM
+		ORDER BY WERKS, LIFNR, LIFNRNM
+
+	</select>
+
+</mapper>

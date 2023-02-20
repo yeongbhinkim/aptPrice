@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.kqis6050.mapper.Kqis6050Mapper">
+	
+	<select id="kqis6050List" parameterType="json" resultType="json">
+	select a.*
+	from  v_q_560_q_570 a
+	where a.yy = #{Y_DATE}
+	<if test="GUBUN != null and GUBUN != ''">
+	and   a.gubun = NVL(#{GUBUN}p_gubun, a.gubun)
+	</if>
+	<if test="COMPANYCD != null and COMPANYCD != ''">
+	and   a.companycd = decode(common.get_cookie('SYSTYPE'),'1',a.companycd,#{COMPANYCD}))
+	</if>
+	<if test="XUSERNM != null and XUSERNM != ''">
+	and   a.xusernm = nvl(#{XUSERNM}, a.xusernm)
+	</if>
+	<if test="D_USER != null and D_USER != ''">
+	and   nvl(a.d_user,1) = nvl(#{D_USER},nvl(a.d_user,1))
+	</if>
+	<if test="KINDCD != null and KINDCD != ''">
+	and   nvl(a.kindcd,1) = nvl(#{KINDCD},nvl(a.kindcd,1))
+	</if>
+	<if test="JUGI != null and JUGI != ''">
+	and   nvl(a.jugi,1) = nvl(#{JUGI},nvl(a.jugi,1))
+	</if>
+	<if test="PARTNO != null and PARTNO != ''">
+	and   a.partno = nvl(#{PARTNO},a.partno)
+	</if>
+	<if test="MONTH != null and MONTH != ''">	
+	and   nvl(case
+	        when #{MONTH} = '01' then a.m01 
+	        when #{MONTH} = '02' then a.m02 
+	        when #{MONTH} = '03' then a.m03
+	        when #{MONTH} = '04' then a.m04 
+	        when #{MONTH} = '05' then a.m05 
+	        when #{MONTH} = '06' then a.m06 
+	        when #{MONTH} = '07' then a.m07
+	        when #{MONTH} = '08' then a.m08
+	        when #{MONTH} = '09' then a.m09
+	        when #{MONTH} = '10' then a.m10
+	        when #{MONTH} = '11' then a.m11
+	        when #{MONTH} = '12' then a.m12
+	      end,1) = 1 
+	</if>      
+	and   not exists (select 1 from q_550_exception where companycd = a.companycd  and yy = a.yy and xusernm = a.xusernm and partno = a.partno)  
+	order by a.partno
+		
+     </select>
+     
+     <select id="selectkqis6050Edit" parameterType="json" resultType="json">
+	 select * from q_570
+	    where companycd = #{COMPANYCD}
+	    and yy = #{YY}
+	    and xusernm = #{XUSERNM}
+	    and partno = #{PARTNO}
+	    and ymd = #{YMD}			
+     </select>
+               
+     
+   	<update id="setkqis6050new" parameterType="json">
+   		MERGE INTO Q_550 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{Y_DATE} AS YY
+		      ,#{XUSERNM} AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,#{GUBUN} AS GUBUN
+		      ,#{XUSER} AS XUSER
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{M00} AS M00
+		      ,#{M01} AS M01
+		      ,#{M02} AS M02
+		      ,#{M03} AS M03
+		      ,#{M04} AS M04
+		      ,#{M05} AS M05
+		      ,#{M06} AS M06
+		      ,#{M07} AS M07
+		      ,#{M08} AS M08
+		      ,#{M09} AS M09
+		      ,#{M10} AS M10
+		      ,#{M11} AS M11
+		      ,#{M12} AS M12
+		      ,#{DESCR} AS DESCR
+		     
+		      ,to_char(sysdate,'yyyymmdd') AS LOGIN_YMD
+		      ,#{JUGI} AS JUGI
+		      ,#{D_USER} AS D_USER
+		      ,#{PART_GUBUN} AS PART_GUBUN
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.GUBUN = D.GUBUN
+		            ,A.XUSER = D.XUSER
+		            ,A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD
+		            ,A.M00 = D.M00
+		            ,A.M01 = D.M01
+		            ,A.M02 = D.M02
+		            ,A.M03 = D.M03
+		            ,A.M04 = D.M04
+		            ,A.M05 = D.M05
+		            ,A.M06 = D.M06
+		            ,A.M07 = D.M07
+		            ,A.M08 = D.M08
+		            ,A.M09 = D.M09
+		            ,A.M10 = D.M10
+		            ,A.M11 = D.M11
+		            ,A.M12 = D.M12
+		            ,A.DESCR = D.DESCR
+		            
+		            ,A.LOGIN_YMD = D.LOGIN_YMD
+		            ,A.JUGI = D.JUGI
+		            ,A.D_USER = D.D_USER
+		            ,A.PART_GUBUN = D.PART_GUBUN
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.GUBUN, A.XUSER, A.PARTNM, A.KINDCD, A.M00, A.M01, A.M02, A.M03, A.M04, A.M05, A.M06, A.M07, A.M08, A.M09, A.M10, A.M11, A.M12, A.DESCR, A.LOGIN_YMD, A.JUGI, A.D_USER, A.PART_GUBUN)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.GUBUN, D.XUSER, D.PARTNM, D.KINDCD, D.M00, D.M01, D.M02, D.M03, D.M04, D.M05, D.M06, D.M07, D.M08, D.M09, D.M10, D.M11, D.M12, D.DESCR, D.LOGIN_YMD, D.JUGI, D.D_USER, D.PART_GUBUN)
+
+     </update>
+     
+    <update id="setkqis6050Edit" parameterType="json">  						
+			
+ 		MERGE INTO Q_570 A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{YY} AS YY
+		      ,#{XUSERNM} AS XUSERNM
+		      ,#{PARTNO} AS PARTNO
+		      ,REPLACE(#{YMD},'-','') AS YMD
+		      ,#{GUBUN} AS GUBUN
+		      ,#{XUSER} AS XUSER
+		      ,#{PARTNM} AS PARTNM
+		      ,#{KINDCD} AS KINDCD
+		      ,#{YN} AS YN
+		      ,#{DESCR} AS DESCR	      
+		      
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.YY = D.YY
+		AND A.XUSERNM = D.XUSERNM
+		AND A.PARTNO = D.PARTNO
+		AND A.YMD = D.YMD
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.GUBUN = D.GUBUN
+		            ,A.XUSER = D.XUSER
+		            ,A.PARTNM = D.PARTNM
+		            ,A.KINDCD = D.KINDCD
+		            ,A.YN = D.YN
+		            ,A.DESCR = D.DESCR		           
+		            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.YY, A.XUSERNM, A.PARTNO, A.YMD, A.GUBUN, A.XUSER, A.PARTNM, A.KINDCD, A.YN, A.DESCR)
+		VALUES(D.COMPANYCD, D.YY, D.XUSERNM, D.PARTNO, D.YMD, D.GUBUN, D.XUSER, D.PARTNM, D.KINDCD, D.YN, D.DESCR)
+		 		                                      
+     </update>      
+     
+     <update id="setkqis6050domyeonsend" parameterType="json">   		
+		   MERGE INTO DRAW_VENDOR_LIST A USING (
+			SELECT #{COMPANYCD} AS COMPANYCD
+			      ,#{DRAWNO} AS DRAWNO
+			      ,#{APNO} AS APNO
+			      ,#{ECO_NO} AS EONO
+			      ,SYSDATE AS RECEIPT_YMD
+			      ,#{VENDCD} AS RECEIPT_VENDCD
+			      ,SYSDATE AS LOGIN_YMD
+			      ,#{COMPANYCD} AS LOGIN_COMPANYCD			      
+			      ,#{APNM} AS APNM
+			FROM DUAL ) D
+			ON (A.COMPANYCD = D.COMPANYCD
+			AND A.DRAWNO = D.DRAWNO
+			AND A.APNO = D.APNO
+			AND A.EONO = D.EONO
+			)
+			WHEN MATCHED THEN
+			  UPDATE SET A.RECEIPT_VENDCD = D.RECEIPT_VENDCD
+			  			,A.RECEIPT_YMD = D.RECEIPT_YMD			  
+			            ,A.LOGIN_YMD = D.LOGIN_YMD
+			            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD			            
+			            ,A.APNM = D.APNM         			            
+			WHEN NOT MATCHED THEN
+			INSERT(A.COMPANYCD, A.DRAWNO, A.APNO, A.EONO, A.RECEIPT_VENDCD, A.RECEIPT_YMD, A.LOGIN_YMD, A.LOGIN_COMPANYCD, A.APNM)
+			VALUES(D.COMPANYCD, D.DRAWNO, D.APNO, D.EONO, D.RECEIPT_VENDCD, D.RECEIPT_YMD, D.LOGIN_YMD, D.LOGIN_COMPANYCD, D.APNM)
+
+     </update>     
+     
+     <update id="uploadkqis6050" parameterType="json">   		
+		   insert into q_550
+                    ( companycd, yy, xusernm, partno, gubun,
+                      partnm, kindcd, m01, m02, m03, m04, m05, m06,
+                      m07, m08, m09, m10, m11, m12,
+                      descr, jugi, d_user)
+                    values 
+                    ( #{COMPANYCD}, #{YY}, #{XUSERNM}, #{PARTNO}, #{GUBUN}, #{PARTNM}, #{KINDCD}, 
+                      #{M01}, #{M02}, #{M03}, #{M04}, #{M05}, #{M06}, #{M07}, #{M08}, #{M09}, #{M10}, #{M11}, #{M12}, 
+                      #{DESCR}, #{JUGI}, #{D_USER}
+                    )
+     </update>    
+     
+     
+   	<delete id="delkqis6050Edit" parameterType="json"> 
+    delete from q_570
+     where companycd = #{COMPANYCD}
+     and yy = #{YY}
+     and xusernm = #{XUSERNM}
+     and partno = #{PARTNO}
+     and ymd = #{YMD}
+ 
+     </delete>
+     
+    <delete id="delkqis6050copy" parameterType="json">      
+	delete from q_550
+    where companycd = #{COMPANYCD}
+      and yy = #{E_DATE} 
+    </delete>
+     
+    <update id="setkqis6050capy" parameterType="json">   		
+	  insert into q_550
+	  select
+	  COMPANYCD, #{E_DATE}, XUSERNM, PARTNO, GUBUN, XUSER, PARTNM, KINDCD, M00, M01, M02, M03, M04, M05, M06, M07, M08, M09, M10, M11, M12, DESCR, LOGIN_COMPANYCD, LOGIN_ID, LOGIN_YMD, JUGI, D_USER, PART_GUBUN
+	  from q_550
+	  where companycd = #{COMPANYCD}
+	  and    yy = #{S_DATE}
+    </update> 
+
+</mapper>

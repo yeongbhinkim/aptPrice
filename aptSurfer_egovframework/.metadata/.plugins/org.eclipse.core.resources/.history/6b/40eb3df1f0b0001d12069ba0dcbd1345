@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+                http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+                http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd">
+
+    <context:component-scan base-package="egovframework.aptSurfer">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+ 
+    <mvc:interceptors>
+		<bean class="com.dbvalley.premier.common.interceptor.AuthInterceptor" />
+	</mvc:interceptors>
+	
+    <mvc:annotation-driven />
+    
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="webBindingInitializer">
+            <bean class="com.dbvalley.premier.common.EgovBindingInitializer"/>
+				   
+		   
+																									 
+									  
+				  
+													  
+				   
+        </property>
+    </bean>
+    
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"/>
+    
+	<!-- <bean id="fileDownload" class="com.dbvalley.premier.common.view.FileDownloadView" /> -->
+    
+    <!-- <bean id="excelDownLoad" class="com.dbvalley.premier.common.view.ExcelDownLoad" /> -->
+    
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="contentNegotiationManager">
+			<bean class="org.springframework.web.accept.ContentNegotiationManager">
+				<constructor-arg>
+					<bean
+						class="org.springframework.web.accept.PathExtensionContentNegotiationStrategy">
+						<constructor-arg>
+							<map>
+								<entry key="json" value="application/json" />
+								<entry key="xml" value="application/xml" />
+							</map>
+						</constructor-arg>
+					</bean>
+				</constructor-arg>
+			</bean>
+		</property>  
+		<!-- Default View -->
+		<property name="defaultViews">
+			<list>
+				<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+					<property name="contentType" value="application/json;charset=UTF-8" />
+				</bean> 
+			</list>
+		</property>
+		<!-- View Resolvers -->
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+					<property name="order" value="1"/>
+				</bean>
+				<!-- 2. JSP View -->
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<property name="prefix" value="/WEB-INF/jsp/" />
+					<property name="suffix" value=".jsp" />
+					<property name="order" value="2"/>
+				</bean>
+			</list>
+		</property>
+
+		<!--<property name="ignoreAcceptHeader" value="true" /> -->
+	</bean>
+
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+    <!-- <bean class="com.dbvalley.premier.common.UserExceptionResolver"> -->
+        <property name="defaultErrorView" value="cmmn/egovError"/>
+        <property name="exceptionMappings">
+            <props>
+                <prop key="org.springframework.dao.DataAccessException">cmmn/dataAccessFailure</prop>
+                <prop key="org.springframework.transaction.TransactionException">cmmn/transactionFailure</prop>
+                <prop key="egovframework.rte.fdl.cmmn.exception.EgovBizException">cmmn/egovError</prop>
+                <prop key="org.springframework.security.AccessDeniedException">cmmn/egovError</prop>
+            </props>
+        </property>
+    </bean>
+    
+																					
+																
+											   
+
+    <!-- For Pagination Tag  -->
+	<bean class="com.dbvalley.premier.common.EgovImgPaginationRenderer" id="imageRenderer"/>
+	
+	<bean class="egovframework.rte.ptl.mvc.tags.ui.pagination.DefaultPaginationManager" id="paginationManager">
+		<property name="rendererType">
+			<map>
+				<entry key="image" value-ref="imageRenderer"/>
+			</map>
+		</property>
+	</bean>
+	
+	<!-- MULTIPART RESOLVERS -->
+    <!-- regular spring resolver -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="-1" />
+        <property name="maxInMemorySize" value="209715200" />
+    </bean>
+    
+    <!-- message source -->
+	<bean id="messageSource" class="com.dbvalley.premier.common.message.MessageResource">
+		<property name="messageSource" ref="messageImpl" />
+	</bean>
+	
+	<bean id="messageImpl" class="com.dbvalley.premier.common.message.MessageSource"/>
+	
+   <!--  <mvc:view-controller path="/cmmn/validator.do" view-name="cmmn/validator"/> -->
+</beans>

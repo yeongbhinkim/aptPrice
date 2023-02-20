@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.inbCreateUpN.mapper.InbCreateUpNMapper">
+	<select id="inbCreateUpNList" parameterType="json" resultType="json">
+          SELECT VBELN, N_DATE
+      		FROM(
+            SELECT SUBSTR(SEQNO,1,10) AS VBELN,
+                   MIN(LFDAT_LA) AS N_DATE
+            FROM TSCM_INB_DELIV_DISP_HISTORY  A
+            WHERE WERKS = #{WERKS}
+            AND   LIFNR = #{LIFNR}
+            AND   TO_CHAR(LOGIN_YMD,'yyyy-mm-dd') BETWEEN #{LFDAT_LA} AND #{LFDAT_LA_TO}
+            AND   MATNR = NVL(#{MATNR},MATNR)
+            AND PRINT_YN = 'N'
+            AND DELYN = 'N'
+            GROUP BY SUBSTR(SEQNO,1,10)
+     )
+     ORDER BY VBELN DESC
+	 
+	</select>
+	
+	<select id="getInbCreateUpNList" parameterType="json" resultType="json">	
+    	SELECT  A.*, 
+        	(SELECT CD_NM FROM TSCM_MLTCD WHERE WERKS = #{WERKS} AND CD = A.LGORT AND ROWNUM = 1) AS MLTNM,
+        	(SELECT 'Y' FROM Q_251 WHERE PARTNO = A.MATNR AND VENDCD = A.LIFNR AND ROWNUM = 1) AS Q_251_CK,
+            (SELECT 'Y' FROM Q_615 WHERE COMPANYCD = #{COMPANYCD} AND VENDCD = A.LIFNR AND PARTNO = A.MATNR 
+<!--             AND 'Y' = CHECK_COMPLETE_FINISH_DOC(DOC_ID)  -->
+            AND  ROWNUM = 1) AS Q_615_CK,
+            (SELECT 'Y' FROM Q_312_1M WHERE COMPANYCD = #{COMPANYCD} AND LIFNR = A.LIFNR AND MATNR = A.MATNR AND BARCO = A.SEQNO) AS SUNG_CHECK,
+            (SELECT NVL(C.SUNG_YN,'Y') FROM Q_615 C WHERE C.COMPANYCD = #{COMPANYCD} AND C.VENDCD = A.LIFNR AND C.PARTNO = A.MATNR AND C.SNO = 
+            	(SELECT MAX(SNO) FROM Q_615 WHERE COMPANYCD = C.COMPANYCD AND VENDCD = C.VENDCD AND PARTNO = C.PARTNO
+<!--              AND 'Y' = CHECK_COMPLETE_FINISH_DOC(DOC_ID) -->
+            	AND TO_CHAR(SYMD,'yyyymmdd') <![CDATA[<=]]> A.LFDAT_LA))AS EXCEPT ,
+            GET_SUNG_YN(#{COMPANYCD},'100',A.LIFNR,A.MATNR,A.SEQNO, REPLACE(A.LFDAT_LA,'-','')) AS SUNG_YN,
+            (SELECT KCLOTNO FROM TSCM_PART_IDNTTY_LBL WHERE SCM_VBELN = A.SEQNO AND LIFNR = A.LIFNR AND MATNR = A.MATNR AND ROWNUM = 1) KCLOTNO,
+            (SELECT REMARK FROM TSCM_PART_IDNTTY_LBL WHERE SCM_VBELN = A.SEQNO AND LIFNR = A.LIFNR AND MATNR = A.MATNR AND ROWNUM = 1) REMARK,
+            TO_CHAR(TO_DATE(A.LFDAT_LA, 'YYYYMMDD'),'YYYY.MM.DD') AS LFDAT_LA_1,
+            (SELECT MAX(REV_NO) FROM Q_251 WHERE VENDCD = A.LIFNR AND PARTNO = A.MATNR AND SDATE <![CDATA[<=]]>  A.LFDAT_LA) REV_NO
+      	FROM    TSCM_INB_DELIV_DISP_HISTORY A 
+     	WHERE   SUBSTR(A.SEQNO,1,10) = #{VBELN}
+      	AND     A.WERKS = #{WERKS}
+      	AND     A.MATNR = NVL(#{MATNR},A.MATNR)
+      	AND     A.LIFNR = #{LIFNR}
+      	AND     A.VBELN IS NULL
+      	AND     A.DELYN = 'N'
+      ORDER BY  A.MATNR
+	</select>
+<!-- 	납품일 기준으로 MAX REV_NO 찾기 -->
+	<select id="getMaxREV_NO" parameterType="json" resultType="json">	
+		SELECT MAX(REV_NO) FROM Q_251
+      	WHERE PARTNO = #{PARTNO}
+      	AND VENDCD = #{WERKS}
+      	AND SDATE <![CDATA[<=]]> #{LFDAT_LA}
+	</select>
+	<!-- 거래명세서 재발행  -->	                                
+	<select id="getSapTestReturn" parameterType="json" resultType="json">	
+		SELECT  MSG_TYP, MSG_TXT, VBELN
+	     FROM    SAP_TEST_RETURN
+	     WHERE   SEQNO = #{SEQNO} 
+	     AND     proc_nm='Z_MM_SCM_R_INB_DELIV_CREATE' 
+	     AND     ROWNUM=1
+	</select>
+	<select id="countGuideline" parameterType="json" resultType="json">	
+	    SELECT  COUNT(*) CNT, MAX(GUIDELINE) GUIDELINE 
+      FROM(
+            SELECT  GUIDELINE
+            FROM    TSCM_INB_DELIV_DISP_HISTORY
+            WHERE   VBELN = #{V_VBELN} 
+            AND     NVL(DELYN,'N') = 'N'
+            GROUP BY GUIDELINE 
+      )
+	</select>
+	
+	<insert id="insertInbDelivCreate" parameterType="json">
+		INSERT INTO TSCM_INB_DELIV_CREATE(LFDAT_LA, LFUHR_LA, WERKS, LIFNR,
+			LGORT, CHARG, PSTYP_N,
+			MATNR, LFIMG, MEINS, SEQNO, VBELN)
+		VALUES(#{LFDAT_LA}, REPLACE(#{LFUHR_LA},':',''), #{WERKS}, #{I_LIFNR}, #{LGORT}, #{CHARG},
+			#{PSTYP_N},
+			#{MATNR}, #{QTY}, #{MEINS}, #{SEQNO}, #{V_VBELN})
+	</insert>
+	
+	<update id="ckeckQ_312_1M" parameterType="json">
+		UPDATE  Q_312_1M
+		SET   PJ ='A' 
+		WHERE MANDT = '100'
+		AND   MATNR = #{MATNR}
+		AND   LIFNR = #{LIFNR}
+		AND   SUBSTR(BARCO,1,10) = SUBSTR(#{VBELN},1,10)                                 
+	</update>
+	
+	<update id="updateTscmPartIdnttyLbl" parameterType="json">
+		UPDATE TSCM_PART_IDNTTY_LBL
+		SET VBELN = #{V_VBELN}
+		WHERE WERKS = #{WERKS}
+		AND   LIFNR = #{LIFNR}
+		AND   SUBSTR(SCM_VBELN,1,10) = SUBSTR(#{VBELN},1,10)
+	</update>
+	
+	<update id="updateInbDelivDispHistoryPrint" parameterType="json">
+		UPDATE TSCM_INB_DELIV_DISP_HISTORY
+       	SET VBELN = #{V_VBELN},
+            PRINT_YN = 'Y'
+        WHERE WERKS = #{WERKS}
+        AND   SUBSTR(SEQNO,1,10) =  SUBSTR(#{VBELN},1,10)
+        AND   LIFNR = #{LIFNR}
+	</update>
+	
+	<update id="updateQ_312_1Vbeln" parameterType="json">
+		UPDATE  Q_312_1
+        SET VBELN = #{V_VBELN}
+        WHERE MANDT = '100'
+        AND   LIFNR = #{LIFNR}
+		AND   SUBSTR(BARCO,1,10) = SUBSTR(#{VBELN},1,10)                                   
+	</update>
+	
+	<update id="updateQ_312_1MVbeln" parameterType="json">
+		UPDATE Q_312_1M
+        SET VBELN = #{V_VBELN}
+        WHERE MANDT = '100'
+        AND   LIFNR = #{LIFNR}
+		AND   SUBSTR(BARCO,1,10) = SUBSTR(#{VBELN},1,10)                                     
+	</update>
+	
+	<update id="updateM_1120Vbeln" parameterType="json">
+		UPDATE m_1120
+        SET SCM_BARCO = #{V_VBELN}
+        WHERE MANDT = '100'
+        AND   LIFNR = #{LIFNR}
+		AND   SUBSTR(BARCODE,1,10) = SUBSTR(#{VBELN},1,10)                                  
+	</update>	
+    
+    <update id="updatePurSpec" parameterType="json">
+		UPDATE TSCM_INB_PUR_SPEC
+			SET SEQNO = #{SEQNO},
+			RCPT_DATE = TO_CHAR(SYSDATE,'YYYYMMDD'),
+			SCM_VBELN = #{SCM_VBELN},
+			ISSUE_DATE = SYSDATE,
+			ISSUE_CNT = NVL(ISSUE_CNT,0) + 1,
+			ISSUE_DIV = 'Y',
+			DESCR = NULL
+		WHERE LFDAT = #{LFDAT_LA}
+		AND VBELN = #{V_VBELN}
+		AND LIFNR = #{LIFNR}                          
+    </update>    
+<!-- MES 영역 -->
+    <update id="insertLstIf" parameterType="json">
+		INSERT INTO TSCM_PO_LST_IF(IFKEY, IFYN, IFDATE, IFTYPE, 
+		                           VBELN, POSNR, WERKS, LIFNR, MATNR, ARKTX, 
+		                           MEINS, LFIMG, LFDAT, ERDAT,  
+		                           LOTNO, CHARG, 
+		                           USERID, LOT, LOTSEQ, 
+		                           IMDEA_GBN, OUT_GBN, 
+		                           KCLOTNO, REMARK, REGDAT, 
+		                           LGORT, WZLOTNO 
+		)
+		SELECT  SCM_PO_LST_IF_SEQ.NEXTVAL AS IFKEY, A.IFYN, A.IFDATE, A.IFTYPE
+		        , A.VBELN, A.POSNR, A.WERKS, A.LIFNR, A.MATNR, A.ARKTX 
+		        , A.MEINS, A.LFIMG, A.LFDAT, A.ERDAT  
+		        , A.LOTNO, A.CHARG 
+		        , A.USERID, A.LOT, A.LOTSEQ 
+		        , DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),'F10', 'Y','X10', 'Y','N') IMDEA_GBN 
+		        , DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),'F30', 'Y','X30', 'Y','N') OUT_GBN 
+		        , KCLOTNO, REMARK, REGDAT
+		        , LGORT, WZLOTNO 
+		FROM(
+		        SELECT 'N' AS IFYN, NULL IFDATE, '1' IFTYPE 
+		               , A.VBELN
+		               , (SELECT MIN(POSNR) FROM TSCM_INB_PUR_SPEC WHERE WERKS = A.WERKS AND LIFNR = A.LIFNR AND LFDAT = A.LFDAT_LA AND MATNR = A.MATNR AND VBELN = A.VBELN  AND NVL(CHARG,'Z') = NVL(A.CHARG,NVL(CHARG,'Z'))) AS POSNR
+		               , A.WERKS, A.LIFNR, A.MATNR, GET_MATLNM(A.WERKS, A.MATNR) AS ARKTX
+		               , A.MEINS, B.MENGE AS LFIMG, A.LFDAT_LA AS LFDAT, TO_CHAR(SYSDATE,'YYYYMMDD') AS ERDAT   
+		               , B.BARCO AS LOTNO, B.CHARG, #{SYSID} AS USERID
+		               , B.LOTNO AS LOT, B.SEQNO AS LOTSEQ 
+		               , B.KCLOTNO, B.REMARK, SYSDATE REGDAT
+		               , A.QTY, A.LGORT
+		               ,  ( SELECT  LOTNO
+		                    FROM    Q_312_1M
+		                    --WHERE   COMPANYCD = A.COMPANYCD
+		                    WHERE   LIFNR = A.LIFNR
+		                    AND     BARCO = A.SEQNO
+		                    AND     ROWNUM = 1
+		                  ) AS WZLOTNO  
+		        FROM   TSCM_INB_DELIV_DISP_HISTORY A LEFT OUTER JOIN TSCM_PART_IDNTTY_LBL B 
+		        ON     A.WERKS = B.WERKS
+		        AND    A.LIFNR = B.LIFNR
+		        AND    A.LFDAT_LA = B.CRDATE
+		        AND    A.VBELN = B.VBELN
+		        AND    A.SNO = B.SNO
+		        WHERE  A.VBELN = #{V_VBELN}
+		        AND    B.LOTNO IS NOT NULL
+		        AND    NVL(A.DELYN,'N') = 'N'
+		        AND    NVL(A.CHARG,'*') = NVL(B.CHARG,NVL(A.CHARG,'*'))
+		)A LEFT OUTER JOIN TSCM_M_MATL_MST_IF C
+		ON     A.WERKS = C.WERKS
+		AND    A.MATNR = C.MATNR 
+    </update>
+    
+    <update id="insertDetatlIf" parameterType="json">
+		INSERT INTO TSCM_PO_DETAIL_IF(IFKEY, IFYN, IFDATE, IFTYPE, VBELN, POSNR, POSNRS, WERKS, LIFNR, 
+                                                                      MATNR, ARKTX, MEINS, LFIMG, LFDAT, ERDAT, VGBEL, VGPOS, CHARG, 
+                                                                      USERID, IMDEA_GBN, OUT_GBN, REGDAT, LGORT)
+			        SELECT SCM_PO_DETAIL_IF_SEQ.NEXTVAL AS IFKEY,
+			               A.IFYN, A.IFDATE, A.IFTYPE, A.VBELN, A.POSNR, A.POSNRS, A.WERKS, A.LIFNR, 
+			               A.MATNR, A.ARKTX, A.MEINS, A.LFIMG, A.LFDAT, A.ERDAT, A.VGBEL, A.VGPOS, A.CHARG, 
+			               A.USERID 
+			              , DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),'F10', 'Y','X10', 'Y','N') IMDEA_GBN 
+			              , DECODE (TRIM (C.BESKZ) || TRIM (C.SOBSL),'F30', 'Y','X30', 'Y','N') OUT_GBN 
+			              , A.REGDAT, A.LGORT
+			        FROM
+			        (
+			              SELECT 'N' AS IFYN, NULL IFDATE, '1' IFTYPE 
+			                     , A.VBELN
+			                     , (SELECT MIN(POSNR) FROM TSCM_INB_PUR_SPEC WHERE WERKS = A.WERKS AND LIFNR = A.LIFNR AND LFDAT = A.LFDAT_LA AND MATNR = A.MATNR AND VBELN = A.VBELN  AND NVL(CHARG,'Z') = NVL(A.CHARG,NVL(CHARG,'Z'))) AS POSNR
+			                     , B.POSNR AS POSNRS
+			                     , A.WERKS, A.LIFNR, A.MATNR, GET_MATLNM(A.WERKS, A.MATNR) AS ARKTX
+			                     , A.MEINS, B.LFIMG AS LFIMG, A.LFDAT_LA AS LFDAT, TO_CHAR(SYSDATE,'YYYYMMDD') AS ERDAT 
+			                     , B.VGBEL, B.VGPOS
+			                     , B.CHARG, #{SYSID} AS USERID
+			                     , SYSDATE AS REGDAT
+			                     , A.LGORT 
+			              FROM   TSCM_INB_PUR_SPEC B LEFT OUTER JOIN TSCM_INB_DELIV_DISP_HISTORY A 
+			              ON     B.LIFNR = A.LIFNR
+			              AND    B.LFDAT = A.LFDAT_LA
+			              AND    B.VBELN = A.VBELN 
+			              AND    B.MATNR = A.MATNR 
+			              WHERE  B.VBELN = #{V_VBELN}
+			              AND    NVL(B.CHARG,'*') = NVL(A.CHARG, NVL(B.CHARG,'*'))
+			              AND    NVL(B.DEL_DIV,'N') = 'N'
+			       ) A LEFT OUTER JOIN TSCM_M_MATL_MST_IF C
+			        ON     A.WERKS = C.WERKS
+			        AND    A.MATNR = C.MATNR 
+ 	</update>
+<!-- 입하예약 삭제 -->
+	<update id="updateInbDelivDispHistory" parameterType="json">
+		UPDATE  TSCM_INB_DELIV_DISP_HISTORY
+                      SET     DELYN = 'Y',
+                              DEL_USERID = #{SYSID}, 
+                              DEL_DATE = SYSDATE
+                      WHERE   SUBSTR(SEQNO,1,10) = SUBSTR(#{VBELN},1,10)
+                      AND     MATNR = NVL(#{MATNR},MATNR)
+                      AND     NVL(CHARG,'Z') = NVL(#{CHARG},NVL(CHARG,'Z'))               
+	</update> 
+	
+    <update id="updatePartIdnttyLbl" parameterType="json">
+    	 UPDATE TSCM_PART_IDNTTY_LBL
+         	SET DELYN = 'Y'
+            WHERE   SUBSTR(SCM_VBELN,1,10) = SUBSTR(#{VBELN},1,10)
+            AND     MATNR = NVL(#{MATNR},MATNR)
+            AND     NVL(CHARG,'Z') = NVL(#{CHARG},NVL(CHARG,'Z'))               
+    </update>                 
+           
+    <update id="deleteM_1120" parameterType="json"> 
+    	DELETE FROM M_1120
+            WHERE   LIFNR = #{VENDCD}
+            AND      SUBSTR(BARCODE,1,10) = SUBSTR(#{VBELN},1,10)
+            AND     MATNR = NVL(#{MATNR},MATNR)
+            AND     NVL(CHARG,'Z') = NVL(#{CHARG},NVL(CHARG,'Z'))               
+                      
+    </update>    
+</mapper>

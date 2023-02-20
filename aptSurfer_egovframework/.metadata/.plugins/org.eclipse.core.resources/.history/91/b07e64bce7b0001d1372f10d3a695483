@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.scmc0010.mapper.Scmc0010Mapper">
+
+<select id="selectScmc0010List" parameterType="json" resultType="json">
+		
+	SELECT COMPANYCD, GUBUN, XUSER, XUSERNM, XUSERNM_ENG, USEYN, TEAMCD, GET_TEAM_NAME_c_0010 (TEAMCD ,'KO') as TEAMNM, get_catalog_name('COM', 'USEYN', 'KO', USEYN) as USEYNNM,
+	MOBILE, EMAIL, A.RANKID, WORK_TYPE
+	FROM C_0010 A
+	WHERE GUBUN = '1'
+	AND USEYN= 'Y'
+	<!-- AND XUSER LIKE '%'||#{P_XUSER}||'%' -->
+	<if test="LIFNR != null and LIFNR != ''">
+     AND XUSER = #{LIFNR}
+	</if>	
+	
+	ORDER BY XUSER
+
+	</select>
+	
+	<select id="selectScmc0010PopupList" parameterType="json" resultType="json">
+	select  a.companycd, a.gubun, a.xuser,a.xusernm, a.useyn, a.jikup, a.rankid, a.teamcd, a.email, a.mobile, a.lang, a.dept_doc_recver, work_type, a.position,      
+              GET_XUSERNM_C_0010 ( '1', #{XUSER} ) ko, c.GRADE,
+           (  select  name
+               from    master_language
+               where    tableid = 'C_0010'
+               and      companycd = a.companycd
+               and      gubun = a.gubun
+               and      code = a.xuser 
+               and      lang = 'EN'  ) en,
+           (  select  name
+               from    master_language
+               where    tableid = 'C_0010'
+               and      companycd = a.companycd
+               and      gubun = a.gubun
+               and      code = a.xuser 
+               and      lang = 'CH'  ) ch,
+           (  select  name
+               from    master_language
+               where    tableid = 'C_0010'
+               and      companycd = a.companycd
+               and      gubun = a.gubun
+               and      code = a.xuser 
+               and      lang = 'SP'  ) sp
+      from    c_0010 a, (SELECT GRADE FROM c_0020 b where b.companycd = #{COMPANYCD}  and b.gubun = #{GUBUN} and b.xuser = #{XUSER} and b.systemcd ='QMS')c 
+      where   a.companycd = #{COMPANYCD} 
+      and     a.gubun = #{GUBUN} 
+      and     a.xuser = #{XUSER}
+	</select>
+	
+	<select id="getScmc0010cheombu" parameterType="json" resultType="json">	
+	select a.*, check_rowid(b.rowid,'1') as row_key
+          from   c_0010_file a, qis_upload_file b
+          where  a.companycd = #{COMPANYCD}   
+          AND    a.gubun = #{GUBUN} 
+          AND    a.xuser = #{XUSER}         
+          and    a.full_file_name = b.name 
+          and    rownum =1   
+          order by a.seq desc
+	</select>
+	
+	<select id="selectConnect_comp" parameterType="json" resultType="json">
+	select  connect_comp
+      from    c_0010_comp      
+     where    companycd = #{COMPANYCD} 
+       and     gubun = #{GUBUN} 
+       and     xuser = #{XUSER}  
+       and     default_yn = 'Y'
+	</select>
+	
+	<select id="selectMail" parameterType="json" resultType="json">
+	select *
+      from  c_0010_mail
+     where   companycd = #{COMPANYCD} 
+       and   gubun = #{GUBUN} 
+       and   xuser = #{XUSER}  
+	</select>
+	
+	<update id="setScmc0010Popup" parameterType="json">        
+    
+	MERGE INTO C_0010 A USING (
+	SELECT #{COMPANYCD} AS COMPANYCD
+	      ,#{GUBUN} AS GUBUN
+	      ,#{XUSER} AS XUSER
+	      ,#{PASS} AS PASS
+	      ,sysdate AS PYMD
+	      ,#{KO} AS XUSERNM
+	      ,#{USEYN} AS USEYN
+	      ,nvl(#{TEAMCD},'199999') AS TEAMCD
+	      ,#{EMAIL} AS EMAIL
+	      ,#{MOBILE} AS MOBILE
+	      ,#{EN} AS XUSERNM_ENG
+	      ,#{JIKUP} AS JIKUP
+	      ,#{C_0010_ID} AS C_0010_ID
+	      ,#{LANG} AS LANG
+	      ,#{RANKID} AS RANKID
+	      ,#{WORK_TYPE} AS WORK_TYPE
+	      ,#{EV_YN} AS EV_YN
+	      ,#{DEPT_DOC_RECVER} AS DEPT_DOC_RECVER
+	      ,#{LOGIN_COMP} AS LOGIN_COMP
+	      ,#{LOGIN_ID} AS LOGIN_ID
+	      ,SYSDATE AS LOGIN_YMD
+	      ,#{POP_MYJOB} AS POP_MYJOB
+	      ,#{POSITION} AS POSITION
+	FROM DUAL ) D
+	ON (A.COMPANYCD = D.COMPANYCD
+	AND A.GUBUN = D.GUBUN
+	AND A.XUSER = D.XUSER
+	)
+	WHEN MATCHED THEN
+	  UPDATE SET A.PYMD = sysdate            
+	            ,A.USEYN = D.USEYN
+	            ,A.TEAMCD = nvl(#{TEAMCD},'199999')
+	            ,A.EMAIL = D.EMAIL
+	            ,A.MOBILE = D.MOBILE            
+	            ,A.JIKUP = D.JIKUP            
+	            ,A.LANG = D.LANG
+	            ,A.RANKID = D.RANKID
+	            ,A.WORK_TYPE = D.WORK_TYPE            
+	            ,A.DEPT_DOC_RECVER = D.DEPT_DOC_RECVER            
+	            ,A.POSITION = D.POSITION
+	WHEN NOT MATCHED THEN
+	INSERT(A.COMPANYCD, A.GUBUN, A.XUSER, A.PASS, A.PYMD, A.XUSERNM, A.USEYN, A.TEAMCD, A.EMAIL, A.MOBILE, A.XUSERNM_ENG, A.JIKUP, A.C_0010_ID, A.LANG, A.RANKID, A.WORK_TYPE, A.EV_YN, A.DEPT_DOC_RECVER, A.LOGIN_COMP, A.LOGIN_ID, A.LOGIN_YMD, A.POP_MYJOB, A.POSITION)
+	VALUES(D.COMPANYCD, D.GUBUN, D.XUSER, D.PASS, D.PYMD, D.XUSERNM, D.USEYN, D.TEAMCD, D.EMAIL, D.MOBILE, D.XUSERNM_ENG, D.JIKUP, D.C_0010_ID, D.LANG, D.RANKID, D.WORK_TYPE, D.EV_YN, D.DEPT_DOC_RECVER, D.LOGIN_COMP, D.LOGIN_ID, D.LOGIN_YMD, D.POP_MYJOB, D.POSITION)
+
+	</update>
+	
+	<delete id="delScmc0010PopupMail" parameterType="json">      
+	delete from c_0010_mail
+     where companycd = #{COMPANYCD}
+     and   gubun = #{GUBUN}
+     and   xuser = #{XUSER}
+     </delete>
+	
+	<update id="setScmc0010PopupMail" parameterType="json">      
+    insert into c_0010_mail ( companycd, gubun, xuser, email, m_name, login_ymd)
+         values ( #{COMPANYCD}, #{GUBUN}, #{XUSER}, #{EMAIL},  #{M_NAME},  sysdate )		
+	</update>	
+	
+	<update id="setScmc0010pass" parameterType="json">      
+	update  C_0010 
+	    set     pass = #{XUSER}||'@1'
+	    where   companycd = #{COMPANYCD}
+	    and     gubun = #{GUBUN} 
+	    and     xuser= #{XUSER}; 
+	</update>	
+</mapper>

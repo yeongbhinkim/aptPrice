@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.cmmsSA017.mapper.CmmsSA017Mapper">
+
+	<select id="selectCmmsSA017List" parameterType="json" resultType="json">
+		 SELECT ROWNUM RNO
+				 , PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_WERKS}, A.WERKS,'',#{SYSLANG}) AS WERKSNM
+				 , TO_CHAR(update_date,'YYYY.MM.DD') as UPDATEDATE
+				 , TO_CHAR(TO_DATE(DATBI, 'YYYY-MM-DD') ,'YYYY.MM.DD') AS DATBIDATE
+				 , TO_CHAR(TO_DATE(DATAB, 'YYYY-MM-DD') ,'YYYY.MM.DD') AS DATABDATE
+				 , A.*
+				 , (CASE WHEN GUIDELINE = '3' THEN  '검사제외품'
+			                     WHEN GUIDELINE = '2' THEN  '무'
+			                     WHEN GUIDELINE = '1' THEN  '유'
+			                     ELSE '미등록'
+			                     END ) AS GUIDELINE_X
+			     , DECODE(A.KI, 'Y', '등록', 'N', '미등록') KI_NM
+			     , DECODE(NVL(GET_SUNG_YN_JAVA(DECODE(A.WERKS, '1110', '11', '1210', '13', '1220', '14', '3110', '31'),LIFNR ,MATNR,'QMS_Q_615'),'Y'), 'Y', '필요', 'N', '불필요') as SUNG_YN
+	        FROM(
+                SELECT A.*
+	                    , (CASE WHEN NVL(GET_GUIDE_LINE_NEW_JAVA(DECODE(A.WERKS, '1110', '11', '1210', '13', '1220', '14', '3110', '31'), A.MATNR, A.LIFNR, TO_CHAR(SYSDATE,'YYYYMMDD'),'QMS_Q_615'),'Z') NOT IN ('P','E','Z') THEN '1'
+	                           WHEN NVL(GET_GUIDE_LINE_NEW_JAVA(DECODE(A.WERKS, '1110', '11', '1210', '13', '1220', '14', '3110', '31'), A.MATNR, A.LIFNR, TO_CHAR(SYSDATE,'YYYYMMDD'),'QMS_Q_615'),'Z') = 'P' THEN '2'
+	                           WHEN NVL(GET_GUIDE_LINE_NEW_JAVA(DECODE(A.WERKS, '1110', '11', '1210', '13', '1220', '14', '3110', '31'), A.MATNR, A.LIFNR, TO_CHAR(SYSDATE,'YYYYMMDD'),'QMS_Q_615'),'Z') = 'E' THEN '3'  
+	                           ELSE '0' 
+	                       	   END ) AS GUIDELINE
+	                    , GET_RGST_KI_JAVA(A.WERKS, A.MATNR, A.LIFNR,'QMS_Q_615') AS KI
+	                    , (CASE WHEN REPLACE(DATBI,'-','') <![CDATA[ >=  ]]> TO_CHAR(SYSDATE,'YYYYMMDD') THEN 'Y' ELSE 'N' END) USEOBJ
+	                FROM   TSCM_M_CMMS_S_A017 A
+	                WHERE 1=1
+	                AND A.MTART  IN ('FERT', 'HAWA', 'HALB', 'ROH1', 'ROH2', 'ROH3')
+	                AND A.MATNR LIKE '%'||#{MATNR}||'%'
+	                AND A.LIFNR = NVL(#{LIFNR},A.LIFNR)
+	                AND A.WERKS = NVL(#{WERKS},A.WERKS)
+	       ) A
+	       WHERE NVL(A.GUIDELINE,'*') = NVL(#{GUIDELINE},NVL(A.GUIDELINE,'*'))
+	       AND A.USEOBJ = NVL(#{USE_DIV},A.USEOBJ)
+	       AND A.KI = NVL(#{KI},A.KI)
+	</select>
+	
+	
+	<select id="selectSapCmmsSA017List" parameterType="json"
+		resultType="json">
+		 SELECT ROWNUM RNO, A.*
+		 , TO_CHAR(A.UPDATE_DATE,'YYYY.MM.DD') as UPDATEDATE
+		 , PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_WERKS}, A.WERKS,'',#{SYSLANG}) AS WERKSNM
+	 	 , TO_CHAR(TO_DATE(A.DATBI, 'YYYY-MM-DD') ,'YYYY.MM.DD') AS DATBIDATE
+		 , TO_CHAR(TO_DATE(A.DATAB, 'YYYY-MM-DD') ,'YYYY.MM.DD') AS DATABDATE
+         FROM TSCM_M_CMMS_S_A017 A
+         WHERE A.SEQNO = #{SEQNO}
+      	 AND A.MATNR LIKE '%'||#{MATNR_SAP}||'%'
+	</select>
+	
+	<select id="selectDocIdSungYN" parameterType="json"
+		resultType="json">
+	SELECT  DECODE((NVL(C.SUNG_YN,'Y')), 'Y', '필요', 'N', '불필요') as SUNG_YN
+      FROM Q_615 C
+     WHERE C.COMPANYCD = #{COMPANYCD}
+       AND C.VENDCD =  #{LIFNR}
+       AND C.PARTNO =  #{MATNR}
+       AND C.SNO = (SELECT MAX(SNO)
+                      FROM Q_615
+                     WHERE COMPANYCD = C.COMPANYCD
+                       AND VENDCD = C.VENDCD
+                       AND PARTNO = C.PARTNO
+                       AND   'Y' = CHECK_COMPLETE_FINISH_DOC(DOC_ID)
+                       AND TO_CHAR(SYMD,'YYYYMMDD') <![CDATA[ <=  ]]>  TO_CHAR(SYSDATE,'YYYYMMDD'))
+	</select>
+	
+	<select id="selectSungYN" parameterType="json"
+		resultType="json">
+	SELECT  DECODE((NVL(C.SUNG_YN,'Y')), 'Y', '필요', 'N', '불필요') as SUNG_YN
+      FROM Q_615 C
+     WHERE C.COMPANYCD = #{COMPANYCD}
+       AND C.VENDCD =  #{LIFNR}
+       AND C.PARTNO =  #{MATNR}
+       AND C.SNO = (SELECT MAX(SNO)
+                      FROM Q_615
+                     WHERE COMPANYCD = C.COMPANYCD
+                       AND VENDCD = C.VENDCD
+                       AND PARTNO = C.PARTNO
+                       and 'C' = (SELECT CASE WHEN SIGNTYPECD = 'C' THEN 'C'
+												ELSE 'N'
+												END SIGNTYPECD
+									FROM	  PREMIER_SYS.SYS_SIGNLINK e
+									WHERE    e.SIGNLINKTYPECD = 'QMS_Q_615'
+									AND      e.LINKID = COMPANYCD||'!'||VENDCD||'!'||PARTNO||'!'||SNO )
+                       AND TO_CHAR(SYMD,'YYYYMMDD') <![CDATA[ <=  ]]>  TO_CHAR(SYSDATE,'YYYYMMDD'))
+	</select>
+</mapper>

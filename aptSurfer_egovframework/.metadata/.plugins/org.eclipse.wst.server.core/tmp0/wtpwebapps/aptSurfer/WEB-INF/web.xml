@@ -71,5 +71,10 @@
 		<error-code>500</error-code>
 		<location>/common/error.jsp</location>
 	</error-page>
+	
+	<context-param> 
+		<param-name>contextConfigLocation</param-name> 
+		<param-value>classpath*:spring/context-*.xml</param-value> 
+	</context-param>
     
 </web-app>

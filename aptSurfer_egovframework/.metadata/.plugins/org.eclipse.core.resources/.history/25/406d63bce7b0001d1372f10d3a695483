@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.reUpDelistN.mapper.ReUpDelistNMapper">
+
+<select id="selectReUpDelistNList" parameterType="json"
+		resultType="json">
+
+	SELECT VBELN
+	FROM TSCM_INB_DELIV_DISP_HISTORY A
+	WHERE WERKS = #{WERKS}
+	AND LIFNR = #{LIFNR}
+	AND LOGIN_YMD BETWEEN TO_DATE(#{LFDAT_LA}||'000000','YYYYMMDDHH24MISS')
+	AND	TO_DATE(#{LFDAT_LA_TO}||'235959','YYYYMMDDHH24MISS')
+	AND PRINT_YN = 'Y'
+	AND DELYN = 'Y'
+	AND EXISTS (SELECT 1 FROM TSCM_INB_PUR_SPEC WHERE VBELN = A.VBELN AND
+	MATNR = A.MATNR AND ROWNUM = 1)
+	GROUP BY VBELN
+	ORDER BY VBELN
+
+	</select>
+
+	<select id="selectReUpDelistNDetailList" parameterType="json" resultType="json">
+	SELECT a.*
+	, to_char(DEL_DATE ,'YYYY.MM.DD HH24:MI:SS') as REAL_DELDATE
+	, TO_CHAR(TO_DATE(LFDAT_LA, 'YYYYMMDD') ,'YYYY.MM.DD') AS LFDAT_LA_1
+	, (case when deldiv = 'Y' then 'QMS' else 'SCM' end) as DELDIVNM
+	FROM(SELECT a.*
+		, GET_SUNG_YN(#{COMPANYCD},'100',a.lifnr,a.matnr,a.seqno, replace(a.lfdat_la,'-','')) as SUNG_YN
+		, (SELECT count(posnr) 
+			from TSCM_INB_PUR_SPEC 
+			where vbeln = a.vbeln 
+			and lifnr = a.lifnr 
+			and lfdat = a.lfdat_la 
+			and matnr = a.matnr ) as POSNR_CNT
+		, (SELECT 'Y' from m_1120_bultype where barcode = a.seqno and rownum = 1) as DELDIV
+		
+		, PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_LGORT}, A.LGORT,'',#{SYSLANG}) AS LGORTNM
+		, PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_WERKS}, A.WERKS,'',#{SYSLANG}) AS WERKSNM
+		
+<!-- 		, (SELECT CD_NM FROM TSCM_MLTCD WHERE WERKS = #{WERKS} AND CD = A.LGORT AND ROWNUM = 1) AS LGORTNM -->
+<!-- 		, CH_XML_DATA(GET_USER_NAME_XUSER_LANG(a.lifnr, #{SYSLANG})) as XUSERNM -->
+		
+		from TSCM_INB_DELIV_DISP_HISTORY a
+		where a.werks = #{WERKS}
+		and a.VBELN = #{VBELN}
+<!-- 		and a.lgort = decode(#{LGORT},'%',a.lgort,#{LGORT}) -->
+		and a.lifnr = #{LIFNR}
+<!-- 		and a.matnr = nvl(#{MATNR},a.matnr) -->
+		and a.vbeln is not null
+		and a.delyn = 'Y'
+		and exists (select 1 from TSCM_INB_PUR_SPEC where vbeln = a.vbeln and
+		matnr = a.matnr and nvl(charg,'Z') = nvl(a.charg,nvl(charg,'Z')) and
+		rownum = 1)
+	) a
+</select>
+	
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.lblPrintN.mapper.LblPrintNMapper">
+	<select id="selectLblPrintNlist" parameterType="json" resultType="json">
+        SELECT A.*, ROWNUM RNO,(SELECT MAKTX FROM TSCM_INB_PUR_SPEC WHERE MATNR =A.MATNR  AND ROWNUM = 1) AS MAKTX, TO_CHAR(TO_DATE(A.ISDAT, 'yyyymmdd'), 'yyyy.mm.dd') AS ISDAT_1
+        FROM(
+              SELECT  A.BARCO, A.WERKS, A.MATNR, A.SEQNO, A.ISDAT, A.LIFNR, A.MENGE, A.KZKRI, A.ITCAT, 
+                      A.PSEQNO, A.LGPBE, A.LIFNR_NM, A.CRDATE, A.LOTNO, A.KCLOTNO, A.REMARK, 
+                      A.LOGIN_YMD, A.LOGIN_ID, A.CHARG, A.II_DIV, A.MEINS, A.BOX_CNT, A.BOX_CNT_IN, 
+                      A.BOX_CNT_REM, A.SCM_VBELN, A.VBELN, A.NUM, A.SNO, A.QMS_SEQNO,  
+                      B.GUIDELINE, 
+                      ( CASE WHEN A.VBELN IS NOT NULL THEN 'B' ELSE 'A' END
+                      ) PRINT_DIV,
+
+                      BARCO AS LOTNO_
+              FROM    TSCM_PART_IDNTTY_LBL A LEFT OUTER JOIN TSCM_INB_DELIV_DISP_HISTORY B
+              ON A.WERKS = B.WERKS
+              AND A.LIFNR = B.LIFNR
+              AND A.ISDAT = B.LFDAT_LA
+              AND A.MATNR = B.MATNR
+              AND A.SCM_VBELN = B.SEQNO
+              WHERE NVL(A.DELYN,'N') = 'N'
+              AND   A.LIFNR = #{LIFNR}
+              AND   A.WERKS = #{WERKS}
+              AND   A.MATNR LIKE '%'||#{MATNR}||'%'
+              AND   A.ISDAT BETWEEN TO_DATE(#{LFDAT_LA}, 'YYYY-MM-DD') AND TO_DATE(#{LFDAT_LA_TO}, 'YYYY-MM-DD')
+              AND   NVL(A.VBELN,SUBSTR(A.SCM_VBELN,1,10)) LIKE '%'||#{VBELN}||'%'
+        )A
+        WHERE 1=1
+        AND   A.LOTNO_ LIKE '%'||#{LOTNO}||'%'
+        ORDER BY RNO,A.VBELN, A.SEQNO
+        </select>
+        
+       	<update id="updateLotno" parameterType="json">
+       	  update TSCM_PART_IDNTTY_LBL
+          SET    KCLOTNO = #{KCLOTNO},
+                 REMARK = #{REMARK}
+          WHERE  BARCO = #{LOTNO_}
+       	</update>
+   
+       	<update id="deleteLblTemp" parameterType="json">
+      		DELETE FROM TSCM_PART_IDNTTY_LBL_TEMP
+        	WHERE UPPER(LOGIN_ID) = UPPER(#{SYSID})  	
+       	</update>
+       	<insert id="insertLblTemp" parameterType="json">
+       		INSERT INTO TSCM_PART_IDNTTY_LBL_TEMP(BARCO, WERKS, MATNR, SEQNO, ISDAT, LIFNR, MENGE, KZKRI, ITCAT, 
+	            PSEQNO, LGPBE, LIFNR_NM, CRDATE, LOTNO, KCLOTNO, REMARK, 
+	            LOGIN_YMD, LOGIN_ID, CHARG, II_DIV, MEINS, 
+	            BOX_CNT, BOX_CNT_IN, BOX_CNT_REM, SCM_VBELN, VBELN, NUM, SNO, QMS_SEQNO,
+	            GUIDENM )  
+           SELECT  BARCO, WERKS, MATNR, SEQNO, ISDAT, LIFNR, MENGE, KZKRI, ITCAT, 
+                      PSEQNO, LGPBE, LIFNR_NM, CRDATE, LOTNO, KCLOTNO, REMARK, 
+                      SYSDATE, #{SYSID}, CHARG, II_DIV, MEINS, 
+                      BOX_CNT, BOX_CNT_IN, BOX_CNT_REM, SCM_VBELN, VBELN, NUM, SNO, #{V_SEQNO},
+                      GUIDENM 
+              FROM   TSCM_PART_IDNTTY_LBL
+              WHERE  SEQNO = #{SEQNO}
+              AND    LIFNR = #{LIFNR}
+              AND    ISDAT = #{ISDAT}
+              AND    MATNR = #{MATNR}
+              AND    SCM_VBELN = #{SCM_VBELN}
+              AND    NVL(DELYN,'N') = 'N'
+       	</insert>
+               
+        
+</mapper>

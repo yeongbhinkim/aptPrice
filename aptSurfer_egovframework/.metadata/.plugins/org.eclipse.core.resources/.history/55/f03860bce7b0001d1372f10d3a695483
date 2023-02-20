@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.draw1010New.mapper.Draw1010NewMapper">
+
+	<select id="draw1010NewList" parameterType="json" resultType="json">
+		select ROWNUM AS SEQNO, Z.COMPANYCD,Z.DRAWNO, Z.B_DATE ,TO_CHAR(Z.B_DATE, 'YYYY.MM.DD')AS B_DATE2,TO_CHAR(Z.B_DATE, 'YYYY-MM-DD')AS B_DATE3, GET_KIND(Z.KINDCD,'')as KINDNM,  
+		Z.VENDCD, Z.DRAW_TITLE, Z.DRAW_DESCR, Z.SEND_DATE, Z.SEND_XUSER, Z.ECO_NO, Z.KINDCD,  GET_COM_COMPANY_INFO_VENDNM(#{COMPANYCD},Z.VENDCD) as VENDNM
+		from draw_vendor Z
+	    where  b_date between to_date(replace(#{S_DATE},'-',''),'yyyymmdd') and to_date(replace(#{E_DATE},'-',''),'yyyymmdd')
+	    <if test="VENDCD != null and VENDCD != ''">	
+	    and    vendcd = nvl(#{VENDCD}, vendcd)
+	    </if>
+	    <if test="DRAWNO != null and DRAWNO != ''">	
+	    and    drawno||eco_no||kindcd||draw_title like '%'||#{DRAWNO}||'%'
+	    </if>
+	    order by SEQNO, b_date desc
+     </select>
+     
+     <select id="draw1010GridList" parameterType="json" resultType="json">
+		select APNO,APNM,EONO,FULL_FILE_NAME,FILE_NAME,LOGIN_YMD,TO_CHAR(LOGIN_YMD,'YYYY-MM-DD')AS REG_YMD from DRAW_MASTER t		 
+	     where    EONO = #{ECO_NO}
+	      
+	    order by APNO desc
+     </select>
+     
+     
+   	<update id="setdraw1010New" parameterType="json">
+   		<selectKey resultType="string" keyProperty="DRAWNO" order="BEFORE">
+			<choose>
+				<when test="DRAWNO != null and DRAWNO != ''">
+					SELECT #{DRAWNO} AS DRAWNO FROM DUAL	
+				</when>
+				<otherwise>
+					SELECT #{COMPANYCD}|| SUBSTR(replace(#{B_DATE3},'-',''),1,8) || LPAD(TO_CHAR(TO_NUMBER(NVL(MAX(SUBSTR(DRAWNO,11,11)),0)) + 1),4,'0') FROM DRAW_VENDOR
+					 WHERE COMPANYCD = #{COMPANYCD}					   
+				</otherwise>
+			</choose>
+        </selectKey>
+		MERGE INTO DRAW_VENDOR A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{DRAWNO} AS DRAWNO
+		      ,to_date(SUBSTR(replace(#{B_DATE3},'-',''),1,8), 'yyyymmdd') AS B_DATE
+		      ,#{VENDCD} AS VENDCD
+		      ,#{DRAW_TITLE} AS DRAW_TITLE
+		      ,#{DRAW_DESCR} AS DRAW_DESCR      
+		      ,SYSDATE AS LOGIN_YMD
+		      ,#{COMPANYCD} AS LOGIN_COMPANYCD     
+		      ,#{ECO_NO} AS ECO_NO
+		      ,#{KINDCD} AS KINDCD
+		      ,#{ACCNO} AS LOGIN_ID
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.DRAWNO = D.DRAWNO
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.B_DATE = D.B_DATE
+		            ,A.VENDCD = D.VENDCD
+		            ,A.DRAW_TITLE = D.DRAW_TITLE
+		            ,A.DRAW_DESCR = D.DRAW_DESCR            
+		            ,A.LOGIN_YMD = D.LOGIN_YMD
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD           
+		            ,A.ECO_NO = D.ECO_NO
+		            ,A.KINDCD = D.KINDCD
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.DRAWNO, A.B_DATE, A.VENDCD, A.DRAW_TITLE, A.DRAW_DESCR, A.LOGIN_YMD, A.LOGIN_COMPANYCD, A.ECO_NO, A.KINDCD)
+		VALUES(D.COMPANYCD, D.DRAWNO, D.B_DATE, D.VENDCD, D.DRAW_TITLE, D.DRAW_DESCR, D.LOGIN_YMD, D.LOGIN_COMPANYCD, D.ECO_NO, D.KINDCD)
+		     
+     </update>
+     
+    <update id="setdraw1010domyeonNew" parameterType="json">   		
+		MERGE INTO DRAW_MASTER A USING (
+		SELECT #{COMPANYCD} AS COMPANYCD
+		      ,#{APNO} AS APNO
+		      ,#{APNM} AS APNM
+		      ,#{ECO_NO} AS EONO		        
+		      ,SYSDATE AS LOGIN_YMD
+		      ,#{COMPANYCD} AS LOGIN_COMPANYCD
+		      ,#{ACCNO} AS LOGIN_ID
+		FROM DUAL ) D
+		ON (A.COMPANYCD = D.COMPANYCD
+		AND A.APNO = D.APNO
+		AND A.EONO = D.EONO
+		)
+		WHEN MATCHED THEN
+		  UPDATE SET A.APNM = D.APNM		            		           
+		            ,A.LOGIN_YMD = D.LOGIN_YMD
+		            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD
+		            
+		WHEN NOT MATCHED THEN
+		INSERT(A.COMPANYCD, A.APNO, A.APNM, A.EONO,  A.LOGIN_YMD, A.LOGIN_COMPANYCD)
+		VALUES(D.COMPANYCD, D.APNO, D.APNM, D.EONO,  D.LOGIN_YMD, D.LOGIN_COMPANYCD)
+
+		     
+     </update> 
+     
+     
+     <update id="setdraw1010domyeonsend" parameterType="json">   		
+		   MERGE INTO DRAW_VENDOR_LIST A USING (
+			SELECT #{COMPANYCD} AS COMPANYCD
+			      ,#{DRAWNO} AS DRAWNO
+			      ,#{APNO} AS APNO
+			      ,#{ECO_NO} AS EONO
+			      ,SYSDATE AS RECEIPT_YMD
+			      ,#{VENDCD} AS RECEIPT_VENDCD
+			      ,SYSDATE AS LOGIN_YMD
+			      ,#{COMPANYCD} AS LOGIN_COMPANYCD			      
+			      ,#{APNM} AS APNM
+			      ,#{ACCNO} AS LOGIN_ID
+			FROM DUAL ) D
+			ON (A.COMPANYCD = D.COMPANYCD
+			AND A.DRAWNO = D.DRAWNO
+			AND A.APNO = D.APNO
+			AND A.EONO = D.EONO
+			)
+			WHEN MATCHED THEN
+			  UPDATE SET A.RECEIPT_VENDCD = D.RECEIPT_VENDCD
+			  			,A.RECEIPT_YMD = D.RECEIPT_YMD			  
+			            ,A.LOGIN_YMD = D.LOGIN_YMD
+			            ,A.LOGIN_COMPANYCD = D.LOGIN_COMPANYCD			            
+			            ,A.APNM = D.APNM         			            
+			WHEN NOT MATCHED THEN
+			INSERT(A.COMPANYCD, A.DRAWNO, A.APNO, A.EONO, A.RECEIPT_VENDCD, A.RECEIPT_YMD, A.LOGIN_YMD, A.LOGIN_COMPANYCD, A.APNM)
+			VALUES(D.COMPANYCD, D.DRAWNO, D.APNO, D.EONO, D.RECEIPT_VENDCD, D.RECEIPT_YMD, D.LOGIN_YMD, D.LOGIN_COMPANYCD, D.APNM)
+
+     </update>     
+     
+   	<delete id="deldraw1010New" parameterType="json">      
+	delete from draw_vendor
+     where companycd = #{COMPANYCD}
+       and drawno = #{DRAWNO}
+
+    <!-- delete from draw_vendor_list       
+     where companycd = #{COMPANYCD}
+     and drawno = #{DRAWNO} -->
+
+     </delete>
+     
+    <delete id="deldraw1010PopupGrid" parameterType="json">      
+	delete from DRAW_MASTER
+     where EONO = #{EONO}
+       and APNO = #{APNO}
+       and APNM = #{APNM}
+	   and TO_CHAR(LOGIN_YMD,'YYYY-MM-DD') = #{REG_YMD}   
+     </delete>
+     
+     <delete id="deldraw1010PopupGridLIST" parameterType="json">      
+	delete from DRAW_VENDOR_LIST
+     where EONO = #{EONO}
+       and APNO = #{APNO}
+       and APNM = #{APNM}
+	   and TO_CHAR(LOGIN_YMD,'YYYY-MM-DD') = #{REG_YMD}   
+     </delete>
+     
+    
+</mapper>
+
+

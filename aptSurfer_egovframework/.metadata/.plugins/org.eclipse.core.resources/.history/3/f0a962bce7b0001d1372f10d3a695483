@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.matbatch.mapper.MatbatchMapper">
+
+	<select id="selectMatbatchList" parameterType="json" resultType="json">
+		SELECT ROWNUM RNO, TO_CHAR(TO_DATE(REPLACE(R.ERSDA,'-',''), 'YYYYMMDD') ,'YYYY.MM.DD') AS ERSDA, R.* FROM(
+		SELECT A.*, B.MAKTX
+		, PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_WERKS}, A.WERKS,'',#{SYSLANG}) AS WERKS_NM
+		FROM TSCM_MATBATCH_ERP_QMS A, TSCM_M_MATL_MST_IF B
+		WHERE A.MATNR = B.MATNR(+)
+		AND B.WERKS(+) = #{WERKS}
+		AND A.MATNR LIKE '%'||#{MATNR}||'%'
+		AND NVL(UPPER(A.CHARG),'*') LIKE '%'||NVL(UPPER(#{CHARG}),NVL(UPPER(A.CHARG),'*'))||'%'
+		ORDER BY A.MATNR
+		) R  
+	</select>
+	
+	<select id="selectSapMatbatchList" parameterType="json"	resultType="json">
+       SELECT ROWNUM RNO, TO_CHAR(TO_DATE(REPLACE(A.ERSDA,'-',''), 'YYYYMMDD') ,'YYYY.MM.DD') AS ERSDA, A.*, B.MAKTX
+       , PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_WERKS}, A.WERKS,'',#{SYSLANG}) AS WERKS_NM
+       FROM TSCM_MATBATCH_ERP_QMS A, TSCM_M_MATL_MST_IF B
+       WHERE A.MATNR = B.MATNR(+)
+	</select>
+	
+</mapper>

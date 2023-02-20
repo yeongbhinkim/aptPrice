@@ -1,0 +1,992 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.qms.prodquality.mapper.CCPChkMgmtServiceMapper"> 
+	 
+	<!-- 중점관리항목검사 계획 상세 -->	 
+	<select id="selectCCPChkMgmtPlanInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT  A.COMPANYCD
+		       ,A.GUBUN  AS PROC_CD
+		       ,A.PLANT
+		       ,A.PARTNO AS APNO
+		       ,A.PARTNM AS APNONM
+		       ,A.KINDCD AS KIND_CD 
+		       ,GET_ITGR_CODE_NAME(A.GUBUN, #{LANG}) AS PROC_NM
+			   ,TO_CHAR(TO_DATE(A.SYMD),'YYYY-MM-DD') AS SYMD
+			   ,TO_CHAR(TO_DATE(A.EYMD),'YYYY-MM-DD') AS EYMD
+		       ,A.USE_YN
+		  FROM Q_241 A
+         WHERE A.COMPANYCD = #{COMPANYCD}
+           AND TO_CHAR(TO_DATE(A.SYMD),'YYYY-MM-DD') = #{SYMD}
+         <if test="PLANT != null and PLANT != ''">
+           AND A.PLANT  = #{PLANT}
+         </if>
+         <if test="APNO != null and APNO != ''">   
+           AND A.PARTNO = #{APNO}
+         </if>
+         <if test="PROC_CD != null and PROC_CD != ''">
+           AND A.GUBUN = #{PROC_CD}
+         </if>
+	</select> 
+
+	<!-- 중점관리항목검사 실적 상세 -->	 
+	<select id="selectCCPChkMgmtCmpltInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT   A.Q_242_SEQ AS SEQ
+				,A.COMPANYCD
+				,A.PLANT
+				,A.GUBUN AS PROC_CD
+				,GET_ITGR_CODE_NAME(A.GUBUN, #{LANG}) AS PROC_NM
+				,A.PARTNO AS APNO
+				,MAX(TO_CHAR(TO_DATE(A.REPORT_DAY),'YYYY-MM-DD')) AS REPORT_DAY
+				,A.RMK
+				,A.LOTNO1
+				,A.LOTNO2
+				,A.EXAM_USER
+				,A.RV_USER
+				,A.AP_USER
+				,A.JUDGE
+				,B.PARTNM AS APNONM
+				,B.KINDCD AS KIND_CD
+				,(SELECT MAX(D.REV_NO) AS MAX_REV_NO
+				    FROM Q_245 D  
+				   WHERE D.COMPANYCD = A.COMPANYCD
+					 AND D.PLANT	 = A.PLANT
+					 AND D.PARTNO	 = A.PARTNO
+					 AND D.ROUTINGCD = A.GUBUN) AS REV_NO
+		   FROM Q_242 A,
+				(SELECT A.COMPANYCD
+					   ,A.PLANT
+					   ,A.PARTNO
+					   ,A.GUBUN
+					   ,A.PARTNM
+					   ,A.KINDCD
+				  FROM Q_241 A
+				 WHERE A.COMPANYCD = #{COMPANYCD}
+				 <if test="PLANT != null and PLANT != ''">
+				   AND A.PLANT  = #{PLANT}
+				 </if>	
+				 <if test="PROC_CD != null and PROC_CD != ''">
+				   AND A.GUBUN LIKE #{PROC_CD}||'%'
+				 </if>
+				 ) B
+		  WHERE A.COMPANYCD = #{COMPANYCD}
+		  <if test="PLANT != null and PLANT != ''">
+		    AND A.PLANT  = #{PLANT}
+		  </if>
+		  <if test="APNO != null and APNO != ''">
+		    AND A.PARTNO = #{APNO}
+		  </if>
+		  <if test="PROC_CD != null and PROC_CD != ''">
+		    AND A.GUBUN = #{PROC_CD}
+		  </if>
+			AND A.COMPANYCD  = B.COMPANYCD(+)
+			AND A.PLANT      = B.PLANT(+)
+			AND A.PARTNO     = B.PARTNO(+)
+			AND A.GUBUN      = B.GUBUN(+)
+			AND A.REPORT_DAY = TO_CHAR(TO_DATE(#{REPORT_DAY},'YYYY-MM-DD'), 'YYYYMMDD')
+		  GROUP BY A.Q_242_SEQ,A.COMPANYCD,A.PLANT,A.GUBUN,A.PARTNO,A.RMK,A.LOTNO1,A.LOTNO2,A.EXAM_USER,A.JUDGE,A.RV_USER,A.AP_USER,
+				   B.PARTNM,B.KINDCD
+	</select>
+
+	<!-- 중점관리항목검사 실적 SEQ -->	 
+	<select id="getQ_242_SEQ" parameterType="hashmap" resultType="hashmap">
+		SELECT DISTINCT A.Q_242_SEQ AS SEQ
+			   ,GET_SIGNTYPECD('QMS_Q_242',A.Q_242_SEQ) AS APPR_STS
+			   ,B.REV_NO
+		  FROM Q_242 A, Q_243 B
+		 WHERE A.COMPANYCD  = #{COMPANYCD}
+		   AND A.PLANT		= #{PLANT}
+		   AND A.PARTNO		= #{APNO}
+		   AND A.GUBUN		= #{PROC_CD}
+		   AND A.REPORT_DAY = TO_CHAR(TO_DATE(#{REPORT_DAY},'YYYY-MM-DD'), 'YYYYMMDD')
+		   AND A.COMPANYCD	= B.COMPANYCD(+)
+		   AND A.PLANT		= B.PLANT(+)
+		   AND A.PARTNO		= B.PARTNO(+)
+		   AND A.GUBUN		= B.ROUTINGCD(+)
+		   AND A.REPORT_DAY = B.REPORT_DAY(+)
+	</select>
+	
+	<!-- 중점관리항목검사 기준서 MAX REV_NO -->	 
+	<select id="getQ_245_MAX_REV_NO" parameterType="json" resultType="hashmap">
+		SELECT NVL(MAX(A.REV_NO), '1') AS MAX_REV_NO
+		  FROM Q_245 A  
+		 WHERE A.COMPANYCD = #{COMPANYCD}
+		   AND A.PLANT     = #{PLANT}
+		   AND A.PARTNO    = #{APNO}
+		   AND A.ROUTINGCD = #{PROC_CD}
+	</select>
+	
+	<!-- 중점관리항목검사 기준서 상세 -->	 
+	<select id="selectCCPChkMgmtStdInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT A.COMPANYCD
+			  ,A.PLANT
+			  ,A.PARTNO AS APNO
+			  ,A.ROUTINGCD AS PROC_CD
+			  ,GET_ITGR_CODE_NAME(A.ROUTINGCD, #{LANG}) AS PROC_NM
+			  ,A.REV_NO
+			  ,A.KINDCD AS KIND_CD
+			  ,A.PARTNM AS APNONM
+			  ,TO_CHAR(TO_DATE(A.REV_DAY),'YYYY-MM-DD') AS REV_DAY
+		  FROM Q_245 A  
+		 WHERE A.COMPANYCD = #{COMPANYCD}
+		   AND A.PLANT     = #{PLANT}
+		   AND A.PARTNO	   = #{APNO}
+		   AND A.KINDCD	   = #{KIND_CD}
+		   AND A.ROUTINGCD = #{PROC_CD}
+		   AND A.REV_NO    = #{REV_NO}
+	</select> 
+	
+	<!-- 중점관리항목검사 기준서 상세 -->	 
+	<select id="selectCCPChkMgmtStdNewRevInfo" parameterType="hashmap" resultType="hashmap">
+		SELECT NVL(MAX(A.REV_NO), '0') AS MAX_REV_NO
+		  FROM Q_245 A  
+		 WHERE A.COMPANYCD = #{COMPANYCD}
+		   AND A.PLANT     = #{PLANT}
+		   AND A.PARTNO    = #{APNO}
+		   AND A.ROUTINGCD = #{PROC_CD}
+	</select> 
+
+	<!-- 중점관리항목검사 기준서 검사항목 리스트 조회 -->	 
+	<select id="getStdCheckList" parameterType="hashmap" resultType="hashmap">
+		SELECT A.SEQ
+			 , A.COMPANYCD
+			 , A.PLANT
+			 , A.PARTNO
+			 , A.ROUTINGCD
+			 , A.REV_NO
+			 , A.SNO
+			 , A.INSPECT_ITEM
+			 , A.INSPECT_SPEC
+			 , A.INSPECT_TERM
+			 , A.INSPECT_TOOL
+			 , A.INSPECT_CNT
+			 , A.SPEC_MIN
+			 , A.SPEC_MAX
+			 , A.MGT_SPEC_MIN
+			 , A.MGT_SPEC_MAX
+			 , A.SEQ AS SUB_SEQ
+			 , B.REV_NO
+			 , B.X1
+			 , B.X2
+			 , (CASE WHEN B.JUDGE = '0000001757' THEN '합격'
+					 WHEN B.JUDGE = '0000001758' THEN '불합격' END) AS JUDGE
+			 , ROWNUM AS RNO
+		  FROM Q_246 A, 
+			   ( SELECT COMPANYCD, PLANT, PARTNO, ROUTINGCD, REPORT_DAY, REV_NO, SEQ, X1, X2, JUDGE
+				   FROM Q_243
+				  WHERE COMPANYCD  = #{COMPANYCD}
+					AND PLANT	   = #{PLANT}
+					AND PARTNO	   = #{APNO}
+					AND ROUTINGCD  = #{PROC_CD}
+					AND REPORT_DAY = TO_CHAR(TO_DATE(#{REPORT_DAY},'YYYY-MM-DD'), 'YYYYMMDD') ) B
+		 WHERE A.COMPANYCD = #{COMPANYCD}
+		   AND A.PLANT	   = #{PLANT}
+		   AND A.PARTNO	   = #{APNO}
+		   AND A.ROUTINGCD = #{PROC_CD}
+		   AND A.REV_NO	   = #{REV_NO}
+		   AND A.COMPANYCD = B.COMPANYCD(+)
+		   AND A.PLANT	   = B.PLANT(+)
+		   AND A.PARTNO	   = B.PARTNO(+)
+		   AND A.ROUTINGCD = B.ROUTINGCD(+)
+		   AND A.SEQ	   = B.SEQ(+)
+		 ORDER BY A.SEQ,A.COMPANYCD,A.PLANT,A.PARTNO,A.ROUTINGCD,A.REV_NO,A.SNO
+	</select>
+	
+	 <!-- 중점관리항목검사 기준서 조회 -->
+	<select id="getSearchStdList" parameterType="hashmap" resultType="hashmap">
+		SELECT ROWNUM AS RNO, B.*
+		FROM ( SELECT  A.COMPANYCD
+					  ,A.PLANT
+					  ,A.PARTNO AS APNO
+					  ,A.ROUTINGCD AS PROC_CD
+					  ,GET_ITGR_CODE_NAME(A.ROUTINGCD, #{LANG}) AS PROC_NM
+					  ,A.REV_NO
+					  ,A.KINDCD AS KIND_CD
+					  ,A.PARTNM AS APNONM
+					  ,TO_CHAR(TO_DATE(A.REV_DAY),'YYYY-MM-DD') AS REV_DAY
+					  ,(SELECT MAX(REV_NO) AS REV_NO 
+					  	  FROM Q_245
+					  	 WHERE A.COMPANYCD = COMPANYCD
+						   AND A.PLANT	   = PLANT
+						   AND A.PARTNO    = PARTNO
+						   AND A.ROUTINGCD = ROUTINGCD  ) AS MAX_REV_NO
+				  FROM Q_245 A  
+				 WHERE A.COMPANYCD = #{COMPANYCD}
+				 <if test="PLANT != null and PLANT != ''">
+				   AND A.PLANT  = #{PLANT}
+				 </if>
+				 <if test="APNO != null and APNO != ''">   
+				   AND A.PARTNO LIKE #{APNO}||'%'
+				 </if>
+				 <if test="KIND_CD != null and KIND_CD != ''">
+				   AND A.KINDCD LIKE #{KIND_CD}||'%'
+				 </if>
+				 <if test="PROC_CD != null and PROC_CD != ''">
+				   AND A.ROUTINGCD = #{PROC_CD}
+				 </if>	
+				 ORDER BY 1,2,7,3,4 ) B
+	</select>
+	
+	 <!-- 중점관리항목검사 계획 조회 -->
+	<select id="getSearchPlanList" parameterType="hashmap" resultType="hashmap">
+		SELECT ROWNUM AS RNO, B.*
+	    FROM (	SELECT A.COMPANYCD
+					  ,A.PLANT
+					  ,A.PARTNO AS APNO
+					  ,A.GUBUN AS PROC_CD
+					  ,PREMIER_SYS.GET_PLANT_NAME(A.COMPANYCD, A.PLANT) AS PLANTNM
+					  ,TO_CHAR(TO_DATE(A.SYMD),'YYYY-MM-DD') AS SYMD
+					  ,TO_CHAR(TO_DATE(A.EYMD),'YYYY-MM-DD') AS EYMD
+					  ,A.PARTNM AS APNONM
+					  ,GET_ITGR_CODE_NAME(A.GUBUN, #{LANG}) AS PROC_NM
+					  ,A.KINDCD AS KIND_CD
+					  ,A.USE_YN
+				  FROM Q_241 A
+				 WHERE A.COMPANYCD = #{COMPANYCD}
+				 <if test="PLANT != null and PLANT != ''">
+				   AND A.PLANT  = #{PLANT}
+				 </if>
+				 <if test="APNO != null and APNO != ''">   
+				   AND A.PARTNO LIKE #{APNO}||'%'
+				 </if>
+				 <if test="KIND_CD != null and KIND_CD != ''">
+				   AND A.KINDCD LIKE #{KIND_CD}||'%'
+				 </if>
+				 <if test="PROC_CD != null and PROC_CD != ''">
+				   AND A.GUBUN LIKE #{PROC_CD}||'%'
+				 </if>
+				 ORDER BY 1,2,3 ) B
+	</select>
+	
+	 <!-- 중점관리항목검사 실적 조회 -->
+	<select id="getSearchCmpltList" parameterType="hashmap" resultType="hashmap">
+		SELECT ROWNUM AS RNO, B.*
+		FROM (  SELECT A.COMPANYCD
+					  ,A.GUBUN AS PROC_CD
+					  ,A.KINDCD AS KIND_CD
+					  ,A.PLANT
+					  ,PREMIER_SYS.GET_PLANT_NAME(A.COMPANYCD, A.PLANT) AS PLANTNM
+					  ,A.PARTNO AS APNO
+					  ,A.PARTNM AS APNONM
+					  ,GET_ITGR_CODE_NAME(A.GUBUN, #{LANG}) AS PROC_NM
+					  ,MAX(DECODE(C.RNUM,1,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D1
+					  ,MAX(DECODE(C.RNUM,2,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D2
+					  ,MAX(DECODE(C.RNUM,3,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D3
+					  ,MAX(DECODE(C.RNUM,4,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D4
+					  ,MAX(DECODE(C.RNUM,5,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D5
+					  ,MAX(DECODE(C.RNUM,6,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D6
+					  ,MAX(DECODE(C.RNUM,7,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D7
+					  ,MAX(DECODE(C.RNUM,8,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D8
+					  ,MAX(DECODE(C.RNUM,9,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D9
+					  ,MAX(DECODE(C.RNUM,10,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D10
+					  ,MAX(DECODE(C.RNUM,11,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D11
+					  ,MAX(DECODE(C.RNUM,12,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D12
+					  ,MAX(DECODE(C.RNUM,13,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D13
+					  ,MAX(DECODE(C.RNUM,14,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D14
+					  ,MAX(DECODE(C.RNUM,15,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D15
+					  ,MAX(DECODE(C.RNUM,16,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D16
+					  ,MAX(DECODE(C.RNUM,17,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D17
+					  ,MAX(DECODE(C.RNUM,18,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D18
+					  ,MAX(DECODE(C.RNUM,19,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D19
+					  ,MAX(DECODE(C.RNUM,20,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D20
+					  ,MAX(DECODE(C.RNUM,21,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D21
+					  ,MAX(DECODE(C.RNUM,22,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D22
+					  ,MAX(DECODE(C.RNUM,23,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D23
+					  ,MAX(DECODE(C.RNUM,24,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D24
+					  ,MAX(DECODE(C.RNUM,25,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D25
+					  ,MAX(DECODE(C.RNUM,26,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D26
+					  ,MAX(DECODE(C.RNUM,27,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D27
+					  ,MAX(DECODE(C.RNUM,28,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D28
+					  ,MAX(DECODE(C.RNUM,29,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D29
+					  ,MAX(DECODE(C.RNUM,30,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END, 
+								  NULL)) D30
+					  ,MAX(DECODE(C.RNUM,31,CASE WHEN C.DAYS BETWEEN A.SYMD AND A.EYMD
+								                THEN CASE WHEN C.W_DAY NOT IN (1,7) 
+								                          THEN CASE WHEN C.DAYS = B.REPORT_DAY   
+								                                    THEN DECODE(B.AP_USER,NULL,DECODE(B.REPORT_DAY, NULL, '1', '2'),DECODE(B.JUDGE,'0000001757','3','4'))
+								                                    ELSE '1' END
+								                          ELSE '0' END      
+								                ELSE NULL END,
+								  NULL)) D31
+					  ,TO_CHAR(TO_DATE(A.SYMD),'YYYY-MM-DD') AS SYMD
+					  ,TO_CHAR(TO_DATE(A.EYMD),'YYYY-MM-DD') AS EYMD
+					  ,MAX(B.RMK) AS RMK
+					  ,(SELECT MAX(D.REV_NO) AS MAX_REV_NO
+						  FROM Q_245 D  
+						 WHERE D.COMPANYCD = A.COMPANYCD
+						   AND D.PLANT	   = A.PLANT
+						   AND D.PARTNO	   = A.PARTNO
+						   AND D.ROUTINGCD = A.GUBUN) AS REV_NO
+					  ,#{YYMM} AS YYMM
+				  FROM Q_241 A, 
+					   (SELECT A.Q_242_SEQ,A.COMPANYCD,A.PLANT,A.GUBUN,A.PARTNO,A.REPORT_DAY,A.LOTNO1,A.LOTNO2,A.RMK,A.JUDGE,A.AP_USER,
+							   B.SEQ, B.X1, B.X2
+						  FROM Q_242 A, Q_243 B
+						 WHERE A.COMPANYCD = #{COMPANYCD}
+						   AND A.PLANT  = #{PLANT}
+						 <if test="APNO != null and APNO != ''">
+						   AND A.PARTNO LIKE #{APNO}||'%'
+						 </if>
+						 <if test="PROC_CD != null and PROC_CD != ''">
+						   AND A.GUBUN LIKE #{PROC_CD}||'%'
+						 </if>
+						 AND A.REPORT_DAY LIKE #{YYMM}||'%'
+						 AND A.Q_242_SEQ = B.Q_242_SEQ(+)
+						 AND A.COMPANYCD = B.COMPANYCD(+)
+						 AND A.PLANT = B.PLANT(+)
+						 AND A.GUBUN = B.ROUTINGCD(+)
+						 AND A.PARTNO = B.PARTNO(+) ) B,
+					   <!-- 당월 요일 select -->
+					   (SELECT ROWNUM AS RNUM,
+							   TO_CHAR(MONTHS + LEVEL-1,'YYYYMMDD') AS DAYS,
+							   TO_CHAR(MONTHS + LEVEL-1,'d') AS W_DAY
+						  FROM (SELECT TO_DATE(#{YYMM},'YYYYMM') MONTHS FROM DUAL)
+<!-- 						 WHERE TO_CHAR(MONTHS + LEVEL-1,'d') NOT IN (1,7) 토요일/일요일 -->
+					   CONNECT BY MONTHS + LEVEL-1 <![CDATA[<=]]> LAST_DAY(MONTHS)) C
+				 WHERE A.COMPANYCD = #{COMPANYCD}
+				   AND A.PLANT  = #{PLANT}
+				   AND A.USE_YN = 'Y'
+				   AND #{YYMM} BETWEEN SUBSTR(A.SYMD, 0, 6) AND SUBSTR(A.EYMD, 0, 6)
+				 <if test="APNO != null and APNO != ''">
+				   AND A.PARTNO LIKE #{APNO}||'%'
+				 </if>
+				 <if test="KIND_CD != null and KIND_CD != ''">
+				   AND A.KINDCD LIKE #{KIND_CD}||'%'
+				 </if>
+				 <if test="PROC_CD != null and PROC_CD != ''">
+				   AND A.GUBUN LIKE #{PROC_CD}||'%'
+				 </if>
+				   AND A.COMPANYCD = B.COMPANYCD(+)
+				   AND A.PLANT  = B.PLANT(+)
+				   AND A.PARTNO = B.PARTNO(+)
+				   AND A.GUBUN  = B.GUBUN(+)
+				   AND B.REPORT_DAY(+) BETWEEN A.SYMD AND A.EYMD
+				   AND C.DAYS BETWEEN A.SYMD AND A.EYMD
+				 GROUP BY A.COMPANYCD
+						 ,A.PLANT
+						 ,A.GUBUN
+						 ,A.PARTNO
+						 ,A.KINDCD
+						 ,A.PARTNM
+						 ,A.SYMD
+						 ,A.EYMD
+				 ORDER BY 1,2,4,3,6 ) B
+	</select>
+
+	<!-- 중점관리항목검사 계획 저장 -->
+	<update id="savePlanRegistInfo" parameterType="json">	 
+		MERGE INTO Q_241 A USING(
+	    SELECT   #{COMPANYCD} AS COMPANYCD
+				,#{PROC_CD}   AS GUBUN
+				,#{PLANT}     AS PLANT
+				,#{APNO}      AS APNO
+				,#{APNONM}    AS APNONM
+				,TO_CHAR(TO_DATE(#{SYMD},'YYYY-MM-DD'), 'YYYYMMDD') AS SYMD
+				,TO_CHAR(TO_DATE(#{EYMD},'YYYY-MM-DD'), 'YYYYMMDD') AS EYMD
+				,#{KIND_CD}   AS KIND_CD
+				,#{ACCNO}     AS ACCNO 
+	      FROM DUAL) D
+		ON (A.COMPANYCD  = D.COMPANYCD
+			AND A.GUBUN  = D.GUBUN
+			AND A.PARTNO = D.APNO
+			AND A.PLANT  = D.PLANT)
+		WHEN MATCHED THEN
+		    UPDATE SET   A.KINDCD          = D.KIND_CD
+						,A.SYMD            = D.SYMD
+						,A.EYMD            = D.EYMD
+						,A.PARTNM          = D.APNONM
+						,A.LOGIN_COMPANYCD = D.COMPANYCD
+						,A.LOGIN_ID        = D.ACCNO
+						,A.LOGIN_YMD       = SYSDATE
+		WHEN NOT MATCHED THEN
+		    INSERT (  A.COMPANYCD
+					, A.GUBUN
+					, A.PLANT
+					, A.PARTNO
+					, A.PARTNM
+					, A.SYMD
+					, A.EYMD
+					, A.KINDCD
+					, A.USE_YN
+					, A.LOGIN_COMPANYCD
+					, A.LOGIN_ID  
+					, A.LOGIN_YMD
+		    		)
+		    VALUES (  D.COMPANYCD
+					, D.GUBUN
+					, D.PLANT
+					, D.APNO
+					, D.APNONM
+					, D.SYMD
+					, D.EYMD
+					, D.KIND_CD
+					, 'Y'
+		    		, D.COMPANYCD
+		    		, D.ACCNO
+		    		, SYSDATE
+		    )
+	</update> 
+
+	<!-- 중점관리항목검사 기준서 저장 -->
+	<update id="saveStdRegistInfo" parameterType="json">	 
+		MERGE INTO Q_245 A USING(
+	    SELECT   #{COMPANYCD} AS COMPANYCD
+	    		,#{PLANT}     AS PLANT
+				,#{APNO}      AS APNO
+				,#{PROC_CD}	  AS ROUTINGCD   
+				,#{REV_NO}    AS REV_NO
+				,TO_CHAR(TO_DATE(#{REV_DAY},'YYYY-MM-DD'), 'YYYYMMDD') AS REV_DAY
+				,#{APNONM}    AS APNONM
+				,#{KIND_CD}   AS KIND_CD
+				,#{ACCNO}     AS ACCNO 
+	      FROM DUAL) D
+		ON (A.COMPANYCD		= D.COMPANYCD
+			AND A.PLANT		= D.PLANT
+			AND A.PARTNO	= D.APNO
+			AND A.ROUTINGCD = D.ROUTINGCD
+			AND A.REV_NO	= D.REV_NO)
+		WHEN MATCHED THEN
+		    UPDATE SET   A.REV_DAY         = D.REV_DAY   
+						,A.PARTNM          = D.APNONM     
+						,A.KINDCD          = D.KIND_CD      
+						,A.LOGIN_COMPANYCD = D.COMPANYCD
+						,A.LOGIN_ID        = D.ACCNO   
+						,A.LOGIN_YMD       = SYSDATE    
+		WHEN NOT MATCHED THEN
+		    INSERT (  A.COMPANYCD
+					, A.PLANT
+					, A.PARTNO
+					, A.ROUTINGCD
+					, A.REV_NO
+					, A.REV_DAY
+					, A.PARTNM 
+					, A.KINDCD
+					, A.LOGIN_COMPANYCD
+					, A.LOGIN_ID  
+					, A.LOGIN_YMD
+		    		)
+		    VALUES (  D.COMPANYCD
+					, D.PLANT    
+					, D.APNO     
+					, D.ROUTINGCD
+					, D.REV_NO
+					, D.REV_DAY
+					, D.APNONM 
+					, D.KIND_CD 
+		    		, D.COMPANYCD
+		    		, D.ACCNO
+		    		, SYSDATE
+		    )
+	</update> 
+		
+	<!-- 중점관리항목검사 실적 저장 -->
+	<update id="saveCmpltRegistInfo" parameterType="hashmap">
+       	<selectKey resultType="String" keyProperty="SEQ" order="BEFORE">
+			<choose>
+				<when test="SEQ == '' or SEQ == null">
+					SELECT SEQ_Q_242.NEXTVAL FROM DUAL
+				</when>
+				<otherwise>
+					SELECT #{SEQ} FROM DUAL
+				</otherwise>
+			</choose> 
+	    </selectKey>
+		MERGE INTO Q_242 A USING(
+	    SELECT  #{SEQ} AS SEQ
+	           ,#{COMPANYCD} AS COMPANYCD
+               ,#{PLANT}	 AS PLANT
+               ,#{APNO}		 AS PARTNO
+               ,#{PROC_CD}	 AS GUBUN
+               ,TO_CHAR(TO_DATE(#{REPORT_DAY},'YYYY-MM-DD'), 'YYYYMMDD') AS REPORT_DAY
+               ,#{EXAM_USER} AS EXAM_USER
+               ,#{RV_USER}	 AS RV_USER
+               ,#{AP_USER}	 AS AP_USER
+               ,#{JUDGE}	 AS JUDGE
+               ,#{LOTNO1}	 AS LOTNO1
+	           ,#{LOTNO2}	 AS LOTNO2
+	           ,#{RMK}		 AS RMK
+	           ,#{ACCNO}	 AS ACCNO 
+	      FROM DUAL) D
+		ON (	A.Q_242_SEQ  = D.SEQ
+			AND A.COMPANYCD  = D.COMPANYCD
+			AND A.PLANT      = D.PLANT
+			AND A.PARTNO     = D.PARTNO
+			AND A.GUBUN      = D.GUBUN
+			AND A.REPORT_DAY = D.REPORT_DAY
+		   )
+		WHEN MATCHED THEN
+		    UPDATE SET A.EXAM_USER       = D.EXAM_USER,
+					   A.RV_USER         = D.RV_USER,
+					   A.AP_USER         = D.AP_USER,
+		    		   A.JUDGE           = D.JUDGE,
+		    		   A.LOTNO1          = D.LOTNO1,
+		    		   A.LOTNO2          = D.LOTNO2,
+		    		   A.RMK             = D.RMK,
+		    		   A.LOGIN_COMPANYCD = D.COMPANYCD,
+		    		   A.LOGIN_ID        = D.ACCNO,
+		    		   A.LOGIN_YMD       = SYSDATE
+		WHEN NOT MATCHED THEN
+		    INSERT (  A.Q_242_SEQ
+		    		, A.COMPANYCD
+					, A.PLANT
+					, A.PARTNO
+					, A.REPORT_DAY
+					, A.GUBUN
+					, A.EXAM_USER
+					, A.RV_USER
+					, A.AP_USER
+					, A.JUDGE
+					, A.LOTNO1
+					, A.LOTNO2
+					, A.RMK
+					, A.LOGIN_COMPANYCD
+					, A.LOGIN_ID  
+					, A.LOGIN_YMD 
+		    		)
+		    VALUES (  D.SEQ
+		    		, D.COMPANYCD
+		    		, D.PLANT
+		    		, D.PARTNO
+		    		, D.REPORT_DAY 
+		    		, D.GUBUN
+		    		, D.EXAM_USER
+		    		, D.RV_USER
+		    		, D.AP_USER
+		    		, D.JUDGE
+		    		, D.LOTNO1
+		    		, D.LOTNO2
+		    		, D.RMK    
+		    		, D.COMPANYCD
+		    		, D.ACCNO
+		    		, SYSDATE
+		    )
+	</update> 
+	
+	<!-- 검사항목 저장 -->
+	<update id="insertStdItemInfo" parameterType="json">
+	    <selectKey resultType="String" keyProperty="SEQ" order="BEFORE">
+			<choose>
+				<when test="SEQ == '' or SEQ == null">
+					SELECT NVL(MAX(A.SEQ), 0) + 1 AS SEQ
+					  FROM Q_246 A
+					 WHERE A.COMPANYCD = #{COMPANYCD}
+					   AND A.PLANT     = #{PLANT}
+					   AND A.PARTNO	   = #{APNO}
+					   AND A.ROUTINGCD = #{PROC_CD}
+					   AND A.REV_NO	   = #{REV_NO}
+				</when>
+				<otherwise>
+					SELECT #{SEQ} FROM DUAL
+				</otherwise>
+			</choose> 
+	    </selectKey>
+		MERGE INTO Q_246 A USING(
+		 SELECT  #{COMPANYCD}	 AS COMPANYCD
+				,#{PLANT}		 AS PLANT
+				,#{APNO}		 AS APNO
+				,#{PROC_CD}		 AS ROUTINGCD
+				,#{REV_NO}		 AS REV_NO
+				,#{SEQ}			 AS SEQ
+				,#{SNO}			 AS SNO
+				,#{INSPECT_ITEM} AS INSPECT_ITEM
+				,#{INSPECT_SPEC} AS INSPECT_SPEC
+				,#{INSPECT_TOOL} AS INSPECT_TOOL
+				,#{INSPECT_TERM} AS INSPECT_TERM
+				,#{INSPECT_CNT}  AS INSPECT_CNT
+				,#{SPEC_MAX}	 AS SPEC_MAX
+				,#{SPEC_MIN}	 AS SPEC_MIN
+				,#{MGT_SPEC_MAX} AS MGT_SPEC_MAX
+				,#{MGT_SPEC_MIN} AS MGT_SPEC_MIN
+				,#{ACCNO}		 AS ACCNO
+		 FROM DUAL
+	      ) D
+		ON (A.COMPANYCD		= D.COMPANYCD
+			AND A.PLANT		= D.PLANT
+			AND A.PARTNO	= D.APNO
+			AND A.ROUTINGCD = D.ROUTINGCD
+			AND A.REV_NO	= D.REV_NO
+			AND A.SEQ 		= D.SEQ)
+		WHEN MATCHED THEN
+		    UPDATE SET 	A.SNO			  = D.SNO,
+			    		A.INSPECT_ITEM	  = D.INSPECT_ITEM,
+		    			A.INSPECT_SPEC	  = D.INSPECT_SPEC,
+			    		A.INSPECT_TOOL	  = D.INSPECT_TOOL,
+		    			A.INSPECT_TERM	  = D.INSPECT_TERM,
+			    		A.INSPECT_CNT	  = D.INSPECT_CNT,
+		    			A.SPEC_MIN		  = D.SPEC_MIN,
+			    		A.SPEC_MAX		  = D.SPEC_MAX,
+		    			A.MGT_SPEC_MIN	  = D.MGT_SPEC_MIN,
+			    		A.MGT_SPEC_MAX	  = D.MGT_SPEC_MAX,
+		    			A.LOGIN_COMPANYCD = D.COMPANYCD,
+			    		A.LOGIN_ID        = D.ACCNO,
+			    		A.LOGIN_YMD		  = SYSDATE
+		WHEN NOT MATCHED THEN
+		    INSERT ( A.COMPANYCD 
+					,A.PLANT
+					,A.PARTNO	
+					,A.ROUTINGCD 
+					,A.REV_NO	
+					,A.SEQ
+					,A.SNO
+					,A.INSPECT_ITEM
+					,A.INSPECT_SPEC
+					,A.INSPECT_TOOL
+					,A.INSPECT_TERM
+					,A.INSPECT_CNT
+					,A.SPEC_MIN
+					,A.SPEC_MAX
+					,A.MGT_SPEC_MIN
+					,A.MGT_SPEC_MAX
+		    		,A.LOGIN_COMPANYCD 
+		    		,A.LOGIN_ID
+		    		,A.LOGIN_YMD
+		    		)
+		    VALUES ( D.COMPANYCD
+		    		,D.PLANT
+		    		,D.APNO
+		    		,D.ROUTINGCD
+		    		,D.REV_NO
+		    		,D.SEQ
+		    		,D.SNO
+		    		,D.INSPECT_ITEM	
+		    		,D.INSPECT_SPEC	
+		    		,D.INSPECT_TOOL	
+		    		,D.INSPECT_TERM	
+		    		,D.INSPECT_CNT
+		    		,D.SPEC_MIN
+		    		,D.SPEC_MAX
+		    		,D.MGT_SPEC_MIN
+		    		,D.MGT_SPEC_MAX
+		    		,D.COMPANYCD 
+		    		,D.ACCNO
+		    		,SYSDATE
+		    	   )
+	</update>
+	
+	<!-- 검사판정 저장 -->
+	<update id="insertEstiItemInfo" parameterType="json">
+	    <selectKey resultType="String" keyProperty="SUB_SEQ" order="BEFORE">
+			<choose>
+				<when test="SUB_SEQ == '' or SUB_SEQ == null">
+					SELECT NVL(MAX(A.SEQ), 0) + 1 AS SUB_SEQ
+					  FROM Q_243 A
+					 WHERE A.COMPANYCD  = #{COMPANYCD}
+					   AND A.PLANT      = #{PLANT}
+					   AND A.PARTNO	    = #{APNO}
+					   AND A.ROUTINGCD  = #{PROC_CD}
+					   AND A.REPORT_DAY	= #{REPORT_DAY}
+				</when>
+				<otherwise>
+					SELECT #{SUB_SEQ} FROM DUAL
+				</otherwise>
+			</choose> 
+	    </selectKey>
+		MERGE INTO Q_243 A USING(
+		 SELECT  #{COMPANYCD}	 AS COMPANYCD
+				,#{SEQ}			 AS SEQ
+				,#{PLANT}		 AS PLANT
+				,#{APNO}		 AS APNO
+				,#{PROC_CD}		 AS ROUTINGCD
+				,TO_CHAR(TO_DATE(#{REPORT_DAY},'YYYY-MM-DD'), 'YYYYMMDD') AS REPORT_DAY
+				,#{SUB_SEQ}		 AS SUB_SEQ
+				,#{REV_NO}		 AS REV_NO
+				,#{X1}			 AS X1
+				,#{X2}			 AS X2
+				,#{JUDGE}		 AS JUDGE
+				,#{ACCNO}		 AS ACCNO
+		 FROM DUAL
+	      ) D
+		ON (A.Q_242_SEQ = D.SEQ
+			AND A.SEQ 	= D.SUB_SEQ)
+		WHEN MATCHED THEN
+		    UPDATE SET 	A.REV_NO		  = D.REV_NO,
+						A.X1			  = D.X1,
+			    		A.X2			  = D.X2,
+		    			A.JUDGE			  = D.JUDGE,
+		    			A.LOGIN_COMPANYCD = D.COMPANYCD,
+			    		A.LOGIN_ID        = D.ACCNO,
+			    		A.LOGIN_YMD		  = SYSDATE
+		WHEN NOT MATCHED THEN
+		    INSERT ( A.Q_242_SEQ
+					,A.COMPANYCD 
+					,A.PLANT
+					,A.PARTNO	
+					,A.ROUTINGCD 
+					,A.REPORT_DAY	
+					,A.SEQ
+					,A.REV_NO
+					,A.X1
+					,A.X2
+					,A.JUDGE
+		    		,A.LOGIN_COMPANYCD 
+		    		,A.LOGIN_ID
+		    		,A.LOGIN_YMD
+		    		)
+		    VALUES ( D.SEQ
+		    		,D.COMPANYCD
+		    		,D.PLANT
+		    		,D.APNO
+		    		,D.ROUTINGCD
+		    		,D.REPORT_DAY
+		    		,D.SUB_SEQ
+		    		,D.REV_NO
+		    		,D.X1
+		    		,D.X2
+		    		,D.JUDGE
+		    		,D.COMPANYCD 
+		    		,D.ACCNO
+		    		,SYSDATE
+		    	   )	
+	</update>
+	
+	<!-- 중점관리항목검사 계획정보 삭제  -->
+	<delete id="deletePlanRegistInfo" parameterType="hashmap"> 
+		DELETE FROM Q_241 A
+		WHERE A.COMPANYCD = #{COMPANYCD}
+		  AND A.PLANT	  = #{PLANT}
+		  AND A.PARTNO	  = #{APNO}
+		  AND A.GUBUN	  = #{PROC_CD}
+<!-- 		  AND A.SYMD	  = TO_CHAR(TO_DATE(#{SYMD},'YYYY-MM-DD'), 'YYYYMMDD') -->
+	</delete>
+	                    
+	<!-- 중점관리항목검사 기준서 삭제  -->
+	<delete id="deleteStdRegistInfo" parameterType="hashmap"> 
+		DELETE FROM Q_245 A
+		WHERE A.COMPANYCD = #{COMPANYCD}
+		  AND A.PLANT	  = #{PLANT}
+		  AND A.PARTNO	  = #{APNO}
+		  AND A.ROUTINGCD = #{PROC_CD}
+		  AND A.REV_NO	  = #{REV_NO}
+	</delete>
+	                    
+	<!-- 중점관리항목검사 실적정보(갑) 삭제  -->
+	<delete id="deleteCmpltRegistInfo" parameterType="hashmap"> 
+		DELETE FROM Q_242 
+		WHERE	Q_242_SEQ = #{SEQ}
+	</delete>
+	
+	<!-- 중점관리항목검사 실적정보(을) 삭제  -->
+	<delete id="deleteCmpltSubRegistInfo" parameterType="hashmap"> 
+		DELETE FROM Q_243 
+		WHERE	Q_242_SEQ = #{SEQ}
+	</delete>
+		
+	<!-- 기준서 삭제 -->
+	<delete id="deleteAllStdItemInfo" parameterType="hashmap"> 
+		DELETE FROM Q_246 A
+		WHERE A.COMPANYCD = #{COMPANYCD}
+		  AND A.PLANT	  = #{PLANT}
+		  AND A.PARTNO	  = #{APNO}
+		  AND A.ROUTINGCD = #{PROC_CD}
+		  AND A.REV_NO	  = #{REV_NO}
+	</delete>
+
+</mapper>

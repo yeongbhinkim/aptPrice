@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dbvalley.premier.scm1.draw1060.mapper.Draw1060Mapper">
+	<select id="draw1060List" parameterType="json" resultType="json">
+	  select a.companycd, a.drawno, a.vendcd, b.apno, TO_CHAR(A.B_DATE, 'YYYY.MM.DD')AS B_DATE, b.eono, TO_CHAR(b.receipt_ymd, 'YYYY.MM.DD')AS receipt_ymd, 
+	  	a.eco_no, a.kindcd, a.login_id, TO_CHAR(a.SEND_DATE, 'YYYY.MM.DD')AS SEND_DATE, a.SEND_XUSER, b.APNO, b.APNM, b.RECEIPT_YMD, TO_CHAR(A.LOGIN_YMD, 'YYYY-MM-DD')AS LOGIN_YMD,        
+        (select  d.apnm from draw_master d where d.companycd = a.companycd and d.apno = b.apno  and d.eono = a.eco_no) AS file_name,
+        (select  d.apnm from draw_master d where d.companycd = a.companycd and d.apno = b.apno  and d.eono = a.eco_no) AS full_file_name,
+        GET_COM_COMPANY_INFO_VENDNM(#{COMPANYCD},a.VENDCD) as VENDNM
+	    from  draw_vendor a, draw_vendor_list b
+	    where a.companycd= b.companycd(+)
+	    and   a.drawno = b.drawno(+)
+	    and   a.b_date between to_date(replace(#{S_DATE},'-',''),'yyyymmdd') and to_date(replace(#{E_DATE},'-',''),'yyyymmdd')
+	    and   b.drawno is not null	    
+	    <if test="DRAWNO != null and DRAWNO != ''">	
+	    and   a.drawno like '%'||#{DRAWNO}||'%'
+	    </if>
+	    <if test="APNO != null and APNO != ''">	
+	    and   b.apno like '%'||#{APNO}||'%'
+	    </if>
+	    order by b_date desc
+     </select>
+
+</mapper>

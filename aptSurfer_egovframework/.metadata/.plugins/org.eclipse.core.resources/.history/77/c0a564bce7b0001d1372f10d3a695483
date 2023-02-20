@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.subconPrice.mapper.SubconPriceMapper">
+		<select id="subconPriceList" parameterType="json" resultType="json">
+			SELECT Z.*,ROWNUM RNO 
+			FROM (
+			SELECT A.*, B.MAKTX, SUBSTR(DATAB,0,4)||'.'||SUBSTR(DATAB,5,2)||'.'||SUBSTR(DATAB,7,2) as DATABJ,
+             	SUBSTR(DATBI,0,4)||'.'||SUBSTR(DATBI,5,2)||'.'||SUBSTR(DATBI,7,2) as DATBIJ
+       			FROM TSCM_SUBCON_PRICE A, TSCM_M_MATL_MST_IF B
+       			WHERE A.MATNR = B.MATNR(+)
+       			ORDER BY A.MATNR
+       		)Z
+       			WHERE Z.MATNR LIKE '%'||#{PARTNO}||'%'
+       			AND Z.SEQNO = #{SEQNO}
+       </select>
+</mapper>

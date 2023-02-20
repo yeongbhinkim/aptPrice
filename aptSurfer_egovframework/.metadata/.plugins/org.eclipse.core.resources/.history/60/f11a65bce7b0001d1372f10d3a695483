@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.weeklyPlan.mapper.WeeklyPlanMapper">
+
+	<select id="selectWeeklyPlanlist" parameterType="json"
+		resultType="json">
+		  SELECT ROWNUM RNO, A.*, B.MAKTX, B.BISMT
+		  ,PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP}, A.EKGRP,'',#{SYSLANG}) AS EKGRPNM
+		  ,PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP2}, A.LGPRO,'',#{SYSLANG}) AS LGPRONM
+	      FROM   TSCM_WEEKLY_PLAN A LEFT OUTER JOIN TSCM_M_MATL_MST_IF B
+	      ON     A.WERKS = B.WERKS
+	      AND    A.MATNR = B.MATNR
+	      WHERE  A.SEQNO = #{SEQNO}
+	      AND  A.MATNR LIKE '%'||#{MATNR}||'%'
+	</select>
+	
+</mapper>

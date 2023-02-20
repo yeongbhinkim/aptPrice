@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.dbvalley.premier.scm1.inbDelivDispUpN.mapper.InbDelivDispUpNMapper">
+
+	<select id="selectInbDelivDispUpNlist" parameterType="json"
+		resultType="json">
+		<![CDATA[	
+		SELECT ROWNUM RNO, R.*, 0 LFIMG, 10 LGORT_1
+		FROM (
+			SELECT A.*
+			, (ZPO_QTY3-QTY) AS ZQTY
+			, PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_LGORT}, A.LGORT,'',#{SYSLANG}) AS LGORTNM
+			, (ZPO_QTY2 + QTY) AS ZZQTY
+			, NVL(GET_GUIDE_LINE_N_JAVA( #{WERKS}, A.MATNR, #{LIFNR}, #{LFDAT_LA}, 'QMS_Q_615'),'P') AS GUIDELINE
+			, GET_GUIDE_LINE_N_JAVA( #{WERKS}, A.MATNR, #{LIFNR}, #{LFDAT_LA}, 'QMS_Q_615') AS GBN
+			, GET_GUIDELINE_NEW_NAME_JAVA(#{COMPANYCD}, A.MATNR, #{LIFNR}, #{LFDAT_LA}, 'QMS_Q_615') AS GUIDENAME
+			FROM(
+				SELECT A.*, B.WERKS, B.MAKTX, B.BISMT, ROUND(B.WESCH) WESCH
+					, NVL(( SELECT SUM(QTY) 
+							FROM TSCM_INB_DELIV_DISP_HISTORY
+							WHERE WERKS = #{WERKS}
+							AND LGORT = A.LGORT
+							AND LFDAT_LA = #{LFDAT_LA}
+							AND MATNR = A.MATNR
+							AND NVL(CHARG,'*') = NVL(A.CHARG,'*')
+							AND VBELN IS NULL
+							AND DELYN='N'),0) AS QTY ,B.MTART
+					FROM TSCM_INB_DELIV_DISP A LEFT OUTER JOIN TSCM_M_MATL_MST_IF B
+				ON A.MATNR = B.MATNR
+				AND B.WERKS = #{WERKS}
+				WHERE A.SEQNO = #{SEQNO}
+				AND  A.MATNR LIKE '%'||#{MATNR}||'%'
+				AND TRIM(B.BESKZ) <> 'E'
+			) A
+		   ORDER BY GUIDELINE, MATNR, LGORT, PSTYP_N
+		)R
+		]]>
+	</select>
+
+	<select id="selectInbDelivDispvIf" parameterType="json"
+		resultType="json">
+		SELECT A.*, B.MAKTX
+		FROM TSCM_INB_DELIV_DISP A LEFT OUTER JOIN TSCM_M_MATL_MST_IF B
+		ON A.MATNR = B.MATNR
+		WHERE A.SEQNO = #{QMS_SEQNO}
+		ORDER BY A.MATNR, A.LGORT, A.PSTYP_N
+	</select>
+
+	<select id="selectInbDelivDispvCreate" parameterType="json" resultType="json">
+	  SELECT ROWNUM RNO, A.*
+      FROM    TSCM_INB_DELIV_CREATE A   
+      WHERE   A.WERKS = #{WERKS}
+      AND     A.LGORT = DECODE(#{LGORT},'%',A.LGORT,#{LGORT})
+      AND     A.LIFNR = #{LIFNR}
+      AND     A.MATNR = NVL(#{MATNR},A.MATNR)
+      AND     A.FLAG IS NULL
+      AND     NOT EXISTS (SELECT 1 FROM TSCM_INB_PUR_SPEC_STCQTY 
+                          WHERE REPLACE(LFDAT,'-','') = A.LFDAT_LA
+                          AND VBELN = A.VBELN 
+                          AND MATNR = A.MATNR 
+                          AND LGORT = A.LGORT 
+                          AND LFIMG = A.LFIMG)
+      AND NVL(FLAG,'*') != 'N'
+      ORDER BY A.LFDAT_LA
+	</select>
+
+	<select id="selectMaxPseq" parameterType="json"
+		resultType="int">
+		SELECT NVL(MAX(PSEQNO),0)+1
+		FROM TSCM_PART_IDNTTY_LBL
+		WHERE CRDATE = #{LFDAT_LA}
+
+	</select>
+
+	<select id="selectMaxSeq" parameterType="json"
+		resultType="int">
+		SELECT NVL(MAX(SEQNO),0)+1
+		FROM TSCM_PART_IDNTTY_LBL
+		WHERE CRDATE = #{LFDAT_LA}
+		AND LIFNR = #{LIFNR}
+
+	</select>
+
+	<select id="selectGcntCnt" parameterType="json"
+		resultType="int">
+		SELECT MAX(GCNT)
+		FROM(
+			SELECT A.*,
+			DENSE_RANK() OVER (ORDER BY LFDAT_LA,LGORT,PSTYP_N DESC) GCNT
+			FROM TSCM_INB_DELIV_DISP_HISTORY A
+			WHERE A.QMS_SEQNO = #{QMS_SEQNO}
+		)
+	</select>
+
+	<select id="selectGcnt" parameterType="json" resultType="json">
+		SELECT	A.*,
+		DENSE_RANK() OVER (ORDER BY LFDAT_LA,LGORT,PSTYP_N DESC) GCNT
+		FROM TSCM_INB_DELIV_DISP_HISTORY A
+		WHERE A.QMS_SEQNO = #{QMS_SEQNO}
+	</select>
+
+	<select id="selectNullYN" parameterType="json"
+		resultType="json">
+		SELECT DECODE(WESCH,NULL,'Y','N') AS NULLYN
+		FROM TSCM_M_MATL_MST_IF
+		WHERE WERKS = #{WERKS}
+		AND MATNR = #{MATNR}
+	</select>
+
+	<select id="selectGcntList" parameterType="json"
+		resultType="json">
+		SELECT A.*,
+		DENSE_RANK() OVER (ORDER BY	LFDAT_LA,LGORT,PSTYP_N DESC) GCNT
+		FROM TSCM_INB_DELIV_DISP_HISTORY A
+		WHERE A.QMS_SEQNO = #{QMS_SEQNO}
+		AND A.NUM = #{NUM}
+	</select>
+
+	<select id="selectMatl" parameterType="json" resultType="json">
+		SELECT
+		(CASE WHEN (BESKZ||SOBSL) = 'F' THEN ''
+		ELSE CASE WHEN (BESKZ||SOBSL) =	'F10' THEN 'K'
+		ELSE CASE WHEN (BESKZ||SOBSL) = 'F30' THEN 'O'
+		ELSE ''
+		END END END	) KZKRI,
+		(CASE WHEN (BESKZ||SOBSL) = 'F30' THEN 'Y'	ELSE ''	END	) ITCAT, LGPBE
+		FROM TSCM_M_MATL_MST_IF
+		WHERE WERKS = #{WERKS}
+		AND MATNR = #{MATNR}
+
+	</select>
+
+	<select id="selectInbDelivDispUpNLotlist" parameterType="json"
+		resultType="json">
+
+		SELECT ROWNUM RNO, A.MATNR, A.LGORT , A.PSTYP_N , A.MEINS ,
+		SUBSTR(A.SEQNO,1,10) AS	SEQNO, A.CHARG
+		, PREMIER_SYS.GET_ITGR_MGT_CODE_NAME(#{CODE_SEQ_UP_LGORT}, A.LGORT,'',#{SYSLANG}) AS LGORTNM
+		FROM TSCM_INB_DELIV_DISP_HISTORY A
+		WHERE A.WERKS = #{WERKS}
+		AND A.LIFNR = #{LIFNR}
+		AND A.QMS_SEQNO = #{QMS_SEQNO}
+
+	</select>
+	
+	<update id="insertInbDelivDispHistory" parameterType="json">
+	
+		<selectKey resultType="Integer" keyProperty="SNO" order="BEFORE">
+            SELECT SCM_INB_DELIV_HIST_NO.NEXTVAL as SNO FROM DUAL
+        </selectKey>
+        
+		MERGE INTO
+		TSCM_INB_DELIV_DISP_HISTORY A
+		USING(
+			SELECT
+			#{SNO} AS SNO
+			, #{WERKS} AS WERKS
+			, #{LGORT} AS LGORT
+			, #{LIFNR} AS LIFNR
+			, #{LFDAT_LA} AS LFDAT_LA
+			, #{LFUHR_LA} AS LFUHR_LA
+			, #{MATNR} AS MATNR 
+			, #{CHARG} AS CHARG
+			, #{PSTYP_N} AS PSTYP_N
+			, #{LFIMG} AS QTY
+			, #{MEINS} AS MEINS
+			, #{GUIDELINE} AS GUIDELINE
+		FROM DUAL
+		)C
+		ON(
+			A.SNO = C.SNO
+		)
+		WHEN MATCHED THEN
+		UPDATE SET
+			A.LOGIN_YMD = sysdate
+		WHEN NOT MATCHED THEN
+		INSERT (
+			A.SNO, A.WERKS, A.LGORT,
+			A.LIFNR,A.LFDAT_LA, A.LFUHR_LA, A.MATNR, A.CHARG,
+			A.PSTYP_N, A.QTY,
+			A.MEINS, A.LOGIN_ID, A.LOGIN_YMD, A.QMS_SEQNO ,A.GUIDELINE
+		)VALUES (
+			C.SNO, C.WERKS, C.LGORT, C.LIFNR, C.LFDAT_LA, C.LFUHR_LA, C.MATNR,
+			C.CHARG,
+			C.PSTYP_N, C.QTY,
+			C.MEINS, #{LOGIN_ID}, sysdate, #{QMS_SEQNO} ,C.GUIDELINE
+		)
+	</update>
+
+	<insert id="insertM1120" parameterType="json">
+		<choose>
+			<when test='GUIDELINE == "P"'>
+				INSERT INTO M_1120
+				(COMPANYCD, TBLID, MANDT, MATNR,
+				SUBSEQ, ISDAT, LIFNR, MENGE, INSP_RSLT,
+				BAD_QTY, BULTYPE, ZWADAT,
+				CREATE_BY_, CREATE_DATE_ , BARCODE,
+				KINDCD,
+				 SNO, QMS_SEQNO, CHARG
+				)
+				VALUES (
+				#{COMPANYCD}, '검수입고처리', '100', #{MATNR}, '1', #{LFDAT_LA},
+				#{LIFNR}, #{LFIMG},
+				'A',
+				null, null, to_char(sysdate,'yyyymmdd'),
+				#{LOGIN_ID}, sysdate, #{INDEXSNO}||#{CHARG},
+				GET_KINDCD_BY_MATL(#{COMPANYCD},#{MATNR}),
+				 #{SNO}, #{QMS_SEQNO}, #{CHARG}
+				)
+			</when>
+			<otherwise>
+				INSERT INTO M_1120_ERR
+				(COMPANYCD, TBLID, MANDT,
+				MATNR,
+				SUBSEQ, ISDAT, LIFNR, MENGE, INSP_RSLT,
+				BAD_QTY, BULTYPE, ZWADAT,
+				CREATE_BY_, CREATE_DATE_ , BARCODE,
+				KINDCD, SNO, QMS_SEQNO, CHARG,
+				DESCR
+				) VALUES (
+				#{COMPANYCD}, '검수입고처리', '100',
+				#{MATNR}, '1',
+				#{LFDAT_LA}, #{LIFNR}, #{LFIMG}, 'A',
+				null, null,
+				to_char(sysdate,'yyyymmdd'), #{LOGIN_ID}, sysdate,
+				#{INDEXSNO}||#{CHARG},
+				GET_KINDCD_BY_MATL(#{COMPANYCD}, #{MATNR}),
+				#{SNO}, #{QMS_SEQNO}, #{CHARG},
+				replace(replace(substr(SQLERRM,1,100), chr(13)||chr(10), ''), '"',
+				'')
+				)
+			</otherwise>
+		</choose>
+	</insert>
+
+	<insert id="insertPartIdnttyLbl1" parameterType="json">
+		INSERT INTO TSCM_PART_IDNTTY_LBL(
+			BARCO, WERKS, MATNR, SEQNO, ISDAT, LIFNR, MENGE, KZKRI, ITCAT, PSEQNO, LGPBE, LIFNR_NM,
+			CRDATE, LOTNO, KCLOTNO, REMARK, LOGIN_YMD, LOGIN_ID, CHARG,II_DIV,MEINS, 
+			BOX_CNT, BOX_CNT_IN, BOX_CNT_REM, SNO, QMS_SEQNO, GUIDENM
+		)VALUES(
+			#{BARCO}, #{WERKS}, #{MATNR}, #{SEQ} ,to_char(sysdate,'yyyymmdd'),#{LIFNR},#{LFIMG},
+			#{KZKRI}, #{ITCAT}, #{PSEQ}, #{LGPBE}, PREMIER_SYS.GETCMPYNMBYCMPYSN_IF(#{LIFNR}),
+			#{LFDAT_LA}, SUBSTR(#{LFDAT_LA},3,6), #{KCLOTNO}, #{REMARK},
+			sysdate, #{LOGIN_ID}||'1', #{CHARG}, #{GUIDELINE},	#{MEINS},
+			#{BOX_CNT}, #{BOX_CNT_IN}, #{BOX_CNT_REM}, #{SNO}, #{QMS_SEQNO}, #{GUIDENM}
+		)
+	</insert>
+	
+	<insert id="insertPartIdnttyLbl2" parameterType="json">
+		INSERT INTO TSCM_PART_IDNTTY_LBL(
+			BARCO, WERKS, MATNR, SEQNO, ISDAT, LIFNR, MENGE, KZKRI, ITCAT, PSEQNO, LGPBE, LIFNR_NM,
+			CRDATE, LOTNO, KCLOTNO, REMARK, LOGIN_YMD, LOGIN_ID, CHARG,II_DIV,MEINS, 
+			BOX_CNT, BOX_CNT_IN, BOX_CNT_REM, SNO, QMS_SEQNO, GUIDENM
+		)VALUES(
+			#{BARCO},#{WERKS},#{MATNR},#{SEQ} ,to_char(sysdate,'yyyymmdd'),#{LIFNR},#{BOX_CNT_IN},
+			#{KZKRI},#{ITCAT},#{PSEQ},#{LGPBE},	PREMIER_SYS.GETCMPYNMBYCMPYSN_IF(#{LIFNR}),
+			#{LFDAT_LA}, SUBSTR(#{LFDAT_LA},3,6), #{KCLOTNO}, #{REMARK}, sysdate, #{LOGIN_ID}||'2',
+			#{CHARG}, #{GUIDELINE},	#{MEINS}, #{BOX_CNT}, #{BOX_CNT_IN}, #{BOX_CNT_REM}, #{SNO}, #{QMS_SEQNO}, #{GUIDENM}
+		)
+	</insert>
+	
+
+	<insert id="insertPartIdnttyLbl3" parameterType="json">
+		INSERT INTO TSCM_PART_IDNTTY_LBL(
+			BARCO, WERKS, MATNR, SEQNO, ISDAT, LIFNR, MENGE, KZKRI, ITCAT, PSEQNO, LGPBE, LIFNR_NM,
+			CRDATE, LOTNO, KCLOTNO, REMARK, LOGIN_YMD, LOGIN_ID, CHARG,II_DIV,MEINS, 
+			BOX_CNT, BOX_CNT_IN, BOX_CNT_REM, SNO, QMS_SEQNO, GUIDENM
+		)VALUES(
+			#{BARCO},#{WERKS},#{MATNR},#{SEQ} ,to_char(sysdate,'yyyymmdd'),#{LIFNR},#{BOX_CNT_REM},
+			#{KZKRI},#{ITCAT},#{PSEQ}, #{LGPBE}, PREMIER_SYS.GETCMPYNMBYCMPYSN_IF(#{LIFNR}),
+			#{LFDAT_LA}, SUBSTR(#{LFDAT_LA},3,6), #{KCLOTNO}, #{REMARK}, sysdate, #{LOGIN_ID}||'3',
+			#{CHARG}, #{GUIDELINE},	#{MEINS}, 1, #{BOX_CNT_REM}, 0,	#{SNO}, #{QMS_SEQNO}, #{GUIDENM}
+		)
+	</insert>
+
+	<insert id="insertPartIdnttyLblException" parameterType="json">
+		INSERT INTO	TSCM_PART_IDNTTY_LBL_LOG(
+			P1, P2, P3, P4, P5, P6,	LOGIN_ID, LOGIN_YMD)
+		VALUES( 
+			#{BARCO},#{SEQ_BARCO},#{SEQ},#{LIFNR},#{QMS_SEQNO},#{ERR_MSG},
+			#{LOGIN_ID}, sysdate)
+	</insert>
+
+	<insert id="insertPartIdnttyLblMesifException"	parameterType="json">
+		INSERT INTO TSCM_PART_IDNTTY_LBL_MESIF_LOG(
+			SEQNO, REMARK1, REMARK2, REMARK3,
+			REMARK4, REMARK5, LOGIN_YMD, LOGIN_ID)
+		VALUES(
+			#{QMS_SEQNO}, 'SAVE FAIL!!', replace(replace(#{ERR_MSG}, chr(13)||chr(10), ''), '"',
+			''), NULL, NULL, NULL, sysdate, #{LOGIN_ID})
+	</insert>
+
+	<update id="updateInbDelivDispHistoryNum" parameterType="json">
+	   UPDATE TSCM_INB_DELIV_DISP_HISTORY
+       SET    NUM = #{GCNT}
+       WHERE SNO = #{SNO}
+       AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+	<update id="updatePartInttyLblNum" parameterType="json">
+		 UPDATE  TSCM_PART_IDNTTY_LBL
+	     SET   NUM = #{GCNT} 
+	     WHERE SNO = #{SNO}
+	     AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+	<update id="updateM1120Num" parameterType="json">
+		UPDATE  M_1120
+	    SET      NUM = #{GCNT}
+	    WHERE SNO = #{SNO}
+	    AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+	
+	<update id="updateInbDelivDispHistorySeqno" parameterType="json">
+		UPDATE
+		TSCM_INB_DELIV_DISP_HISTORY
+		SET SEQNO =	LPAD(#{CNTSNO},10,0)||'-'||LPAD(#{j}*10,5,0)
+		WHERE SNO = #{SNO}
+		AND NUM = #{i}
+		AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+
+	<update id="updatePartInttyLblSeqno" parameterType="json">
+		UPDATE
+		TSCM_PART_IDNTTY_LBL
+		SET SCM_VBELN =
+		LPAD(#{CNTSNO},10,0)||'-'||LPAD(#{j}*10,5,0)
+		WHERE SNO = #{SNO}
+		AND NUM = #{i}
+		AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+
+	<update id="updateM1120Seqno" parameterType="json">
+		UPDATE M_1120
+		SET BARCODE = LPAD(#{CNTSNO},10,0)||'-'||LPAD(#{j}*10,5,0)
+		WHERE SNO = #{SNO}
+		AND NUM = #{i}
+		AND QMS_SEQNO = #{QMS_SEQNO}
+	</update>
+	
+	<select id="selectCntSno" parameterType="json"
+		resultType="int">
+		SELECT SCM_INB_DELIV_HIST_SEQNO.NEXTVAL as CNTSNO FROM DUAL
+	</select>
+	
+	
+	<select id="selectPartIdnttyLbl" parameterType="json"
+		resultType="json">
+		SELECT *
+		FROM TSCM_PART_IDNTTY_LBL 
+		WHERE CRDATE = #{LFDAT_LA}
+        and WERKS = #{WERKS}
+        and LIFNR = #{LIFNR}
+        and MATNR = #{MATNR}
+        and BARCO = #{BARCO}
+	</select>
+		
+	<update id="updateIsnull" parameterType="json">
+		 update  TSCM_M_MATL_MST_IF
+         set     wesch =#{BOX_CNT_IN}
+         where   werks = #{WERKS}
+         and     matnr = #{MATNR}
+	</update>
+
+</mapper>

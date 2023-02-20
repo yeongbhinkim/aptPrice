@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dbvalley.premier.scm1.monthlyPlan.mapper.MonthlyPlanMapper">
+	<select id="monthlyPlanList" parameterType="json" resultType="json">
+        SELECT  ROWNUM RNO, A.SPMON, A.WERKS, A.LIFNR, A.MATNR, A.CHARG, A.MEINS, A.EKGRP, A.PLN01, A.PLN02, A.PLN03, A.PLN04, A.PLN05, A.SEQNO, B.MAKTX, B.BISMT
+        FROM   TSCM_MONTHLY_PLAN A LEFT OUTER JOIN TSCM_M_MATL_MST_IF B
+        ON     A.WERKS = B.WERKS
+        AND    A.MATNR = B.MATNR
+        WHERE  A.SEQNO = #{SEQNO}
+        AND A.MATNR like #{MATNR}||'%'
+	</select>
+</mapper>
