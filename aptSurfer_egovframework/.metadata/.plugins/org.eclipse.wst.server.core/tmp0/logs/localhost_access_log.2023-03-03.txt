@@ -1,0 +1,11 @@
+127.0.0.1 - - [03/Mar/2023:12:13:50 +0900] "GET / HTTP/1.1" 200 137
+127.0.0.1 - - [03/Mar/2023:12:13:54 +0900] "GET / HTTP/1.1" 200 137
+127.0.0.1 - - [03/Mar/2023:12:13:55 +0900] "GET /homeView.do HTTP/1.1" 200 6427
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /css/page/home-body.css HTTP/1.1" 200 182
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /css/page/home-page-style.css HTTP/1.1" 200 3109
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /js/homeJs/searchBar.js HTTP/1.1" 304 -
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /img/logo/logo-white.png HTTP/1.1" 200 4777
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /img/icon/icon-search.png HTTP/1.1" 200 68805
+127.0.0.1 - - [03/Mar/2023:12:13:56 +0900] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [03/Mar/2023:12:13:58 +0900] "POST /getRegionCounty.json HTTP/1.1" 200 382
+127.0.0.1 - - [03/Mar/2023:12:14:00 +0900] "POST /getRegionDistricts.json HTTP/1.1" 200 1292

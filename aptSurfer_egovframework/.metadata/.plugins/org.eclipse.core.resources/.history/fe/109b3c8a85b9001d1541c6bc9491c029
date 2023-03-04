@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper	namespace="egovframework.aptSurfer.main.mapper.MainMapper">
+
+	<!-- APT 조건조회 -->
+	<select id="selectMyHomePriceList" parameterType="json" resultType="json">
+		 SELECT * FROM (
+		 SELECT A.* 
+		  ,ROW_NUMBER() OVER (ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC) NO 
+		  ,GET_CONTRACT(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS CONTRACT 
+		  ,GET_TRANSACTIONCOUNT_LIST(A.CITY,A.STREET,A.BON_BUN,A.BU_BUN,A.DAN_GI_MYEONG,A.SQUARE_METER,A.LAYER,A.CONSTRUCTION_DATE) AS TRANSACTIONCOUNTLIST 
+		  FROM( 
+		   SELECT  
+		  ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  
+		  ,A.* FROM APT A 
+		   WHERE 1 = 1
+		   AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(#{CONTRACTDATE},'-','') AND REPLACE(#{CONTRACTDATETO},'-','') 
+		   AND CITY  LIKE '%'||REPLACE(#{SEARCHSIDOCD},'전체','')||'%'||'%'||REPLACE(#{SEARCHGUGUNCD},'전체','')||'%'||'%'||REPLACE(#{SEARCHDONGCD},'전체','')||'%' 
+		   AND TO_NUMBER(SUBSTR(SQUARE_METER, 1, INSTR(SQUARE_METER, '.') - 1))  BETWEEN  TO_NUMBER(#{SEARCHAREAVALUE})  AND  TO_NUMBER(#{SEARCHAREAVALUETO})
+		   AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(#{SEARCHFROMAMOUNT}, ','))  AND  TO_NUMBER(REPLACE(#{SEARCHTOAMNOUNT}, ','))
+		   ORDER BY CONTRACT_DATE DESC, LPAD(CONTRACT_DAY, 2, '0') DESC 
+		 ) A 
+		 WHERE A.RN= 1 
+		 ) 
+		 WHERE NO BETWEEN #{STARTREC} AND #{ENDREC} 
+	</select>
+	
+	<!-- 전체건수 조회 -->
+	<select id="totalCount" parameterType="json" resultType="int">
+  	SELECT count(*) as COUNT FROM( 
+       SELECT 
+       ROW_NUMBER() OVER (PARTITION BY A.CITY ,A.STREET ,A.BON_BUN ,A.BU_BUN ,A.DAN_GI_MYEONG ,A.SQUARE_METER ,A.LAYER ,A.CONSTRUCTION_DATE ORDER BY A.CONTRACT_DATE DESC) AS RN  
+       FROM APT A 
+       WHERE 1 = 1
+       AND CONTRACT_DATE||LPAD(CONTRACT_DAY, 2, '0') BETWEEN REPLACE(#{CONTRACTDATE},'-','') AND REPLACE(#{CONTRACTDATETO},'-','') 
+       AND CITY  LIKE '%'||REPLACE(#{SEARCHSIDOCD},'전체','')||'%'||'%'||REPLACE(#{SEARCHGUGUNCD},'전체','')||'%'||'%'||REPLACE(#{SEARCHDONGCD},'전체','')||'%' 
+       AND TO_NUMBER(SUBSTR(SQUARE_METER, 1, INSTR(SQUARE_METER, '.') - 1))  BETWEEN  TO_NUMBER(#{SEARCHAREAVALUE})  AND  TO_NUMBER(#{SEARCHAREAVALUETO})
+       AND  TO_NUMBER(REPLACE(AMOUNT, ',')) BETWEEN  TO_NUMBER(REPLACE(#{SEARCHFROMAMOUNT}, ','))  AND  TO_NUMBER(REPLACE(#{SEARCHTOAMNOUNT}, ','))
+     ) A 
+     WHERE A.RN= 1 
+	</select>
+	
+	<!-- APT 상세조회 폼 -->
+	<select id="selectRegionDistricts" parameterType="json" resultType="json">
+		SELECT * FROM APT
+		WHERE APT_ID = #{APT_ID} 
+	</select>
+	
+	<!-- APT 상세조회 리스트 -->
+	<select id="selectRegionDistricts" parameterType="json" resultType="json">
+		SELECT A.* 
+		FROM APT A, (SELECT * 
+		             FROM APT B 
+		             WHERE APT_ID = #{APT_ID} ) B 
+		WHERE 1 = 1 
+		AND A.CITY LIKE '%'||B.CITY||'%' 
+		AND A.STREET LIKE '%'||B.STREET||'%' 
+		AND A.BON_BUN LIKE '%'||B.BON_BUN||'%' 
+		AND A.BU_BUN LIKE '%'||B.BU_BUN||'%' 
+		AND A.DAN_GI_MYEONG LIKE '%'||B.DAN_GI_MYEONG||'%' 
+		AND A.SQUARE_METER LIKE '%'||B.SQUARE_METER||'%' 
+		AND A.LAYER LIKE '%'||B.LAYER||'%' 
+		AND A.CONSTRUCTION_DATE LIKE '%'||B.CONSTRUCTION_DATE||'%' 
+		ORDER BY A.CONTRACT_DATE||LPAD(A.CONTRACT_DAY, 2, '0') DESC 
+	</select>
+	
+	<!-- APT 상세조회 ScatterChart -->
+	<select id="selectRegionDistricts" parameterType="json" resultType="json">
+		SELECT A.CONTRACT_DATE||LPAD(A.CONTRACT_DAY, 2, '0') as x , TRIM(REPLACE(A.AMOUNT, ',', '')) as y  
+		FROM APT A, (SELECT * 
+		             FROM APT B 
+		             WHERE APT_ID = #{APT_ID} ) B 
+		WHERE 1 = 1 
+		AND A.CITY LIKE '%'||B.CITY||'%' 
+		AND A.STREET LIKE '%'||B.STREET||'%' 
+		AND A.BON_BUN LIKE '%'||B.BON_BUN||'%' 
+		AND A.BU_BUN LIKE '%'||B.BU_BUN||'%' 
+		AND A.DAN_GI_MYEONG LIKE '%'||B.DAN_GI_MYEONG||'%' 
+		AND A.SQUARE_METER LIKE '%'||B.SQUARE_METER||'%' 
+		AND A.LAYER LIKE '%'||B.LAYER||'%' 
+		AND A.CONSTRUCTION_DATE LIKE '%'||B.CONSTRUCTION_DATE||'%' 
+	</select>
+	
+	<!--  조회 -->
+	<select id="selectRegionDistricts" parameterType="json" resultType="json">
+	
+	</select>
+
+
+</mapper>

@@ -1,5 +1,7 @@
 package egovframework.aptSurfer.home.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.ui.ModelMap;
@@ -35,21 +37,13 @@ public interface HomeService {
 	public String homeView(HttpServletRequest request, ModelMap model) throws Exception;
 
 	/**
-	 * 시도 조회
-	 * 
-	 * @param param
-	 * @return
-	 * @throws Exception
-	 */
-	public JSONObject getRegionCity(JSONObject param) throws Exception;
-	/**
 	 * 시군구 조회
 	 * 
 	 * @param param
 	 * @return
 	 * @throws Exception
 	 */
-	public JSONObject getRegionCounty(JSONObject param) throws Exception;
+	public List<JSONObject> getRegionCounty(JSONObject param) throws Exception;
 	/**
 	 * 읍면동 조회
 	 * 
@@ -57,6 +51,6 @@ public interface HomeService {
 	 * @return
 	 * @throws Exception
 	 */
-	public JSONObject getRegionDistricts(JSONObject param) throws Exception;
+	public List<JSONObject> getRegionDistricts(JSONObject param) throws Exception;
 	
 }

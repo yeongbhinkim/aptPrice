@@ -1,43 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="ko"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="ko"/>
-			<item value="message"/>
-			<item value="image"/>
-			<item value="com"/>
-			<item value="JsonGenerator"/>
-			<item value="/WEB-INF/jsp/"/>
-			<item value="mvc:annotation-driven"/>
-			<item value="egovframework.aptSurfer"/>
-			<item value="RequestMappingHandlerAdapter"/>
-			<item value="web."/>
-			<item value="web"/>
-			<item value="dispatcher"/>
-			<item value="encodingFilter"/>
-			<item value="example"/>
-			<item value="properties"/>
+			<item value="// TODO Auto-generated method stub"/>
+			<item value="#{}"/>
+			<item value="?"/>
+			<item value="commonService"/>
+			<item value="search_f"/>
+			<item value="searchBtn"/>
+			<item value=".data"/>
+			<item value=".json"/>
+			<item value="cbSuccess"/>
+			<item value="cbError"/>
+			<item value="JSONObject"/>
+			<item value="url"/>
+			<item value="ApiResult"/>
+			<item value="param"/>
+			<item value="getCookie"/>
 		</list>
 		<list key="replacehistory">
-			<item value="aptSurfer"/>
-			<item value="egovframework.aptSurfer"/>
-			<item value="comn"/>
 			<item value=""/>
-			<item value="common"/>
-			<item value="commonService"/>
+			<item value="#{}"/>
+			<item value="mainService"/>
+			<item value="cbSuccess"/>
+			<item value="param"/>
+			<item value="url"/>
+			<item value="searchSidoCd"/>
+			<item value="searchGugunCd"/>
+			<item value="egovframework.aptSurfer.cmmn"/>
+			<item value="egovframework.aptSurfer"/>
+			<item value="egovframework.aptSurfer.comm"/>
+			<item value="comm"/>
+			<item value="com.egovframework.aptSurfer"/>
+			<item value="aptSurfer"/>
+			<item value="comn"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="47"/>
-		<item key="DIALOG_Y_ORIGIN" value="1142"/>
-		<item key="DIALOG_WIDTH" value="393"/>
-		<item key="DIALOG_HEIGHT" value="389"/>
-		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>
+		<item key="DIALOG_X_ORIGIN" value="40"/>
+		<item key="DIALOG_Y_ORIGIN" value="590"/>
+		<item key="DIALOG_WIDTH" value="288"/>
+		<item key="DIALOG_HEIGHT" value="391"/>
+		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>
 	</section>
 </section>

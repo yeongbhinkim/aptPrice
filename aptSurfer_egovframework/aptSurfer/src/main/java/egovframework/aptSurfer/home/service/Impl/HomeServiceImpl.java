@@ -1,4 +1,6 @@
-package egovframework.aptSurfer.home.service.Impl;
+package egovframework.aptSurfer.home.service.impl;
+
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,7 +31,7 @@ public class HomeServiceImpl implements HomeService {
 
 
 	// 맵퍼
-	@Autowired(required = false)
+	@Autowired
 	private HomeMapper homeMapper;
 
 	/**
@@ -38,30 +40,25 @@ public class HomeServiceImpl implements HomeService {
 	@Override
 	public String homeView(HttpServletRequest request, ModelMap model) throws Exception {
 
+		model.addAttribute("RegionCity", homeMapper.selectRegionCity());
+
 		return "/home/homeView";
 	}
-	/**
-	 * 시도 조회
-	 */
-	@Override
-	public JSONObject getRegionCity(JSONObject param) throws Exception {
-		
-		return homeMapper.selectRegionCity(param);
-	}
+	
 	/**
 	 * 시군구 조회
 	 */
 	@Override
-	public JSONObject getRegionCounty(JSONObject param) throws Exception {
-		
+	public List<JSONObject> getRegionCounty(JSONObject param) throws Exception {
+//		System.out.println(param);
 		return homeMapper.selectRegionCounty(param);
 	}
 	/**
 	 * 읍면동 조회
 	 */
 	@Override
-	public JSONObject getRegionDistricts(JSONObject param) throws Exception {
-		
+	public List<JSONObject> getRegionDistricts(JSONObject param) throws Exception {
+//		System.out.println(param);
 		return homeMapper.selectRegionDistricts(param);
 	}
 

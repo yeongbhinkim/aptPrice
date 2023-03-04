@@ -1,0 +1,34 @@
+package egovframework.aptSurfer.home.api;
+
+
+//import lombok.AllArgsConstructor;
+//import lombok.Data;
+//import lombok.NoArgsConstructor;
+//
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+
+public class ApiResult<T> {
+  private String rtcd;
+  private String rtmsg;
+  public String getRtcd() {
+	return rtcd;
+}
+public void setRtcd(String rtcd) {
+	this.rtcd = rtcd;
+}
+public String getRtmsg() {
+	return rtmsg;
+}
+public void setRtmsg(String rtmsg) {
+	this.rtmsg = rtmsg;
+}
+public T getData() {
+	return data;
+}
+public void setData(T data) {
+	this.data = data;
+}
+private T data;
+}

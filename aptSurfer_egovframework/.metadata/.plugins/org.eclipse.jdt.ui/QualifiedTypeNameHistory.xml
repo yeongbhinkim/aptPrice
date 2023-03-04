@@ -7,4 +7,12 @@
 <fullyQualifiedTypeName name="org.apache.log4j.spi.LoggerFactory"/>
 <fullyQualifiedTypeName name="org.apache.log4j.Logger"/>
 <fullyQualifiedTypeName name="org.slf4j.LoggerFactory"/>
+<fullyQualifiedTypeName name="org.apache.ibatis.annotations.Select"/>
+<fullyQualifiedTypeName name="org.springframework.stereotype.Repository"/>
+<fullyQualifiedTypeName name="org.apache.catalina.authenticator.Constants"/>
+<fullyQualifiedTypeName name="java.util.List"/>
+<fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PathVariable"/>
+<fullyQualifiedTypeName name="java.util.Optional"/>
+<fullyQualifiedTypeName name="javax.annotation.sql.DataSourceDefinition"/>
+<fullyQualifiedTypeName name="javax.annotation.sql.DataSourceDefinitions"/>
 </qualifiedTypeNameHistroy>

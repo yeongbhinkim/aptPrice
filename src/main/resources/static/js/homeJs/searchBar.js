@@ -164,3 +164,5 @@ function search_f(e) {
     const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.options[$searchSidoCd.selectedIndex].text}/${$searchGugunCd.options[$searchGugunCd.selectedIndex].text}/${$searchDongCd.options[$searchDongCd.selectedIndex].text}/${$searchArea.value}/${$searchAreaValue}/${$searchAreaValueTo}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
     location.href = url;
 }
+
+

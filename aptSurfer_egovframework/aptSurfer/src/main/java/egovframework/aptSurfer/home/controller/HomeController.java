@@ -1,5 +1,7 @@
 package egovframework.aptSurfer.home.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +28,14 @@ import net.sf.json.JSONObject;
  * @see
  * copyright (c) KIM.inc All rights reserved.
  */
+
 @Controller
-@RequestMapping("/home")
+@RequestMapping("/")
 public class HomeController {
 
-	@Autowired(required = false)
+	@Autowired
 	private HomeService homeService;
-
+	
 	/**
 	 * 화면
 	 * 
@@ -43,24 +46,10 @@ public class HomeController {
 	 */
 	@RequestMapping("/homeView")
 	public String homeView(HttpServletRequest request, ModelMap model) throws Exception {
-		System.out.println("asd");
+		
 		return homeService.homeView(request, model);
 	}
 
-	/**
-	 * 시도 조회
-	 * 
-	 * @param param
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping("/getRegionCity")
-	@ResponseBody
-	public JSONObject getRegionCity(@RequestBody JSONObject param) throws Exception {
-
-		return homeService.getRegionCity(param);
-	}
-	
 	/**
 	 * 시군구 조회
 	 * 
@@ -70,7 +59,7 @@ public class HomeController {
 	 */
 	@RequestMapping("/getRegionCounty")
 	@ResponseBody
-	public JSONObject getRegionCounty(@RequestBody JSONObject param) throws Exception {
+	public List<JSONObject> getRegionCounty(@RequestBody JSONObject param) throws Exception {
 		
 		return homeService.getRegionCounty(param);
 	}
@@ -84,7 +73,7 @@ public class HomeController {
 	 */
 	@RequestMapping("/getRegionDistricts")
 	@ResponseBody
-	public JSONObject getRegionDistricts(@RequestBody JSONObject param) throws Exception {
+	public List<JSONObject> getRegionDistricts(@RequestBody JSONObject param) throws Exception {
 		
 		return homeService.getRegionDistricts(param);
 	}
