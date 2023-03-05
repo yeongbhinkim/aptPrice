@@ -57,20 +57,8 @@ function gugunCd(e) {
   //   console.log(param)
 }
 
-/*
-function fn_sgg_search(param, url, cbSuccess) {
 
-    fetch(url, {
-        method: 'GET',
-    })
-        .then((res) => res.json())
-        .then((res) => cbSuccess(res))
-        .catch((err) => {
-            console.error('Err:', err);
-        });
-    console.log('res:', res)
-}
-*/
+
 
 function fn_sgg_search(reqeustUrl, paramObject, cbSuccess){
 
@@ -189,7 +177,21 @@ function search_f(e) {
         $searchAreaValue = 0;
         $searchAreaValueTo = 10000;
     }
+	
+
+
     //조건 검색
-    const url = `/MyHomePrice/list/1/${$contractDate.value}/${$contractDateTo.value}/${$searchSidoCd.options[$searchSidoCd.selectedIndex].text}/${$searchGugunCd.options[$searchGugunCd.selectedIndex].text}/${$searchDongCd.options[$searchDongCd.selectedIndex].text}/${$searchArea.value}/${$searchAreaValue}/${$searchAreaValueTo}/${$searchFromAmount.value}/${$searchToAmnount.value}`;
+    const url = "/MainController/mainView.do?CONTRACTDATE=" + $contractDate.value + 
+											"&CONTRACTDATETO=" + $contractDateTo.value +
+											"&SEARCHSIDOCD=" + $searchSidoCd.options[$searchSidoCd.selectedIndex].text + 
+											"&SEARCHGUGUNCD=" + $searchGugunCd.options[$searchGugunCd.selectedIndex].text + 
+											"&SEARCHDONGCD=" + $searchDongCd.options[$searchDongCd.selectedIndex].text + 
+											"&SEARCHAREA=" + $searchArea.value  + 
+											"&SEARCHAREAVALUE=" + $searchAreaValue  + 
+											"&SEARCHAREAVALUETO=" + $searchAreaValueTo + 
+											"&SEARCHFROMAMOUNT=" + $searchFromAmount.value + 
+											"&SEARCHTOAMNOUNT=" + $searchToAmnount.value ;
+	console.log(url)
     location.href = url;
 }
+

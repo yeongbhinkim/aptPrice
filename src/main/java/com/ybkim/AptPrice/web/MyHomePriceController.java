@@ -86,8 +86,8 @@ public class MyHomePriceController {
     fc.setSearchGugunCd(searchGugunCd.orElse(""));                //시군구
     fc.setSearchDongCd(searchDongCd.orElse(""));                  //읍면동
     fc.setSearchArea(searchArea.orElse(""));                      //면적
-    fc.setSearchArea(searchAreaValue.orElse("0"));                //시작 면적
-    fc.setSearchArea(searchAreaValueTo.orElse("10000"));          //종료 면적
+    fc.setSearchAreaValue(searchAreaValue.orElse("0"));                //시작 면적
+    fc.setSearchAreaValueTo(searchAreaValueTo.orElse("10000"));          //종료 면적
     fc.setSearchFromAmount(searchFromAmount.orElse("0"));         //시작 금액
     fc.setSearchToAmnount(searchToAmnount.orElse("100000000"));   //종료 금액
 

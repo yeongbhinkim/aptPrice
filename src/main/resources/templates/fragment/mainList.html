@@ -52,6 +52,7 @@
 
     </div>
   </div>
+
   <div class="AptPrice-page page">
     <!--              이전페이지 정보-->
     <th:block th:if="${fc.prev}">
@@ -93,7 +94,7 @@
       </a>
     </th:block>
   </div>
-  </div>
+
   <script>
       // 대표 해시태그 정보 텍스트 앞에 # 붙이기
       const $mainHashtag = document.querySelectorAll('.mainHashtag');
@@ -110,8 +111,11 @@
       /* Function to create the chart */
 
       function createChart(item) {
+          console.log(item);
           const transactioncountlist = item.transactioncountlist;
+          console.log(transactioncountlist);
           const transactioncountlistArr = transactioncountlist.split(',');
+          console.log(transactioncountlistArr);
 
           const contract = item.contract;
           const contractArr = contract.split(',');
@@ -145,6 +149,7 @@
       /* Loop through the chart data */
       [[${list}]].forEach(function (item) {
           createChart(item);
+          console.log(item);
       });
   </script>
 

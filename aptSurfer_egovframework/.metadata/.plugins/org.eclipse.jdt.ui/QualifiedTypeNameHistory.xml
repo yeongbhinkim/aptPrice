@@ -15,4 +15,5 @@
 <fullyQualifiedTypeName name="java.util.Optional"/>
 <fullyQualifiedTypeName name="javax.annotation.sql.DataSourceDefinition"/>
 <fullyQualifiedTypeName name="javax.annotation.sql.DataSourceDefinitions"/>
+<fullyQualifiedTypeName name="javax.inject.Qualifier"/>
 </qualifiedTypeNameHistroy>

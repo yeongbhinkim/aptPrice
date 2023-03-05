@@ -1,7 +1,5 @@
 package egovframework.aptSurfer.main.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +56,7 @@ public class MainController {
 	 */
 	@RequestMapping("/getMyHomePriceList")
 	@ResponseBody
-	public List<JSONObject> getMyHomePriceList(@RequestBody JSONObject param) throws Exception {
+	public JSONObject getMyHomePriceList(@RequestBody JSONObject param) throws Exception {
 
 		return mainService.getMyHomePriceList(param);
 	}
