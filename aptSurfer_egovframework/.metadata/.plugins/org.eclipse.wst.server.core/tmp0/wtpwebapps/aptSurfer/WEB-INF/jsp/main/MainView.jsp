@@ -1,8 +1,8 @@
 <!--
-'*  파 일 명 : jsp/home/homeView.jsp
-'*  기    능 : home
+'*  파 일 명 : jsp/main/mainView.jsp
+'*  기    능 : main
 '*  작 성 자 : 김영빈
-'*  비    고 : 2023.02.20 작성
+'*  비    고 : 2023.03.03 작성
 -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -13,11 +13,10 @@
 
 <link rel="stylesheet" type="text/css" href="./../css/page/home-page-style.css" />
 <link rel="stylesheet" type="text/css" href="./../css/page/main-page-style.css" />
-	<!--차트-->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-  <!--   fontawesome-->
-	<script src="https://kit.fontawesome.com/023d8f21ed.js" crossorigin="anonymous"></script>
+<!--차트-->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<!--   fontawesome-->
+<script src="https://kit.fontawesome.com/023d8f21ed.js" crossorigin="anonymous"></script>
 <script defer src="./../js/homeJs/searchBar.js"></script>
 <script defer src="./../js/homeJs/main.js"></script>
 </head>

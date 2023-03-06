@@ -5,23 +5,20 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import egovframework.aptSurfer.main.service.MainService;
-import net.sf.json.JSONObject;
 /**
- * @Class Name : egovframework.aptSurfer.common.mapper.CommonController
+ * @Class Name : egovframework.aptSurfer.main.mapper.MainController
  * @Description :  aptSurfer 공통
  * @Modification Information
  * @ 
  * @ 수정일 		 수정자 		수정내용
  * @ ---------- --------- ------------------------------- 
  * @
- * @ 2023.02.19  KIM 		최초생성
+ * @ 2023.03.03  KIM 		최초생성
  * @author KIM
- * @since 2023.02.19
+ * @since 2023.03.03
  * @version 1.0.0
  * @see
  * copyright (c) KIM.inc All rights reserved.
@@ -46,22 +43,5 @@ public class MainController {
 
 		return mainService.mainView(request, model);
 	}
-
-	/**
-	 * APT 조건 조회
-	 * 
-	 * @param param
-	 * @return
-	 * @throws Exception
-	 */
-	@RequestMapping("/getMyHomePriceList")
-	@ResponseBody
-	public JSONObject getMyHomePriceList(@RequestBody JSONObject param) throws Exception {
-
-		return mainService.getMyHomePriceList(param);
-	}
-	
-	
-
 	
 }

@@ -1,216 +1,173 @@
 <!--
-'*  파 일 명 : jsp/home/homeView.jsp
-'*  기    능 : home
+'*  파 일 명 : jsp/content/contentItem.jsp
+'*  기    능 : content -> contentItem
 '*  작 성 자 : 김영빈
-'*  비    고 : 2023.02.20 작성
+'*  비    고 : 2023.03.05 작성
 -->
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Insert title here</title>
+<title>content</title>
 </head>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <body>
-	<main th:fragment="contentItem">
-
-	<form action="" method="post" th:object="${myHomePriceListForm}">
-		<input type="hidden" th:field="*{apt_id}" id="AptId"> <input
-			type="text" id="AptUrl" name="AptUrl" style="display: none;"
-			th:value="|http://localhost:9080/MyHomePrice/detail/*{apt_id}|">
+	<main>
 		<!-- container -->
-		<!-- width : standard -->
 		<div class="container">
 
 			<!-- Apt_info -->
 			<div class="Apt_info_wrap">
 				<div class="Apt-info">
 
-					<!--   Apt-info_img  ì°¨í¸ ë°ì¤-->
+					<!--   Apt-info_img  차트 박스-->
 					<div class="Apt-info_img">
 						<div class="chart_canvas_box">
 							<canvas id="chart-canvas"></canvas>
 						</div>
-					</div>
-					<!--   Apt-info_img  ì°¨í¸ ë°ì¤-->
+					</div><!--   Apt-info_img  차트 박스-->
 
 
-					<!-- Apt-info_content-wrap ìì¸ì ë³´ ë°ì¤-->
+					<!-- Apt-info_content-wrap 상세정보 박스-->
 					<div class="Apt-info-content-wrap">
 						<div class="Apt-info-content Apt-title-sub-box">
 							<div class="Apt-title-sub">
-								<h1 id="AptName" th:text="*{dan_gi_myeong}">ë¨ì§ëª</h1>
-								<a href="javascript:void(0)" class="link-btn">íì¬ url
-									ë³µì¬</a>
+								<h1 id="AptName">${myHomePriceListForm.DAN_GI_MYEONG}</h1>
+								<a href="javascript:void(0)" class="link-btn">현재 url 복사</a>
 							</div>
 						</div>
 
 						<div class="Apt-info-content Apt-location-sub-box">
 							<div class="Apt-location-icon-box icon-box">
-								<span class="mainHashtag">ì£¼ì</span>
+								<span class="mainHashtag">주소</span>
 							</div>
 							<div class="location-txt txt-box">
-								<span class="AptAddress" th:text="*{city}">ìêµ°êµ¬</span>
+								<span class="AptAddress">${myHomePriceListForm.CITY}</span>
 							</div>
 						</div>
 
 						<div class="Apt-info-content Apt-location-sub-box">
 							<div class="Apt-location-icon-box icon-box">
-								<span class="mainHashtag">ëë¡ëª</span>
+								<span class="mainHashtag">도로명</span>
 							</div>
 							<div class="location-txt txt-box">
-								<span id="AptAddressRoad" class="AptAddress"
-									th:text="*{road_name}">ëë¡ëª</span>
+								<span id="AptAddressRoad" class="AptAddress">${myHomePriceListForm.ROAD_NAME}</span>
 							</div>
 						</div>
 
 						<div class="Apt-info-content Apt-call-sub-box">
 							<div class="Apt-location-icon-box icon-box">
-								<span class="mainHashtag">ì ì©ë©´ì (ã¡)</span>
+								<span class="mainHashtag">전용면적(㎡)</span>
 							</div>
 							<div class="call-txt txt-box">
-								<span class="AptAddress" th:text="*{square_meter}">ì ì©ë©´ì (ã¡)</span>
+								<span class="AptAddress">${myHomePriceListForm.SQUARE_METER}</span>
 							</div>
 						</div>
-
 
 						<div class="Apt-info-content Apt-hashtag-sub-box">
 							<div class="Apt-hashtag-icon-box icon-box">
-								<span class="mainHashtag">ê¸°í</span>
+								<span class="mainHashtag">기타</span>
 							</div>
 							<div class="hashtag-txt txt-box" style="display: contents;">
 								<div>
-									<span class="mainHashtag">ê±´ì¶ëë</span> <span
-										class="AptAddress" th:text="*{construction_date}">ê±´ì¶ëë</span>
+									<span class="mainHashtag">건축년도</span> 
+									<span class="AptAddress">${myHomePriceListForm.CONSTRUCTION_DATE}</span>
 								</div>
 								<div>
-									<span class="mainHashtag">ì¸µ</span> <span class="AptAddress"
-										th:text="*{layer}">ì¸µ</span>
+									<span class="mainHashtag">층</span>
+									<span class="AptAddress">${myHomePriceListForm.LAYER}</span>
 								</div>
 								<div>
-									<span class="mainHashtag">ë²ì§</span> <span
-										class="AptAddress" th:text="*{street}">ë²ì§</span>
+									<span class="mainHashtag">번지</span>
+									<span class="AptAddress">${myHomePriceListForm.STREET}</span>
 								</div>
 								<div>
-									<span class="mainHashtag">ë³¸ë²</span> <span
-										class="AptAddress" th:text="*{bon_bun}">ë³¸ë²</span>
+									<span class="mainHashtag">본번</span>
+									<span class="AptAddress">${myHomePriceListForm.BON_BUN}</span>
 								</div>
 								<div>
-									<span class="mainHashtag">ë¶ë²</span> <span
-										class="AptAddress" th:text="*{bu_bun}">ë¶ë²</span>
+									<span class="mainHashtag">부번</span>
+									<span class="AptAddress">${myHomePriceListForm.BU_BUN}</span>
 								</div>
 							</div>
 						</div>
-					</div>
-					<!-- End of Apt-info_content-wrap ìì¸ì ë³´ ë°ì¤-->
+					</div><!-- End of Apt-info_content-wrap 상세정보 박스-->
 
-					<!-- map-box  ì§ëë°ì¤    -->
+					<!-- map-box  지도박스    -->
 					<div class="map-box">
-						<!-- ì§ëë¥¼ íìí  div ìëë¤ -->
+						<!-- 지도를 표시할 div 입니다 -->
 						<div id="map" style="width: 100%; height: 100%;"></div>
-						<p class="map_info">ë§ì»¤ë¥¼ í´ë¦­íë©´ ì¹´ì¹´ì¤ë§µì¼ë¡
-							ì´ëí©ëë¤.</p>
+						<p class="map_info">마커를 클릭하면 카카오맵으로 이동합니다.</p>
 					</div>
 
-				</div>
-				<!-- Apt-info-->
-			</div>
-			<!-- End of Apt_info -->
-
+				</div><!-- Apt-info-->
+			</div><!-- End of Apt_info -->
 
 			<div class="Apt-header">
 				<table class="Apt-content">
 					<thead>
 						<tr>
-							<!--            <th class="Apt-content-th">ì£¼ì</th>-->
-							<!--            <th class="Apt-content-th">ë²ì§</th>-->
-							<!--            <th class="Apt-content-th">ë³¸ë²</th>-->
-							<!--            <th class="Apt-content-th">ë¶ë²</th>-->
-							<!--            <th class="Apt-content-th">ë¨ì§ëª</th>-->
-							<!--            <th class="Apt-content-th">ì ì©ë©´ì (ã¡)</th>-->
-							<th class="Apt-content-th">ê³ì½<br>ëìì¼
-							</th>
-							<!--            <th class="Apt-content-th">ê³ì½<br>ëì</th>-->
-							<!--            <th class="Apt-content-th">ì¼</th>-->
-							<th class="Apt-content-th">ê±°ëê¸ì¡<br>(ë§ì)
-							</th>
-							<!--            <th class="Apt-content-th">ì¸µ</th>-->
-							<!--            <th class="Apt-content-th">ê±´ì¶ëë</th>-->
-							<!--            <th class="Apt-content-th">ëë¡ëª</th>-->
-							<!--            <th class="Apt-content-th">í´ì ì¬ì ë°ìì¼</th>-->
-							<th class="Apt-content-th">ê±°ë<br>ì í
-							</th>
-							<th class="Apt-content-th">ì¤ê°ì¬<br>ìì¬ì§
-							</th>
+							<th class="Apt-content-th">계약<br>년월일</th>
+							<th class="Apt-content-th">거래금액<br>(만원)</th>
+							<th class="Apt-content-th">거래<br>유형</th>
+							<th class="Apt-content-th">중개사<br>소재지</th>
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="item : ${list}">
-							<!--            <td class="Apt-content-td" th:text="${item.city}">ìêµ°êµ¬</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.street}">ë²ì§</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.bon_bun}">ë³¸ë²</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.bu_bun}">ë¶ë²</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.dan_gi_myeong}">ë¨ì§ëª</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.square_meter}">ì ì©ë©´ì (ã¡)</td>-->
-							<td class="Apt-content-td"
-								th:text="${item.contract_date}+.+${item.contract_day}">ê³ì½ëì</td>
-							<!--            <td class="Apt-content-td" th:text="${item.contract_date}">ê³ì½ëì</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.contract_day}">ê³ì½ì¼</td>-->
-							<td class="Apt-content-td" th:text="${item.amount}">ê±°ëê¸ì¡(ë§ì)</td>
-							<!--            <td class="Apt-content-td" th:text="${item.layer}">ì¸µ</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.construction_date}">ê±´ì¶ëë</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.road_name}">ëë¡ëª</td>-->
-							<!--            <td class="Apt-content-td" th:text="${item.reason_cancellation_date}">í´ì ì¬ì ë°ìì¼</td>-->
-							<td class="Apt-content-td" th:text="${item.transaction_type}">ê±°ëì í</td>
-							<td class="Apt-content-td" th:text="${item.location_agency}">ì¤ê°ì¬ìì¬ì§</td>
-						</tr>
+						<c:forEach var="item" items="${list}">
+							<tr>
+								<td class="Apt-content-td"><c:out value="${item.CONTRACT_DATE}"/><c:out value="."/><c:out value="${item.CONTRACT_DAY}"/></td>
+								<td class="Apt-content-td"><c:out value="${item.AMOUNT}"/></td>
+								<td class="Apt-content-td"><c:out value="${item.TRANSACTION_TYPE}"/></td>
+								<td class="Apt-content-td"><c:out value="${item.LOCATION_AGENCY}"/></td>
+							</tr>
+						</c:forEach>
 					</tbody>
 				</table>
 			</div>
 
-		</div>
-		</div>
-		<!-- End of container -->
-	</form>
+		</div><!-- End of container -->
 
 	<script type="text/javascript"
-		src="//dapi.kakao.com/v2/maps/sdk.js?appkey=410b3a83564f0bac127be038fded443b&libraries=services"></script>
+		src="//dapi.kakao.com/v2/maps/sdk.js?appkey=410b3a83564f0bac127be038fded443b&libraries=services">
+	</script>
+	
 	<script>
       // const $AptName = AptName.textContent;
-      //road_nameì¼ë¡ ë³ê²½
+      //road_name으로 변경
       const $AptAddress = AptAddressRoad.textContent;
-      var mapContainer = document.getElementById('map'), // ì§ëë¥¼ íìí  div
+      var mapContainer = document.getElementById('map'), // 지도를 표시할 div
           mapOption = {
-              center: new kakao.maps.LatLng(33.450701, 126.570667), // ì§ëì ì¤ì¬ì¢í
-              level: 4 // ì§ëì íë ë ë²¨
+              center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+              level: 4 // 지도의 확대 레벨
           };
 
-      // ì§ëë¥¼ ìì±í©ëë¤
+      // 지도를 생성합니다
       var map = new kakao.maps.Map(mapContainer, mapOption);
 
-      // ì£¼ì-ì¢í ë³í ê°ì²´ë¥¼ ìì±í©ëë¤
+      // 주소-좌표 변환 객체를 생성합니다
       var geocoder = new kakao.maps.services.Geocoder();
 
-      // ì£¼ìë¡ ì¢íë¥¼ ê²ìí©ëë¤
+      // 주소로 좌표를 검색합니다
       geocoder.addressSearch($AptAddress, function (result, status) {
 
-          // ì ìì ì¼ë¡ ê²ìì´ ìë£ëì¼ë©´
+          // 정상적으로 검색이 완료됐으면
           if (status === kakao.maps.services.Status.OK) {
 
               var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
-              // ê²°ê³¼ê°ì¼ë¡ ë°ì ìì¹ë¥¼ ë§ì»¤ë¡ íìí©ëë¤
+              // 결과값으로 받은 위치를 마커로 표시합니다
               var marker = new kakao.maps.Marker({
                   map: map,
                   position: coords,
                   clickable: true
               });
 
-              // ì§ëì ì¤ì¬ì ê²°ê³¼ê°ì¼ë¡ ë°ì ìì¹ë¡ ì´ëìíµëë¤
+              // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
               map.setCenter(coords);
 
-              // ë§ì»¤ë¥¼ í´ë¦­íë©´ ì¹´ì¹´ì¤ë§µì¼ë¡ ì´ë
+              // 마커를 클릭하면 카카오맵으로 이동
               kakao.maps.event.addListener(marker, 'click', (evt) => {
                   // window.open(`https://map.kakao.com/?q=${$AptName}`)
                   window.open(`https://map.kakao.com/?q=${$AptAddress}`)
@@ -218,16 +175,16 @@
           }
       });
 
-  </script> <script th:inline="javascript">
+  </script> 
+  <script type="text/javascript">
       /* Function to create the chart */
       function createChart(item) {
-
           /* Data for the chart */
           var data = {
-              //ìê°
+              //시간
               // labels: contractArr,
               datasets: [{
-                  label: 'ê±°ëê¸ì¡',
+                  label: '거래금액',
                   data: item,
                   backgroundColor: 'rgba(255, 99, 132, 0.2)',
                   borderColor: 'rgba(255, 99, 132, 1)',
@@ -256,7 +213,8 @@
       }
 
       /* Loop through the chart data */
-      createChart([[${chart}]]);
-  </script> </main>
+      createChart([${chart}]);
+  </script> 
+ </main>
 </body>
 </html>

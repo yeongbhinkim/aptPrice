@@ -15,16 +15,16 @@ import egovframework.aptSurfer.main.service.MainService;
 import egovframework.aptSurfer.paging.FindCriteria;
 import net.sf.json.JSONObject;
 /**
- * @Class Name : egovframework.aptSurfer.common.mapper.CommonServiceImpl
+ * @Class Name : egovframework.aptSurfer.main.mapper.MainServiceImpl
  * @Description :  aptSurfer 공통
  * @Modification Information
  * @ 
  * @ 수정일 		 수정자 		수정내용
  * @ ---------- --------- ------------------------------- 
  * @
- * @ 2023.02.19  KIM 		최초생성
+ * @ 2023.03.03  KIM 		최초생성
  * @author KIM
- * @since 2023.02.19
+ * @since 2023.03.03
  * @version 1.0.0
  * @see
  * copyright (c) KIM.inc All rights reserved.
@@ -47,9 +47,7 @@ public class MainServiceImpl implements MainService {
 	@Override
 	public String mainView(HttpServletRequest request, ModelMap model) throws Exception {
 
-		try {
 			JSONObject PARAM_INFO = DevUtil.getJsonFromRequestParameter(request);
-			System.out.println("PARAM_INFO = " + PARAM_INFO);
 			
 		    //FindCriteria 값 설정
 		    fc.getRc().setReqPage(PARAM_INFO.optString("ReqPage").equals("") ? 1 :  Integer.parseInt(PARAM_INFO.get("ReqPage").toString()));                     //요청페이지, 요청없으면 1
@@ -86,64 +84,14 @@ public class MainServiceImpl implements MainService {
 			
 			//목록, 차트
 		    model.addAttribute("list", mainMapper.selectMyHomePriceList(json));
-			
-		    System.out.println("fc = " + fc);
-			System.out.println("json = " + json);
-			System.out.println("list = " + mainMapper.selectMyHomePriceList(json));
 		    
-		} catch (Exception e) {
-			System.out.println("Exception = " + e);
-		}
+//		    System.out.println("PARAM_INFO = " + PARAM_INFO);
+//		    System.out.println("fc = " + fc);
+//			System.out.println("json = " + json);
+//			System.out.println("list = " + mainMapper.selectMyHomePriceList(json));
+		    
 		
-		
-		
-		return "/main/MainView";
-	}
-
-	@Override
-	public JSONObject getMyHomePriceList(JSONObject param) throws Exception {
-
-		JSONObject result = new JSONObject();
-		
-	    //FindCriteria 값 설정
-	    fc.getRc().setReqPage(param == null ? 1 : (int) param.get("reqPage"));                     //요청페이지, 요청없으면 1
-	    fc.setContractDate(param == null ? "" : param.get("contractDate").toString());                  //시작 계약일자
-	    fc.setContractDateTo(param == null ? "" : param.get("contractDateTo").toString());              //종료 계약일자
-	    fc.setSearchSidoCd(param == null ? "" : param.get("searchSidoCd").toString());                  //시도
-	    fc.setSearchGugunCd(param == null ? "" : param.get("searchGugunCd").toString());                //시군구
-	    fc.setSearchDongCd(param == null ? "" : param.get("searchDongCd").toString());                  //읍면동
-	    fc.setSearchArea(param == null ? "" : param.get("searchArea").toString());                      //면적
-	    fc.setSearchAreaValue(param == null ? "0" : param.get("searchAreaValue").toString());                //시작 면적
-	    fc.setSearchAreaValueTo(param == null ? "10000" : param.get("searchAreaValueTo").toString());          //종료 면적
-	    fc.setSearchFromAmount(param == null ? "0" : param.get("searchFromAmount").toString());         //시작 금액
-	    fc.setSearchToAmnount(param == null ? "100000000" : param.get("searchToAmnount").toString());   //종료 금액
-		
-	    JSONObject json = new JSONObject();
-	    
-		json.put("STARTREC", fc.getRc().getStartRec());
-		json.put("ENDREC", fc.getRc().getEndRec());
-		json.put("CONTRACTDATE", param.optString("contractDate"));
-		json.put("CONTRACTDATETO", param.optString("contractDateTo"));
-		json.put("SEARCHSIDOCD", param.optString("searchSidoCd"));
-		json.put("SEARCHGUGUNCD", param.optString("searchGugunCd"));
-		json.put("SEARCHDONGCD", param.optString("searchDongCd"));
-		json.put("SEARCHAREAVALUE", param.get("searchAreaValue") == null ? "0" : param.get("searchAreaValue").toString());
-		json.put("SEARCHAREAVALUETO", param.get("searchAreaValueTo") == null ? "10000" : param.get("searchAreaValueTo").toString());
-		json.put("SEARCHFROMAMOUNT", param.get("searchFromAmount") == null ? "0" : param.get("searchFromAmount").toString());
-		json.put("SEARCHTOAMNOUNT", param.get("searchToAmnount") == null ? "100000000" : param.get("searchToAmnount").toString());
-		
-		//FindCriteria 전체건수 값 설정
-		fc.setTotalRec(mainMapper.totalCount(json));
-		
-		//페이징
-//	    model.addAttribute("fc", fc);
-		result.put("fc",  fc);
-		
-		//목록, 차트
-//	    model.addAttribute("list", mainMapper.selectMyHomePriceList(json););
-		result.put("list",  mainMapper.selectMyHomePriceList(json));
-		
-		return result;
+		return "/main/mainView";
 	}
 	
 }

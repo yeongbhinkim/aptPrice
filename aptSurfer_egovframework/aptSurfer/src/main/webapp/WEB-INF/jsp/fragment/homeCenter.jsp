@@ -2,7 +2,7 @@
 '*  파 일 명 : jsp/home/homeView.jsp
 '*  기    능 : home
 '*  작 성 자 : 김영빈
-'*  비    고 : 2023.02.20 작성
+'*  비    고 : 2023.02.27 작성
 -->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>

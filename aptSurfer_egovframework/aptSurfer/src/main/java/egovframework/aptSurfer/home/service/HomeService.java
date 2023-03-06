@@ -16,9 +16,9 @@ import net.sf.json.JSONObject;
  * @ 수정일 		 수정자 		수정내용
  * @ ---------- --------- ------------------------------- 
  * @
- * @ 2023.02.19  KIM 		최초생성
+ * @ 2023.02.27  KIM 		최초생성
  * @author KIM
- * @since 2023.02.19
+ * @since 2023.02.27
  * @version 1.0.0
  * @see
  * copyright (c) KIM.inc All rights reserved.

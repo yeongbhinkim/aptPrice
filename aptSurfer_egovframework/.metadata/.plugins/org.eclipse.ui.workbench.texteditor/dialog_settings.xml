@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="SearchArea"/>
+		<item key="selection" value="item"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
+			<item value="item"/>
+			<item value="createChart"/>
+			<item value="container"/>
+			<item value="items"/>
+			<item value="item.APT_ID"/>
+			<item value="APT_ID"/>
+			<item value="#{"/>
+			<item value="home"/>
+			<item value="common"/>
+			<item value="2023.02.09"/>
+			<item value="2023.02.20"/>
+			<item value="2023.02.19"/>
+			<item value="commonService"/>
 			<item value="searchArea"/>
 			<item value="list"/>
-			<item value="MyHomePrice"/>
-			<item value="c:forEach"/>
-			<item value="chart-"/>
-			<item value="chart"/>
-			<item value="contract"/>
-			<item value="createChart"/>
-			<item value="transactioncountlist"/>
-			<item value="split"/>
-			<item value="transactioncountlistArr"/>
-			<item value="CONTRACTDATE"/>
-			<item value=".toString() == &quot;&quot;"/>
-			<item value=" == null"/>
-			<item value="searchAreaValue"/>
 		</list>
 		<list key="replacehistory">
+			<item value="content"/>
+			<item value="main"/>
+			<item value="2023.03.03"/>
+			<item value="2023.03.05"/>
+			<item value="contentService"/>
 			<item value="mainView"/>
 			<item value="MainController"/>
 			<item value=".equals(&quot;&quot;)"/>
@@ -35,11 +40,6 @@
 			<item value=""/>
 			<item value="#{}"/>
 			<item value="mainService"/>
-			<item value="cbSuccess"/>
-			<item value="param"/>
-			<item value="url"/>
-			<item value="searchSidoCd"/>
-			<item value="searchGugunCd"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

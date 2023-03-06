@@ -7,16 +7,16 @@ import egovframework.rte.psl.dataaccess.mapper.Mapper;
 import net.sf.json.JSONObject;
 
 /**
- * @Class Name : egovframework.aptSurfer.Home.mapper.HomeMapper
+ * @Class Name : egovframework.aptSurfer.home.mapper.HomeMapper
  * @Description :  aptSurfer 공통
  * @Modification Information
  * @ 
  * @ 수정일 		 수정자 		수정내용
  * @ ---------- --------- ------------------------------- 
  * @
- * @ 2023.02.20  KIM 		최초생성
+ * @ 2023.02.27  KIM 		최초생성
  * @author KIM
- * @since 2023.02.20
+ * @since 2023.02.27
  * @version 1.0.0
  * @see
  * copyright (c) KIM.inc All rights reserved.

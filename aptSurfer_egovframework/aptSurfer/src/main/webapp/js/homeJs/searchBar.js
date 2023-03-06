@@ -1,30 +1,19 @@
 'use strict';
 var now = new Date();
 
-
 //계약일자 오늘날짜
 document.getElementById('contractDate').value = new Date(now.setMonth(now.getMonth() - 1)).toISOString().substring(0, 10);
 document.getElementById('contractDateTo').value = new Date().toISOString().substring(0, 10);
 
 // 주소구분 라디오 이벤트
-// const $gubunR1 = document.getElementById('gubunR1');
-// $gubunR1.addEventListener('click', fn_select_check)
 const $searchDongCd = document.getElementById("searchDongCd");
-// const $searchChosung = document.getElementById("searchChosung");
 const $searchLoad = document.getElementById("searchLoad");
-// $searchDongCd.style.cssText = "display: block; ";
-// $searchChosung.style.cssText = "display: none; ";
-// $searchLoad.style.cssText = "display: none; ";
 
 function fn_select_check(e) {
     if (e == 1) {
         $searchDongCd.style.cssText = "display: block; ";
-        // $searchChosung.style.cssText = "display: none; ";
-        // $searchLoad.style.cssText = "display: none; ";
     } else if (e == 2) {
         $searchDongCd.style.cssText = "display: none; ";
-        // $searchChosung.style.cssText = "display: block; ";
-        // $searchLoad.style.cssText = "display: block; ";
     }
 }
 
@@ -34,16 +23,14 @@ $searchSidoCd.addEventListener('click', sidoCd)
 const $searchGugunCd = document.getElementById("searchGugunCd");
 $searchGugunCd.addEventListener('click', gugunCd)
 
-
 //시도
 function sidoCd(e) {
     if (e != '[object PointerEvent]') {
         const url = '/getRegionCounty';
 
-		var param= {CITY_CODE: e};
+        var param = { CITY_CODE: e };
         fn_sgg_search(url, param, cbSidoCd);
     }
- //    console.log(param)
 }
 
 //시군구
@@ -51,36 +38,29 @@ function gugunCd(e) {
     if (e != '[object PointerEvent]') {
         const url = '/getRegionDistricts';
 
-		var param= {COUNTY_CODE: e};
+        var param = { COUNTY_CODE: e };
         fn_sgg_search(url, param, cbGugunCd);
     }
-  //   console.log(param)
 }
 
-
-
-
-function fn_sgg_search(reqeustUrl, paramObject, cbSuccess){
+function fn_sgg_search(reqeustUrl, paramObject, cbSuccess) {
 
     var param = JSON.stringify(paramObject);
-	console.log('param:', param) ;
-	
-	$.ajax({
+
+    $.ajax({
         type: 'POST',
         contentType: "application/json",
         url: "http://localhost:8080" + reqeustUrl + ".json",
         data: param,
-        dataType:'json',
-	  	success: function(data){ 	  //요청 성공시 실행될 메서드
-	        console.log("통신성공");
-			cbSuccess(data);
-	    },
-	    error:function(){			  //요청 실패시 에러 확인을 위함
-	        console.log("통신에러");
-	    }
-	
+        dataType: 'json',
+        success: function (data) { 	  //요청 성공시 실행될 메서드
+            console.log("통신성공");
+            cbSuccess(data);
+        },
+        error: function () {			  //요청 실패시 에러 확인을 위함
+            console.log("통신에러");
+        }
     });
-
 }
 
 
@@ -129,17 +109,14 @@ function cbGugunCd(res) {
 //검색
 const $contractDate = document.getElementById('contractDate');              //시작 계약일자
 const $contractDateTo = document.getElementById('contractDateTo');          //종료 계약일자
-// const $searchSidoCd = document.getElementById('searchSidoCd');              //시도
-// const $searchGugunCd = document.getElementById('searchGugunCd');            //시군구
-// const $searchDongCd = document.getElementById('searchDongCd');              //읍면동
 const $searchArea = document.getElementById('searchArea');                  //면적
 const $searchFromAmount = document.getElementById('searchFromAmount');      //시작 금액
 const $searchToAmnount = document.getElementById('searchToAmnount');        //종료 금액
 const $searchBtn = document.getElementById('searchBtn');                    //검색버튼
 var $searchAreaValue = "";  //시작 면적
 var $searchAreaValueTo = "";  //종료 면적
-//검색 버튼 클릭시
-$searchBtn?.addEventListener('click', search_f);
+
+$searchBtn?.addEventListener('click', search_f);							//검색 버튼 클릭시
 
 
 function search_f(e) {
@@ -177,21 +154,18 @@ function search_f(e) {
         $searchAreaValue = 0;
         $searchAreaValueTo = 10000;
     }
-	
-
 
     //조건 검색
-    const url = "/MainController/mainView.do?CONTRACTDATE=" + $contractDate.value + 
-											"&CONTRACTDATETO=" + $contractDateTo.value +
-											"&SEARCHSIDOCD=" + $searchSidoCd.options[$searchSidoCd.selectedIndex].text + 
-											"&SEARCHGUGUNCD=" + $searchGugunCd.options[$searchGugunCd.selectedIndex].text + 
-											"&SEARCHDONGCD=" + $searchDongCd.options[$searchDongCd.selectedIndex].text + 
-											"&SEARCHAREA=" + $searchArea.value  + 
-											"&SEARCHAREAVALUE=" + $searchAreaValue  + 
-											"&SEARCHAREAVALUETO=" + $searchAreaValueTo + 
-											"&SEARCHFROMAMOUNT=" + $searchFromAmount.value + 
-											"&SEARCHTOAMNOUNT=" + $searchToAmnount.value ;
-	console.log(url)
+    const url = "/MainController/mainView.do?CONTRACTDATE=" + $contractDate.value +
+        "&CONTRACTDATETO=" + $contractDateTo.value +
+        "&SEARCHSIDOCD=" + $searchSidoCd.options[$searchSidoCd.selectedIndex].text +
+        "&SEARCHGUGUNCD=" + $searchGugunCd.options[$searchGugunCd.selectedIndex].text +
+        "&SEARCHDONGCD=" + $searchDongCd.options[$searchDongCd.selectedIndex].text +
+        "&SEARCHAREA=" + $searchArea.value +
+        "&SEARCHAREAVALUE=" + $searchAreaValue +
+        "&SEARCHAREAVALUETO=" + $searchAreaValueTo +
+        "&SEARCHFROMAMOUNT=" + $searchFromAmount.value +
+        "&SEARCHTOAMNOUNT=" + $searchToAmnount.value;
+    console.log(url)
     location.href = url;
 }
-

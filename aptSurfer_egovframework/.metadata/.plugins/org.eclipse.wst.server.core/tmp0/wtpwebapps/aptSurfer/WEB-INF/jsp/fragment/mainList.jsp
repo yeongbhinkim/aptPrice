@@ -2,10 +2,9 @@
 '*  파 일 명 : src\main\resources\templates\fragment\mainList.html
 '*  기    능 : 메인 -> 메인 리스트
 '*  작 성 자 : 김영빈
-'*  비    고 : 2023.02.09 작성
+'*  비    고 : 2023.03.03 작성
   -->
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -13,7 +12,6 @@
 <title>Main</title>
 </head>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
 <body>
 	<main>
 	<div class="Apt-list-wrap">
@@ -27,7 +25,7 @@
 									height="170"></canvas>
 							</div>
 							<div class="Apt-container-util Apt-each_title">
-								<span> <a href="/MainController/detail/${item.APT_ID}">
+								<span> <a href="/ContentController/contentView.do?APT_ID=${item.APT_ID}">
 										${item.DAN_GI_MYEONG} ${item.LAYER}층</a>
 								</span>
 							</div>
@@ -166,7 +164,6 @@
 
       const contract = item.CONTRACT;
       const contractArr = contract.split(',');
-
       /* Data for the chart */
       var data = {
           labels: contractArr,
