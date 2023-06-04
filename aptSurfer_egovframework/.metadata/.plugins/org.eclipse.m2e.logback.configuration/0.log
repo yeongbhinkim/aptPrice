@@ -8220,3 +8220,27 @@ org.eclipse.core.runtime.CoreException: Could not resolve artifact net.sf.jasper
 2023-03-05 22:27:49,259 [Worker-86: Cleaning all projects] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Cleaning filtered folder for aptSurfer
 2023-03-05 22:27:50,184 [Worker-85: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
 2023-03-05 22:27:50,184 [Worker-85: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-03-16 14:54:09,178 [Worker-46: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-03-16 14:54:09,180 [Worker-46: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-03-16 14:54:13,292 [Worker-45: Cleaning all projects] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Cleaning filtered folder for aptSurfer
+2023-03-16 14:54:13,512 [Worker-46: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-03-16 14:54:13,512 [Worker-46: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-03-16 14:55:28,777 [Worker-47: Updating Maven Project] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Cleaning filtered folder for aptSurfer
+2023-03-16 14:55:29,689 [Worker-47: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-03-16 14:55:29,689 [Worker-47: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 18:55:43,986 [Worker-41: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 18:55:43,989 [Worker-41: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 20:20:37,830 [Worker-45: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 20:20:37,834 [Worker-45: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:05:41,714 [Worker-70: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:05:41,715 [Worker-70: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:49:44,118 [Worker-105: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:49:44,119 [Worker-105: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:50:47,573 [Worker-105: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:50:47,573 [Worker-105: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:50:52,813 [Worker-114: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:50:52,813 [Worker-114: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:50:54,605 [Worker-112: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:50:54,605 [Worker-112: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer
+2023-06-04 21:51:48,907 [Worker-108: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Changed resources require a complete clean of filtered resources of aptSurfer
+2023-06-04 21:51:48,907 [Worker-108: Building] INFO  o.e.m.w.i.f.ResourceFilteringBuildParticipant - Executing resource filtering for aptSurfer

@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="item"/>
+		<item key="selection" value=""/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="item"/>
-			<item value="createChart"/>
-			<item value="container"/>
-			<item value="items"/>
-			<item value="item.APT_ID"/>
-			<item value="APT_ID"/>
-			<item value="#{"/>
-			<item value="home"/>
-			<item value="common"/>
-			<item value="2023.02.09"/>
+			<item value="log4jdbc3"/>
+			<item value="mysql-connector-java"/>
+			<item value="property name=&quot;basePackage&quot;"/>
+			<item value="mapperLocations"/>
+			<item value="property name"/>
+			<item value="driverClassName"/>
+			<item value="sqlSession-mysql"/>
+			<item value="`사용자ID`"/>
+			<item value="sqlSession"/>
+			<item value="Common"/>
+			<item value="schemalocation"/>
+			<item value="c##"/>
 			<item value="2023.02.20"/>
 			<item value="2023.02.19"/>
-			<item value="commonService"/>
-			<item value="searchArea"/>
-			<item value="list"/>
+			<item value="item"/>
 		</list>
 		<list key="replacehistory">
+			<item value="TEST"/>
+			<item value=""/>
+			<item value="2023.02.27"/>
 			<item value="content"/>
 			<item value="main"/>
 			<item value="2023.03.03"/>
@@ -37,16 +40,13 @@
 			<item value="PARAM_INFO.get"/>
 			<item value="request.getParameter"/>
 			<item value="param.get(&quot;contractDate&quot;).toString()"/>
-			<item value=""/>
-			<item value="#{}"/>
-			<item value="mainService"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="40"/>
-		<item key="DIALOG_Y_ORIGIN" value="590"/>
-		<item key="DIALOG_WIDTH" value="288"/>
-		<item key="DIALOG_HEIGHT" value="391"/>
-		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>
+		<item key="DIALOG_X_ORIGIN" value="557"/>
+		<item key="DIALOG_Y_ORIGIN" value="902"/>
+		<item key="DIALOG_WIDTH" value="393"/>
+		<item key="DIALOG_HEIGHT" value="460"/>
+		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>
 	</section>
 </section>
